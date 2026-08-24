@@ -1,58 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
   <defs>
-    <radialGradient id="bg" cx="72%" cy="18%" r="105%">
-      <stop offset="0" stop-color="#183b59"/>
-      <stop offset="0.45" stop-color="#0b2034"/>
-      <stop offset="1" stop-color="#050c16"/>
+    <radialGradient id="background" cx="68%" cy="18%" r="100%">
+      <stop offset="0" stop-color="#173754"/>
+      <stop offset="1" stop-color="#06101c"/>
     </radialGradient>
-    <linearGradient id="liver" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f08a62"/>
-      <stop offset="0.5" stop-color="#c65346"/>
-      <stop offset="1" stop-color="#7f2d3d"/>
+    <linearGradient id="organ" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f18465"/>
+      <stop offset="1" stop-color="#a33e4d"/>
     </linearGradient>
-    <linearGradient id="largeLesion" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#a78bfa"/>
-      <stop offset="1" stop-color="#4f46e5"/>
-    </linearGradient>
-    <linearGradient id="smallLesion" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="focus" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#67e8f9"/>
-      <stop offset="1" stop-color="#0d9488"/>
+      <stop offset="1" stop-color="#14b8a6"/>
     </linearGradient>
     <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
-      <feDropShadow dx="0" dy="30" stdDeviation="28" flood-color="#000814" flood-opacity="0.58"/>
+      <feDropShadow dx="0" dy="28" stdDeviation="26" flood-color="#000814" flood-opacity="0.55"/>
     </filter>
-    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
-      <feGaussianBlur stdDeviation="16" result="b"/>
-      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    <filter id="softGlow" x="-70%" y="-70%" width="240%" height="240%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
-    <clipPath id="liverClip">
-      <path d="M151 476C174 316 316 227 504 223C647 220 803 245 866 336C918 411 898 558 821 671C755 770 652 831 517 823C394 816 285 771 214 686C161 623 137 568 151 476Z"/>
-    </clipPath>
   </defs>
-
-  <rect width="1024" height="1024" fill="url(#bg)"/>
-  <circle cx="810" cy="178" r="230" fill="#263b80" opacity="0.16"/>
-  <circle cx="870" cy="90" r="142" fill="#5b21b6" opacity="0.10"/>
-
+  <rect width="1024" height="1024" fill="url(#background)"/>
   <g filter="url(#shadow)">
-    <path d="M151 476C174 316 316 227 504 223C647 220 803 245 866 336C918 411 898 558 821 671C755 770 652 831 517 823C394 816 285 771 214 686C161 623 137 568 151 476Z" fill="url(#liver)" stroke="#ffad86" stroke-width="10" stroke-opacity="0.72"/>
-    <path d="M164 470C211 351 344 296 512 291C659 286 788 307 851 377C877 407 885 447 884 490C813 408 705 366 586 357C412 344 276 389 164 470Z" fill="#ffb28c" opacity="0.18" clip-path="url(#liverClip)"/>
-    <path d="M498 226C488 380 514 529 583 678C604 724 636 766 677 797" fill="none" stroke="#ffb394" stroke-width="12" stroke-linecap="round" opacity="0.25" clip-path="url(#liverClip)"/>
+    <path d="M132 460C155 306 309 224 527 231C691 236 821 285 875 378C915 448 889 555 804 633C735 696 650 720 558 710C520 706 496 724 464 759C421 806 352 829 286 802C205 768 155 699 132 615C116 555 117 504 132 460Z" fill="url(#organ)" stroke="#ffaf8e" stroke-width="11"/>
+    <path d="M147 451C203 335 340 293 530 298C682 301 794 335 855 407C786 353 679 331 562 334C383 338 242 379 147 451Z" fill="#ffc0a4" opacity="0.20"/>
   </g>
-
-  <g filter="url(#glow)">
-    <ellipse cx="407" cy="499" rx="131" ry="153" fill="url(#largeLesion)" stroke="#c4b5fd" stroke-width="9"/>
-    <ellipse cx="665" cy="389" rx="84" ry="104" fill="#4169d8" stroke="#8bb9ff" stroke-width="8"/>
-    <circle cx="724" cy="588" r="55" fill="url(#smallLesion)" stroke="#99f6e4" stroke-width="7"/>
-    <circle cx="590" cy="682" r="34" fill="#f5b942" stroke="#fde68a" stroke-width="6"/>
-  </g>
-
-  <g fill="none" stroke-linecap="round">
-    <path d="M235 727C126 624 115 435 218 310" stroke="#22d3ee" stroke-width="13" opacity="0.95"/>
-    <path d="M211 311L223 365L168 349" stroke="#22d3ee" stroke-width="13" stroke-linejoin="round"/>
-    <path d="M783 284C894 373 919 545 839 674" stroke="#8b5cf6" stroke-width="11" opacity="0.75" stroke-dasharray="13 24"/>
-  </g>
-
-  <circle cx="407" cy="499" r="17" fill="#ffffff" opacity="0.92"/>
-  <circle cx="665" cy="389" r="12" fill="#ffffff" opacity="0.88"/>
+  <circle cx="424" cy="492" r="119" fill="#121f39" opacity="0.24" filter="url(#softGlow)"/>
+  <circle cx="424" cy="492" r="103" fill="url(#focus)" stroke="#d9fffb" stroke-width="11"/>
+  <circle cx="424" cy="492" r="28" fill="#ffffff" opacity="0.94"/>
+  <circle cx="691" cy="421" r="58" fill="#7c5ce8" stroke="#d7ccff" stroke-width="9"/>
+  <circle cx="691" cy="421" r="14" fill="#ffffff" opacity="0.90"/>
 </svg>
