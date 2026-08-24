@@ -39,7 +39,7 @@ function classification(row) {
 }
 
 function imageFor(row) {
-  return `assets/timeline/${row.lesion_id}_${fromDate}_${toDate}.webp`;
+  return `assets/timeline/${row.lesion_id}_${fromDate}_${toDate}.webp?v=5`;
 }
 
 function renderSelectors() {
@@ -232,7 +232,7 @@ grid.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.
 document.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
 
-const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=4', window.location.href).href;
+const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=5', window.location.href).href;
 const shareStatus = document.querySelector('#shareStatus');
 async function shareReport(event) {
   const button = event.currentTarget;
