@@ -7,6 +7,7 @@ const toSelect = document.querySelector('#toStudy');
 let studies = [];
 let studyMap = {};
 let lesions = [];
+let comparisons = {};
 let activeFilter = 'all';
 let fromDate;
 let toDate;
@@ -15,6 +16,13 @@ const fmt = (value, digits = 1) => value == null ? '—' : Number(value).toFixed
 const signed = (value, suffix = '%') => value == null ? '—' : `${value >= 0 ? '+' : ''}${Number(value).toFixed(1)}${suffix}`;
 const change = (from, to) => from == null || !from || to == null ? null : (to - from) / from * 100;
 const measurement = (row, date) => row.measurements[date] || { detected:false };
+const comparisonKey = (first, second) => `${first}__${second}`;
+const selectedComparison = () => comparisons[comparisonKey(fromDate, toDate)] || {
+  level:'limited', label:'Attenuation comparability not established', score_pct:null,
+  explanation:'Matched contrast timing and internal-reference measurements are not available for this pair.'
+};
+const metricPair = (first, second, key, suffix = '', digits = 1) =>
+  `${fmt(first[key], digits)}${first[key] == null ? '' : suffix} → ${fmt(second[key], digits)}${second[key] == null ? '' : suffix}`;
 
 function classification(row) {
   const first = measurement(row, fromDate);
@@ -62,6 +70,7 @@ function renderOverview() {
   const leadSecond = measurement(lead, toDate);
   const diameterChange = change(leadFirst.long_mm, leadSecond.long_mm);
   const detected = lesions.filter(row => measurement(row, toDate).detected).length;
+  const quality = selectedComparison();
 
   document.querySelector('#comparisonLabel').textContent = `CT comparison · ${first.label} → ${second.label}`;
   document.querySelector('#latestBurden').textContent = `${fmt(studies.at(-1).tumor_burden_pct,2)}%`;
@@ -101,7 +110,8 @@ function renderOverview() {
   document.querySelector('#findingsList').innerHTML = `
     <li><span>01</span><div><b>Total segmented burden</b><p>${signed(volumeChange)} volume change and ${signed(burdenChange,' percentage points')} burden change.</p></div></li>
     <li><span>02</span><div><b>Dominant segment 3 lesion</b><p>${signed(l01Change)} automated volume change over the selected interval.</p></div></li>
-    <li><span>03</span><div><b>Vessel proximity</b><p>${nearest == null ? 'Available on the latest segmented scan.' : `L02 is approximately ${fmt(nearest)} mm from the nearest automated major-vessel mask.`}</p></div></li>
+    <li class="quality-${quality.level}"><span>03</span><div><b>${quality.label}${quality.score_pct == null ? '' : ` · ${fmt(quality.score_pct)}% internal-reference similarity`}</b><p>${quality.explanation}</p></div></li>
+    <li><span>04</span><div><b>Vessel proximity</b><p>${nearest == null ? 'Available on the latest segmented scan.' : `L02 is approximately ${fmt(nearest)} mm from the nearest automated major-vessel mask.`}</p></div></li>
     <li class="warning-item"><span>!</span><div><b>Viability limitation</b><p>Low attenuation and enhancement ratios are proxies; single-phase CT cannot determine whether tumor cells are alive.</p></div></li>`;
 }
 
@@ -152,9 +162,21 @@ function openLesion(id) {
   const first = measurement(row, fromDate);
   const second = measurement(row, toDate);
   const status = classification(row);
+  const quality = selectedComparison();
   const proximity = second.proximity_mm && Object.keys(second.proximity_mm).length
     ? `<div class="proximity"><h3>Approximate edge-to-edge proximity on ${studyMap[toDate].label}</h3><div class="proximity-grid">${Object.entries(second.proximity_mm).map(([name,distance]) => `<div class="${distance < 5 ? 'near' : ''}"><span>${name.replaceAll('_',' ')}</span><b>${fmt(distance)} mm</b></div>`).join('')}</div><small>Automated masks only. These distances are not suitable for operative planning.</small></div>` : '';
-  const attenuation = second.median_hu == null ? '' : `<div class="proxy-panel"><h3>Attenuation proxies on ${studyMap[toDate].label}</h3><div class="dialog-stats"><div><span>Median attenuation</span><b>${fmt(second.median_hu)} HU</b></div><div><span>Local liver median</span><b>${fmt(second.local_liver_median_hu)} HU</b></div><div><span>Core below 40 HU</span><b>${fmt(second.below_40hu_pct)}%</b></div><div><span>Relative low attenuation</span><b>${fmt(second.relative_low_attenuation_pct)}%</b></div></div><small>These values describe appearance only and do not measure live tumor cells or prove necrosis.</small></div>`;
+  const hasAttenuation = first.median_hu != null || second.median_hu != null;
+  const hasNormalized = first.vnc_corrected_enhancement_hu != null || second.vnc_corrected_enhancement_hu != null;
+  const attenuation = !hasAttenuation ? '' : `<div class="proxy-panel"><div class="proxy-heading"><div><h3>Hemodynamic-aware attenuation</h3><p>${studyMap[fromDate].label} → ${studyMap[toDate].label}</p></div><span class="quality-badge ${quality.level}">${quality.label}${quality.score_pct == null ? '' : ` · ${fmt(quality.score_pct)}% reference similarity`}</span></div><div class="dialog-stats">
+    <div><span>Contrast CT median</span><b>${metricPair(first,second,'median_hu',' HU')}</b></div>
+    <div><span>VNC baseline median</span><b>${metricPair(first,second,'vnc_median_hu',' HU')}</b></div>
+    <div><span>VNC-corrected enhancement</span><b>${metricPair(first,second,'vnc_corrected_enhancement_hu',' HU')}</b></div>
+    <div><span>Enhancement vs local liver</span><b>${metricPair(first,second,'enhancement_vs_liver_pct','%')}</b></div>
+    <div><span>Enhancement vs portal vein</span><b>${metricPair(first,second,'enhancement_vs_portal_pct','%')}</b></div>
+    <div><span>Minimal enhancement (&lt;10 HU)</span><b>${metricPair(first,second,'minimal_enhancement_pct','%')}</b></div>
+    <div><span>Absolute core below 40 HU</span><b>${metricPair(first,second,'below_40hu_pct','%')}</b></div>
+    <div><span>Local liver median</span><b>${metricPair(first,second,'local_liver_median_hu',' HU')}</b></div>
+    </div><small>${quality.explanation} ${hasNormalized ? 'The normalized values reduce—but do not eliminate—differences in contrast delivery and circulation.' : 'VNC-based correction is unavailable for at least one selected scan.'} These are appearance proxies, not a measurement of living tumor or pathologic necrosis.</small></div>`;
   const trend = studies.map(study => {
     const value = measurement(row, study.date);
     return `<div><span>${study.label}</span><b>${value.detected ? `${fmt(value.volume_ml,2)} mL` : 'Not detected'}</b><small>${value.long_mm == null ? '—' : `${fmt(value.long_mm)} mm long axis`}</small></div>`;
@@ -187,10 +209,11 @@ function updateComparison() {
   renderCards();
 }
 
-fetch('assets/timeline.json?v=1').then(response => response.json()).then(data => {
+fetch('assets/timeline.json?v=2').then(response => response.json()).then(data => {
   studies = data.studies;
   studyMap = Object.fromEntries(studies.map(study => [study.date, study]));
   lesions = data.lesions;
+  comparisons = data.comparisons || {};
   toDate = studies.at(-1).date;
   fromDate = studies.at(-2).date;
   renderSelectors();
@@ -209,7 +232,7 @@ grid.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.
 document.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
 
-const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=2', window.location.href).href;
+const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=3', window.location.href).href;
 const shareStatus = document.querySelector('#shareStatus');
 async function shareReport(event) {
   const button = event.currentTarget;

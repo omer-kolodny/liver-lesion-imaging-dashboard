@@ -10,7 +10,9 @@ Responsive static web application containing:
 - Switchable liver segments, hepatic vessels, portal vein, IVC, aorta, gallbladder, pancreas, spleen, kidneys, and duodenum
 - Per-lesion distance estimates to selected vessels and nearby organs
 - Liver and tumor-volume summary
-- December 2025 versus January 2026 comparison
+- Selectable comparisons across all three CT dates
+- VNC-corrected lesion enhancement normalized to local liver and portal-vein enhancement for January–August
+- Pair-specific attenuation comparability indicators based on contrast protocol and internal blood-pool references
 - Searchable and filterable lesion explorer
 - Full-resolution comparison images and measurements
 - Downloadable designed PDF report and CSV data
