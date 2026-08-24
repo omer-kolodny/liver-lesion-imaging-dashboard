@@ -1,5 +1,7 @@
 # Liver Lesion Imaging Dashboard
 
+Public site: https://omer-kolodny.github.io/liver-lesion-imaging-dashboard/
+
 Responsive static web application containing:
 
 - Touch-controlled interactive GLB liver model
