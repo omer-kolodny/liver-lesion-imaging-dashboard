@@ -60,6 +60,7 @@ function openLesion(id) {
       <div><span>Median attenuation</span><b>${fmt(row.dec_median_hu)} → ${fmt(row.jan_median_hu)} HU</b></div>
       <div><span>Core below 40 HU</span><b>${fmt(row.dec_fraction_below_40hu_pct)}% → ${fmt(row.jan_fraction_below_40hu_pct)}%</b></div>
     </div>
+    ${row.proximity_mm ? `<div class="proximity"><h3>Approximate edge-to-edge proximity</h3><div class="proximity-grid">${Object.entries(row.proximity_mm).map(([name,distance]) => `<div><span>${name.replaceAll('_',' ')}</span><b>${fmt(distance)} mm</b></div>`).join('')}</div><small>Distances come from automated masks and are not suitable for operative planning.</small></div>` : ''}
     <div class="dialog-note"><b>Assessment:</b> ${status.note}<br><b>Confidence:</b> ${row.confidence}<br><small>The below-40-HU value is a low-attenuation proxy and does not establish necrosis.</small></div>
   </div>`;
   dialog.showModal();
@@ -83,9 +84,3 @@ grid.addEventListener('click', event => { const card = event.target.closest('.le
 grid.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('.lesion-card')) openLesion(event.target.dataset.id); });
 document.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
-
-const model = document.querySelector('#liverModel');
-const rotate = document.querySelector('#rotateToggle');
-rotate.addEventListener('click', () => { model.autoRotate = !model.autoRotate; rotate.textContent = model.autoRotate ? 'Pause rotation' : 'Resume rotation'; });
-document.querySelector('#resetCamera').addEventListener('click', () => { model.cameraOrbit = '0deg 75deg 105%'; model.fieldOfView = '30deg'; model.jumpCameraToGoal(); });
-document.querySelector('#fullscreenModel').addEventListener('click', () => document.querySelector('#modelShell').requestFullscreen?.());

@@ -1,6 +1,6 @@
 {
-  "name": "Liver Lesion Imaging Dashboard",
-  "short_name": "Liver CT",
+  "name": "HepatoMap 3D · Liver Imaging Dashboard",
+  "short_name": "HepatoMap",
   "description": "Interactive liver lesion visualization and CT comparison dashboard.",
   "start_url": "./",
   "display": "standalone",

@@ -7,19 +7,20 @@
   <meta name="description" content="Interactive liver lesion visualization and CT comparison dashboard.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Liver CT">
-  <title>Liver Lesion Imaging Dashboard</title>
+  <meta name="apple-mobile-web-app-title" content="HepatoMap">
+  <title>HepatoMap 3D · Liver Imaging Dashboard</title>
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2">
   <link rel="manifest" href="site.webmanifest?v=2">
   <link rel="stylesheet" href="styles.css">
-  <script type="module" src="model-viewer.min.js"></script>
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+  <script type="module" src="viewer.js"></script>
   <script defer src="app.js"></script>
 </head>
 <body>
   <div class="privacy-strip">Derived and anonymized imaging data only · Automated analysis · Radiologist verification required</div>
   <header class="nav shell">
-    <a class="brand" href="#top"><span class="brand-mark">3D</span><span>Hepatic Imaging</span></a>
+    <a class="brand" href="#top"><span class="brand-mark">3D</span><span>HepatoMap</span></a>
     <nav aria-label="Main navigation">
       <a href="#overview">Overview</a>
       <a href="#model">3D model</a>
@@ -88,9 +89,9 @@
         </div>
         <div class="model-layout">
           <div class="model-shell glass" id="modelShell">
-            <model-viewer id="liverModel" src="assets/liver_with_lesions.glb" poster="assets/liver-3d.webp" alt="Interactive 3D liver with highlighted lesions" camera-controls auto-rotate rotation-per-second="10deg" shadow-intensity="1.2" shadow-softness=".8" exposure="1.15" environment-image="neutral" interaction-prompt="auto" touch-action="pan-y">
-              <div class="model-loading" slot="poster"><img src="assets/liver-3d.webp" alt=""><span>Loading interactive model…</span></div>
-            </model-viewer>
+            <div id="threeViewer" class="three-viewer" role="img" aria-label="Interactive 3D liver, lesions, vessels and nearby organs">
+              <div class="model-loading" id="modelLoading"><img src="assets/liver-3d.webp" alt=""><span>Loading interactive anatomy…</span></div>
+            </div>
             <div class="model-controls">
               <button id="rotateToggle" type="button">Pause rotation</button>
               <button id="resetCamera" type="button">Reset view</button>
@@ -102,7 +103,23 @@
             <h3>Lesion candidates</h3>
             <p>Colors identify distinct connected lesion masks. Lesion IDs correspond to the measurement report and comparison screenshots.</p>
             <div class="mini-metrics"><div><span>Liver volume</span><b>1,667.05 mL</b></div><div><span>Tumor volume</span><b>170.34 mL</b></div><div><span>Voxel spacing</span><b>0.70 × 0.70 × 1.5 mm</b></div></div>
-            <a class="button ghost wide" href="assets/liver_with_lesions.glb" download>Download 3D model</a>
+            <div class="layer-heading">Anatomy layers</div>
+            <div class="layer-controls" id="layerControls">
+              <button class="layer-toggle active" data-layer="liver"><i style="--swatch:#b84e3a"></i>Liver</button>
+              <button class="layer-toggle active" data-layer="lesions"><i style="--swatch:#8b5cf6"></i>Lesions</button>
+              <button class="layer-toggle active" data-layer="hepatic"><i style="--swatch:#22d3ee"></i>Hepatic vessels</button>
+              <button class="layer-toggle active" data-layer="portal"><i style="--swatch:#3b82f6"></i>Portal vein</button>
+              <button class="layer-toggle" data-layer="ivc"><i style="--swatch:#2563eb"></i>IVC</button>
+              <button class="layer-toggle" data-layer="aorta"><i style="--swatch:#ef4444"></i>Aorta</button>
+              <button class="layer-toggle" data-layer="segments"><i style="--swatch:#84cc16"></i>Liver segments</button>
+              <button class="layer-toggle" data-layer="gallbladder"><i style="--swatch:#22c55e"></i>Gallbladder</button>
+              <button class="layer-toggle" data-layer="pancreas"><i style="--swatch:#fbbf24"></i>Pancreas</button>
+              <button class="layer-toggle" data-layer="spleen"><i style="--swatch:#c084fc"></i>Spleen</button>
+              <button class="layer-toggle" data-layer="kidneys"><i style="--swatch:#f4c9a0"></i>Kidneys</button>
+              <button class="layer-toggle" data-layer="duodenum"><i style="--swatch:#fb923c"></i>Duodenum</button>
+            </div>
+            <div class="preset-controls"><button data-preset="tumor">Tumor map</button><button data-preset="vascular">Vascular map</button><button data-preset="context">Organ context</button></div>
+            <a class="button ghost wide" href="assets/liver_anatomy_layers.glb" download>Download layered 3D model</a>
           </aside>
         </div>
       </div>

@@ -1,10 +1,12 @@
-# Liver Lesion Imaging Dashboard
+# HepatoMap 3D
 
 Public site: https://omer-kolodny.github.io/liver-lesion-imaging-dashboard/
 
 Responsive static web application containing:
 
 - Touch-controlled interactive GLB liver model
+- Switchable liver segments, hepatic vessels, portal vein, IVC, aorta, gallbladder, pancreas, spleen, kidneys, and duodenum
+- Per-lesion distance estimates to selected vessels and nearby organs
 - Liver and tumor-volume summary
 - December 2025 versus January 2026 comparison
 - Searchable and filterable lesion explorer

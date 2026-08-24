@@ -18,7 +18,15 @@
     "jan_median_hu": 68.0,
     "dec_fraction_below_40hu_pct": 1.4,
     "jan_fraction_below_40hu_pct": 5.4,
-    "confidence": "High for correspondence; boundaries require review"
+    "confidence": "High for correspondence; boundaries require review",
+    "proximity_mm": {
+      "hepatic_vessels": 1.4,
+      "portal_vein": 0.0,
+      "ivc": 31.3,
+      "aorta": 27.4,
+      "gallbladder": 34.9,
+      "pancreas": 2.1
+    }
   },
   {
     "lesion_id": "L02",
@@ -39,7 +47,15 @@
     "jan_median_hu": 83.0,
     "dec_fraction_below_40hu_pct": 0.5,
     "jan_fraction_below_40hu_pct": 0.4,
-    "confidence": "High for correspondence; stable by diameter"
+    "confidence": "High for correspondence; stable by diameter",
+    "proximity_mm": {
+      "hepatic_vessels": 0.7,
+      "portal_vein": 9.5,
+      "ivc": 0.7,
+      "aorta": 27.2,
+      "gallbladder": 44.8,
+      "pancreas": 38.9
+    }
   },
   {
     "lesion_id": "L03",
@@ -60,7 +76,15 @@
     "jan_median_hu": 79.0,
     "dec_fraction_below_40hu_pct": 0.1,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "High for correspondence; stable"
+    "confidence": "High for correspondence; stable",
+    "proximity_mm": {
+      "hepatic_vessels": 7.7,
+      "portal_vein": 42.5,
+      "ivc": 46.9,
+      "aorta": 65.2,
+      "gallbladder": 96.0,
+      "pancreas": 87.5
+    }
   },
   {
     "lesion_id": "L04",
@@ -81,7 +105,15 @@
     "jan_median_hu": 76.0,
     "dec_fraction_below_40hu_pct": 0.0,
     "jan_fraction_below_40hu_pct": 0.3,
-    "confidence": "Moderate-high; stable"
+    "confidence": "Moderate-high; stable",
+    "proximity_mm": {
+      "hepatic_vessels": 1.4,
+      "portal_vein": 18.8,
+      "ivc": 46.6,
+      "aorta": 66.7,
+      "gallbladder": 4.5,
+      "pancreas": 34.2
+    }
   },
   {
     "lesion_id": "L05",
@@ -102,7 +134,15 @@
     "jan_median_hu": 87.0,
     "dec_fraction_below_40hu_pct": 0.0,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "Moderate; volume change likely contour-sensitive"
+    "confidence": "Moderate; volume change likely contour-sensitive",
+    "proximity_mm": {
+      "hepatic_vessels": 4.7,
+      "portal_vein": 29.5,
+      "ivc": 55.7,
+      "aorta": 82.2,
+      "gallbladder": 46.9,
+      "pancreas": 68.1
+    }
   },
   {
     "lesion_id": "L06",
@@ -123,7 +163,15 @@
     "jan_median_hu": 70.0,
     "dec_fraction_below_40hu_pct": 1.2,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "Moderate; stable by diameter"
+    "confidence": "Moderate; stable by diameter",
+    "proximity_mm": {
+      "hepatic_vessels": 3.5,
+      "portal_vein": 52.0,
+      "ivc": 60.8,
+      "aorta": 83.1,
+      "gallbladder": 96.4,
+      "pancreas": 104.1
+    }
   },
   {
     "lesion_id": "L07",
@@ -144,7 +192,15 @@
     "jan_median_hu": 86.0,
     "dec_fraction_below_40hu_pct": 0.0,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "Moderate; apparent volume change is unreliable at this size"
+    "confidence": "Moderate; apparent volume change is unreliable at this size",
+    "proximity_mm": {
+      "hepatic_vessels": 0.7,
+      "portal_vein": 75.3,
+      "ivc": 50.2,
+      "aorta": 79.7,
+      "gallbladder": 47.4,
+      "pancreas": 48.2
+    }
   },
   {
     "lesion_id": "L08",
@@ -165,7 +221,15 @@
     "jan_median_hu": 70.0,
     "dec_fraction_below_40hu_pct": 0.0,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "Moderate; stable"
+    "confidence": "Moderate; stable",
+    "proximity_mm": {
+      "hepatic_vessels": 6.8,
+      "portal_vein": 23.5,
+      "ivc": 53.9,
+      "aorta": 85.3,
+      "gallbladder": 27.9,
+      "pancreas": 49.7
+    }
   },
   {
     "lesion_id": "L09",
@@ -186,7 +250,15 @@
     "jan_median_hu": 77.0,
     "dec_fraction_below_40hu_pct": 0.0,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "Moderate; stable"
+    "confidence": "Moderate; stable",
+    "proximity_mm": {
+      "hepatic_vessels": 4.5,
+      "portal_vein": 46.0,
+      "ivc": 48.5,
+      "aorta": 73.7,
+      "gallbladder": 12.2,
+      "pancreas": 31.5
+    }
   },
   {
     "lesion_id": "L10",
@@ -207,7 +279,15 @@
     "jan_median_hu": 76.0,
     "dec_fraction_below_40hu_pct": 0.0,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "Moderate-low; stable by diameter"
+    "confidence": "Moderate-low; stable by diameter",
+    "proximity_mm": {
+      "hepatic_vessels": 14.2,
+      "portal_vein": 48.6,
+      "ivc": 73.1,
+      "aorta": 106.5,
+      "gallbladder": 86.4,
+      "pancreas": 97.9
+    }
   },
   {
     "lesion_id": "L11",
@@ -228,7 +308,15 @@
     "jan_median_hu": 74.0,
     "dec_fraction_below_40hu_pct": 0.0,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "Moderate-low; stable by diameter"
+    "confidence": "Moderate-low; stable by diameter",
+    "proximity_mm": {
+      "hepatic_vessels": 13.6,
+      "portal_vein": 49.4,
+      "ivc": 64.8,
+      "aorta": 100.0,
+      "gallbladder": 57.0,
+      "pancreas": 67.2
+    }
   },
   {
     "lesion_id": "L12",
@@ -249,7 +337,15 @@
     "jan_median_hu": 85.0,
     "dec_fraction_below_40hu_pct": 0.7,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "Moderate-low; small-lesion variability"
+    "confidence": "Moderate-low; small-lesion variability",
+    "proximity_mm": {
+      "hepatic_vessels": 3.0,
+      "portal_vein": 46.9,
+      "ivc": 49.2,
+      "aorta": 83.0,
+      "gallbladder": 62.8,
+      "pancreas": 76.7
+    }
   },
   {
     "lesion_id": "L13",
@@ -270,7 +366,15 @@
     "jan_median_hu": 71.0,
     "dec_fraction_below_40hu_pct": 2.0,
     "jan_fraction_below_40hu_pct": 2.4,
-    "confidence": "Low; segmentation/matching inconsistency, do not interpret as true regression"
+    "confidence": "Low; segmentation/matching inconsistency, do not interpret as true regression",
+    "proximity_mm": {
+      "hepatic_vessels": 20.3,
+      "portal_vein": 36.8,
+      "ivc": 42.6,
+      "aorta": 56.2,
+      "gallbladder": 0.0,
+      "pancreas": 13.6
+    }
   },
   {
     "lesion_id": "L14",
@@ -291,7 +395,15 @@
     "jan_median_hu": 84.0,
     "dec_fraction_below_40hu_pct": 0.0,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "Low; sub-centimeter"
+    "confidence": "Low; sub-centimeter",
+    "proximity_mm": {
+      "hepatic_vessels": 3.0,
+      "portal_vein": 32.7,
+      "ivc": 47.2,
+      "aorta": 83.2,
+      "gallbladder": 47.7,
+      "pancreas": 53.4
+    }
   },
   {
     "lesion_id": "L15",
@@ -312,7 +424,15 @@
     "jan_median_hu": 74.0,
     "dec_fraction_below_40hu_pct": 9.4,
     "jan_fraction_below_40hu_pct": 0.3,
-    "confidence": "Low; sub-centimeter and attenuation unstable"
+    "confidence": "Low; sub-centimeter and attenuation unstable",
+    "proximity_mm": {
+      "hepatic_vessels": 16.4,
+      "portal_vein": 50.5,
+      "ivc": 66.2,
+      "aorta": 66.3,
+      "gallbladder": 129.2,
+      "pancreas": 44.6
+    }
   },
   {
     "lesion_id": "L16",
@@ -333,7 +453,15 @@
     "jan_median_hu": 82.0,
     "dec_fraction_below_40hu_pct": 0.6,
     "jan_fraction_below_40hu_pct": 0.0,
-    "confidence": "Low; sub-centimeter"
+    "confidence": "Low; sub-centimeter",
+    "proximity_mm": {
+      "hepatic_vessels": 4.8,
+      "portal_vein": 62.6,
+      "ivc": 53.3,
+      "aorta": 76.2,
+      "gallbladder": 96.6,
+      "pancreas": 104.8
+    }
   },
   {
     "lesion_id": "U01",
@@ -354,6 +482,7 @@
     "jan_median_hu": null,
     "dec_fraction_below_40hu_pct": 0.0,
     "jan_fraction_below_40hu_pct": null,
-    "confidence": "Low; older-scan-only automated candidate"
+    "confidence": "Low; older-scan-only automated candidate",
+    "proximity_mm": null
   }
 ]
