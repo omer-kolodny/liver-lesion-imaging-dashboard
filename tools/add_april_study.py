@@ -163,7 +163,7 @@ def source_half(lesion_id: str, date: str) -> Image.Image:
     draw.rectangle((0, 0, 900, 92), fill="#0d1b2d")
     draw.text((28, 20), f"{lesion_id} · {labels[date]}", font=title_font, fill="#f4f8ff")
     draw.rectangle((0, 790, 900, 855), fill="#0d1b2d")
-    draw.text((28, 806), "Measured image overlay · automated contour", font=load_fonts()[2], fill="#b9c9dc")
+    draw.text((28, 806), "Axial measured image overlay · automated contour", font=load_fonts()[2], fill="#b9c9dc")
     return panel
 
 
@@ -182,21 +182,25 @@ def april_panel(lesion_id: str, measurement: dict) -> Image.Image:
     component = APRIL_COMPONENT_MAP[lesion_id][0]
     image_path = APRIL_ROOT / "assets" / "20260426" / f"lesion_{component:02d}.png"
     image = Image.open(image_path).convert("RGB")
-    # The source is a high-resolution multi-planar lesion montage. Remove only the
-    # outer title margin, then preserve its complete diagnostic panels.
-    crop = image.crop((0, 95, image.width, image.height))
-    crop.thumbnail((860, 675), Image.Resampling.LANCZOS)
-    x = (900 - crop.width) // 2
-    y = 105 + (675 - crop.height) // 2
-    panel.paste(crop, (x, y))
+    # Use only the axial source panel so both comparison sides have the same
+    # orientation, square viewport, panel size, and zoom treatment.
+    scale_x = image.width / 4160
+    scale_y = image.height / 1560
+    axial_box = tuple(round(value) for value in (
+        155 * scale_x, 275 * scale_y, 1275 * scale_x, 1395 * scale_y,
+    ))
+    axial = image.crop(axial_box).resize((598, 598), Image.Resampling.LANCZOS)
+    panel.paste(axial, (151, 192))
     fragments = measurement.get("fragment_count", 1)
     subtitle = (
         f"{fragments} fragments · {measurement['volume_ml']:.2f} mL · {measurement['long_mm']:.1f} mm long axis"
         if fragments > 1
         else f"{measurement['volume_ml']:.2f} mL · {measurement['long_mm']:.1f} × {measurement['short_mm']:.1f} mm"
     )
+    draw.text((260, 126), "26 Apr 2026", font=body_font, fill="#f4f8ff")
+    draw.text((245, 158), subtitle, font=small_font, fill="#d5dfed")
     draw.rectangle((0, 790, 900, 855), fill="#0d1b2d")
-    draw.text((28, 804), subtitle, font=small_font, fill="#b9c9dc")
+    draw.text((28, 806), "Axial measured image overlay · automated contour", font=small_font, fill="#b9c9dc")
     return panel
 
 
