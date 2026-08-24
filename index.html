@@ -12,9 +12,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
   <link rel="manifest" href="site.webmanifest?v=4">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
-  <script type="module" src="viewer.js"></script>
+  <script type="module" src="viewer.js?v=2"></script>
   <script defer src="app.js"></script>
 </head>
 <body>
@@ -92,8 +92,31 @@
             <div id="threeViewer" class="three-viewer" role="img" aria-label="Interactive 3D liver, lesions, vessels and nearby organs">
               <div class="model-loading" id="modelLoading"><img src="assets/liver-3d.webp" alt=""><span>Loading interactive anatomy…</span></div>
             </div>
+            <div class="anatomy-toolbar" id="anatomyToolbar">
+              <button class="layer-panel-toggle" id="layerPanelToggle" type="button" aria-expanded="false" aria-controls="layerPanel">
+                <span>Layers</span><b id="visibleLayerCount">2 on</b>
+              </button>
+              <div class="layer-panel" id="layerPanel">
+                <div class="layer-panel-title"><strong>Anatomy overlays</strong><span>Tap to show or hide</span></div>
+                <div class="layer-controls" id="layerControls">
+                  <button class="layer-toggle active" data-layer="liver"><i style="--swatch:#b84e3a"></i>Liver</button>
+                  <button class="layer-toggle active" data-layer="lesions"><i style="--swatch:#8b5cf6"></i>Lesions</button>
+                  <button class="layer-toggle" data-layer="hepatic"><i style="--swatch:#22d3ee"></i>Hepatic vessels</button>
+                  <button class="layer-toggle" data-layer="portal"><i style="--swatch:#3b82f6"></i>Portal vein</button>
+                  <button class="layer-toggle" data-layer="ivc"><i style="--swatch:#2563eb"></i>IVC</button>
+                  <button class="layer-toggle" data-layer="aorta"><i style="--swatch:#ef4444"></i>Aorta</button>
+                  <button class="layer-toggle" data-layer="segments"><i style="--swatch:#84cc16"></i>Liver segments</button>
+                  <button class="layer-toggle" data-layer="gallbladder"><i style="--swatch:#22c55e"></i>Gallbladder</button>
+                  <button class="layer-toggle" data-layer="pancreas"><i style="--swatch:#fbbf24"></i>Pancreas</button>
+                  <button class="layer-toggle" data-layer="spleen"><i style="--swatch:#c084fc"></i>Spleen</button>
+                  <button class="layer-toggle" data-layer="kidneys"><i style="--swatch:#f4c9a0"></i>Kidneys</button>
+                  <button class="layer-toggle" data-layer="duodenum"><i style="--swatch:#fb923c"></i>Duodenum</button>
+                </div>
+                <div class="preset-controls"><button data-preset="tumor">Tumor only</button><button data-preset="vascular">Vessels</button><button data-preset="context">Organs</button></div>
+              </div>
+            </div>
             <div class="model-controls">
-              <button id="rotateToggle" type="button">Pause rotation</button>
+              <button id="rotateToggle" type="button">Auto-rotate</button>
               <button id="resetCamera" type="button">Reset view</button>
               <button id="fullscreenModel" type="button">Fullscreen</button>
             </div>
@@ -103,22 +126,8 @@
             <h3>Lesion candidates</h3>
             <p>Colors identify distinct connected lesion masks. Lesion IDs correspond to the measurement report and comparison screenshots.</p>
             <div class="mini-metrics"><div><span>Liver volume</span><b>1,667.05 mL</b></div><div><span>Tumor volume</span><b>170.34 mL</b></div><div><span>Voxel spacing</span><b>0.70 × 0.70 × 1.5 mm</b></div></div>
-            <div class="layer-heading">Anatomy layers</div>
-            <div class="layer-controls" id="layerControls">
-              <button class="layer-toggle active" data-layer="liver"><i style="--swatch:#b84e3a"></i>Liver</button>
-              <button class="layer-toggle active" data-layer="lesions"><i style="--swatch:#8b5cf6"></i>Lesions</button>
-              <button class="layer-toggle active" data-layer="hepatic"><i style="--swatch:#22d3ee"></i>Hepatic vessels</button>
-              <button class="layer-toggle active" data-layer="portal"><i style="--swatch:#3b82f6"></i>Portal vein</button>
-              <button class="layer-toggle" data-layer="ivc"><i style="--swatch:#2563eb"></i>IVC</button>
-              <button class="layer-toggle" data-layer="aorta"><i style="--swatch:#ef4444"></i>Aorta</button>
-              <button class="layer-toggle" data-layer="segments"><i style="--swatch:#84cc16"></i>Liver segments</button>
-              <button class="layer-toggle" data-layer="gallbladder"><i style="--swatch:#22c55e"></i>Gallbladder</button>
-              <button class="layer-toggle" data-layer="pancreas"><i style="--swatch:#fbbf24"></i>Pancreas</button>
-              <button class="layer-toggle" data-layer="spleen"><i style="--swatch:#c084fc"></i>Spleen</button>
-              <button class="layer-toggle" data-layer="kidneys"><i style="--swatch:#f4c9a0"></i>Kidneys</button>
-              <button class="layer-toggle" data-layer="duodenum"><i style="--swatch:#fb923c"></i>Duodenum</button>
-            </div>
-            <div class="preset-controls"><button data-preset="tumor">Tumor map</button><button data-preset="vascular">Vascular map</button><button data-preset="context">Organ context</button></div>
+            <div class="layer-heading">Interactive overlays</div>
+            <p class="layer-help">Use the <b>Layers</b> button inside the 3D viewer to add vessels, liver segments, and nearby organs.</p>
             <a class="button ghost wide" href="assets/liver_anatomy_layers.glb" download>Download layered 3D model</a>
           </aside>
         </div>

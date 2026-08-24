@@ -6,13 +6,16 @@ const container = document.querySelector('#threeViewer');
 const loading = document.querySelector('#modelLoading');
 
 if (container) {
+  const touchDevice = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+  const normalPixelRatio = Math.min(window.devicePixelRatio, touchDevice ? 1 : 1.5);
+  const interactionPixelRatio = touchDevice ? Math.min(normalPixelRatio, 0.8) : normalPixelRatio;
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#07111e');
   scene.fog = new THREE.FogExp2('#07111e', 0.0015);
 
   const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 3000);
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const renderer = new THREE.WebGLRenderer({ antialias: !touchDevice, alpha: false, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(normalPixelRatio);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
@@ -20,12 +23,20 @@ if (container) {
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
-  controls.dampingFactor = 0.07;
-  controls.autoRotate = true;
+  controls.dampingFactor = 0.1;
+  controls.rotateSpeed = touchDevice ? 0.9 : 0.75;
+  controls.zoomSpeed = 0.85;
+  controls.autoRotate = false;
   controls.autoRotateSpeed = 1.1;
-  controls.enablePan = true;
+  controls.enablePan = !touchDevice;
+  controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
   controls.minDistance = 120;
   controls.maxDistance = 900;
+  let renderRequested = true;
+  let interacting = false;
+  let settleFrames = 0;
+  let viewerVisible = true;
+  let qualityTimer;
 
   scene.add(new THREE.HemisphereLight(0xbfe8ff, 0x172033, 2.4));
   const key = new THREE.DirectionalLight(0xffffff, 3.3); key.position.set(250, -350, 450); scene.add(key);
@@ -46,13 +57,23 @@ if (container) {
     kidneys: name => name.startsWith('Kidney_'),
     duodenum: name => name === 'Duodenum',
   };
-  const initial = { liver:true, lesions:true, hepatic:true, portal:true, ivc:false, aorta:false, segments:false, gallbladder:false, pancreas:false, spleen:false, kidneys:false, duodenum:false };
+  const initial = { liver:true, lesions:true, hepatic:false, portal:false, ivc:false, aorta:false, segments:false, gallbladder:false, pancreas:false, spleen:false, kidneys:false, duodenum:false };
   const layers = Object.fromEntries(Object.keys(layerMatchers).map(key => [key, []]));
+  const overlayLayerNames = new Set(Object.keys(layerMatchers).filter(name => !['liver', 'lesions'].includes(name)));
   const lesionLabels = new THREE.Group();
   lesionLabels.name = 'Lesion_Labels';
   scene.add(lesionLabels);
   let rootModel;
   let homeCamera = null;
+  let overlaysPromise = null;
+  let overlaysReady = false;
+  const loader = new GLTFLoader();
+
+  function updateLayerCount() {
+    const count = document.querySelectorAll('.layer-toggle.active').length;
+    const label = document.querySelector('#visibleLayerCount');
+    if (label) label.textContent = `${count} on`;
+  }
 
   function objectLayer(name) {
     return Object.entries(layerMatchers).find(([, match]) => match(name))?.[0];
@@ -70,10 +91,22 @@ if (container) {
   }
 
   function setLayer(name, visible) {
+    if (visible && overlayLayerNames.has(name) && !overlaysReady) {
+      document.querySelectorAll(`[data-layer="${name}"]`).forEach(button => button.classList.add('loading'));
+      ensureOverlays().then(() => setLayer(name, true)).catch(() => {
+        document.querySelectorAll(`[data-layer="${name}"]`).forEach(button => button.classList.remove('loading'));
+      });
+      return;
+    }
     (layers[name] || []).forEach(object => object.visible = visible);
     if (name === 'lesions') lesionLabels.visible = visible;
-    const button = document.querySelector(`[data-layer="${name}"]`);
-    if (button) button.classList.toggle('active', visible);
+    document.querySelectorAll(`[data-layer="${name}"]`).forEach(button => {
+      button.classList.remove('loading');
+      button.classList.toggle('active', visible);
+      button.setAttribute('aria-pressed', String(visible));
+    });
+    updateLayerCount();
+    renderRequested = true;
   }
 
   function applyPreset(name) {
@@ -85,29 +118,58 @@ if (container) {
     Object.entries(presets[name]).forEach(([key,value]) => setLayer(key,value));
   }
 
-  new GLTFLoader().load('assets/liver_anatomy_layers.glb', gltf => {
-    rootModel = gltf.scene; scene.add(rootModel);
-    rootModel.traverse(object => {
-      if (!object.isMesh) return;
-      const layer = objectLayer(object.name);
-      if (layer) layers[layer].push(object);
-      object.castShadow = true; object.receiveShadow = true;
-      const materials = Array.isArray(object.material) ? object.material : [object.material];
-      materials.forEach(material => {
-        material.side = THREE.DoubleSide;
-        if (material.transparent) material.depthWrite = false;
-      });
-      if (object.name.startsWith('Lesion_')) {
-        const box = new THREE.Box3().setFromObject(object); const center = box.getCenter(new THREE.Vector3());
-        const label = makeLabel(object.name.replace('Lesion_','')); label.position.copy(center); label.position.z += 8; lesionLabels.add(label);
-      }
+  function prepareMesh(object, includeLabels = false) {
+    if (!object.isMesh) return;
+    const layer = objectLayer(object.name);
+    if (layer) layers[layer].push(object);
+    object.castShadow = false;
+    object.receiveShadow = false;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    materials.forEach(material => {
+      material.side = material.transparent ? THREE.DoubleSide : THREE.FrontSide;
+      if (material.transparent) material.depthWrite = false;
     });
+    if (includeLabels && object.name.startsWith('Lesion_')) {
+      const box = new THREE.Box3().setFromObject(object); const center = box.getCenter(new THREE.Vector3());
+      const label = makeLabel(object.name.replace('Lesion_','')); label.position.copy(center); label.position.z += 8; lesionLabels.add(label);
+    }
+  }
+
+  function ensureOverlays() {
+    if (overlaysReady) return Promise.resolve();
+    if (overlaysPromise) return overlaysPromise;
+    overlaysPromise = new Promise((resolve, reject) => {
+      loader.load('assets/anatomy_overlays.glb?v=1', gltf => {
+        const overlayRoot = gltf.scene;
+        overlayRoot.traverse(object => {
+          prepareMesh(object);
+          if (object.isMesh) object.visible = false;
+        });
+        scene.add(overlayRoot);
+        overlaysReady = true;
+        renderRequested = true;
+        document.querySelectorAll('.layer-toggle.loading').forEach(button => button.classList.remove('loading'));
+        resolve();
+      }, undefined, error => {
+        console.error(error);
+        document.querySelectorAll('.layer-toggle.loading').forEach(button => button.classList.remove('loading'));
+        overlaysPromise = null;
+        reject(error);
+      });
+    });
+    return overlaysPromise;
+  }
+
+  loader.load('assets/liver_core.glb?v=1', gltf => {
+    rootModel = gltf.scene; scene.add(rootModel);
+    rootModel.traverse(object => prepareMesh(object, true));
     Object.entries(initial).forEach(([name,visible]) => setLayer(name,visible));
     const box = new THREE.Box3().setFromObject(rootModel); const center = box.getCenter(new THREE.Vector3()); const size = box.getSize(new THREE.Vector3());
     const distance = Math.max(size.x,size.y,size.z) * 1.65;
     controls.target.copy(center); camera.position.set(center.x + distance*.7, center.y - distance, center.z + distance*.52); camera.lookAt(center);
     controls.minDistance = distance*.35; controls.maxDistance = distance*3; controls.update();
     homeCamera = { position:camera.position.clone(), target:center.clone() };
+    renderRequested = true;
     loading?.remove();
   }, undefined, error => {
     console.error(error);
@@ -118,8 +180,32 @@ if (container) {
     const name = button.dataset.layer; setLayer(name, !button.classList.contains('active'));
   }));
   document.querySelectorAll('[data-preset]').forEach(button => button.addEventListener('click', () => applyPreset(button.dataset.preset)));
+  const anatomyToolbar = document.querySelector('#anatomyToolbar');
+  const layerPanelToggle = document.querySelector('#layerPanelToggle');
+  layerPanelToggle?.addEventListener('click', () => {
+    const open = anatomyToolbar?.classList.toggle('open') ?? false;
+    layerPanelToggle.setAttribute('aria-expanded', String(open));
+  });
   document.querySelector('#rotateToggle')?.addEventListener('click', event => {
-    controls.autoRotate = !controls.autoRotate; event.currentTarget.textContent = controls.autoRotate ? 'Pause rotation' : 'Resume rotation';
+    controls.autoRotate = !controls.autoRotate; event.currentTarget.textContent = controls.autoRotate ? 'Pause rotation' : 'Auto-rotate';
+  });
+  controls.addEventListener('start', () => {
+    interacting = true;
+    settleFrames = 45;
+    clearTimeout(qualityTimer);
+    if (renderer.getPixelRatio() !== interactionPixelRatio) renderer.setPixelRatio(interactionPixelRatio);
+    if (controls.autoRotate) controls.autoRotate = false;
+    const button = document.querySelector('#rotateToggle');
+    if (button) button.textContent = 'Auto-rotate';
+  });
+  controls.addEventListener('change', () => { renderRequested = true; });
+  controls.addEventListener('end', () => {
+    interacting = false;
+    settleFrames = 45;
+    qualityTimer = setTimeout(() => {
+      renderer.setPixelRatio(normalPixelRatio);
+      renderRequested = true;
+    }, 120);
   });
   document.querySelector('#resetCamera')?.addEventListener('click', () => {
     if (!homeCamera) return; camera.position.copy(homeCamera.position); controls.target.copy(homeCamera.target); controls.update();
@@ -131,6 +217,20 @@ if (container) {
     renderer.setSize(width,height,false); camera.aspect = width/height; camera.updateProjectionMatrix();
   }
   new ResizeObserver(resize).observe(container); resize();
-  renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene,camera); });
+  new IntersectionObserver(entries => {
+    viewerVisible = entries[0]?.isIntersecting ?? true;
+    if (viewerVisible) renderRequested = true;
+  }, { rootMargin: '200px' }).observe(container);
+  const clock = new THREE.Clock();
+  renderer.setAnimationLoop(() => {
+    const delta = Math.min(clock.getDelta(), 0.05);
+    if (!viewerVisible) return;
+    const requested = renderRequested;
+    renderRequested = false;
+    const changed = controls.update(delta);
+    const animating = controls.autoRotate || interacting || settleFrames > 0;
+    if (requested || changed || animating) renderer.render(scene,camera);
+    if (!interacting && !controls.autoRotate && settleFrames > 0) settleFrames -= 1;
+  });
   window.anatomyViewer = { setLayer, applyPreset };
 }
