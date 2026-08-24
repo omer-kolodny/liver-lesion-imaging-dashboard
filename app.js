@@ -29,6 +29,7 @@ function classification(row) {
   const second = measurement(row, toDate);
   const volumeChange = change(first.volume_ml, second.volume_ml);
   const small = Math.max(first.volume_ml || 0, second.volume_ml || 0) < 0.5;
+  if (!first.detected && !second.detected) return { key:'inactive', cls:'unreliable', label:'Absent in selected pair', note:'This historical track was not separately detected in either selected study.' };
   if (first.detected && !second.detected) return { key:'stable', cls:'stable', label:'Not separately detected', note:'No separate residual focus was identified by the automated later-scan model. This does not prove complete resolution.' };
   if (small) return { key:'caution', cls:'caution', label:'Small / uncertain', note:'Sub-centimeter lesion measurements and attenuation fractions are highly contour-sensitive.' };
   if (second.confidence === 'low') return { key:'caution', cls:'unreliable', label:'Low-confidence match', note:'Registration and independent-model agreement are limited for this match.' };
@@ -69,7 +70,8 @@ function renderOverview() {
   const leadFirst = measurement(lead, fromDate);
   const leadSecond = measurement(lead, toDate);
   const diameterChange = change(leadFirst.long_mm, leadSecond.long_mm);
-  const detected = lesions.filter(row => measurement(row, toDate).detected).length;
+  const relevant = lesions.filter(row => measurement(row, fromDate).detected || measurement(row, toDate).detected);
+  const matched = relevant.filter(row => measurement(row, fromDate).detected && measurement(row, toDate).detected).length;
   const quality = selectedComparison();
 
   document.querySelector('#comparisonLabel').textContent = `CT comparison · ${first.label} → ${second.label}`;
@@ -80,7 +82,7 @@ function renderOverview() {
   document.querySelector('#burdenValues').textContent = `${fmt(first.tumor_burden_pct,2)}% → ${fmt(second.tumor_burden_pct,2)}%`;
   document.querySelector('#diameterDelta').textContent = signed(diameterChange);
   document.querySelector('#diameterValues').textContent = `${fmt(leadFirst.long_mm)} → ${fmt(leadSecond.long_mm)} mm`;
-  document.querySelector('#trackedCount').textContent = `${detected} / 16`;
+  document.querySelector('#trackedCount').textContent = `${matched} / ${relevant.length}`;
 
   const fromDonut = document.querySelector('#fromDonut');
   const toDonut = document.querySelector('#toDonut');
@@ -121,6 +123,7 @@ function renderCards() {
     const status = classification(row);
     const first = measurement(row, fromDate);
     const second = measurement(row, toDate);
+    if (!first.detected && !second.detected) return false;
     const major = Math.max(first.volume_ml || 0, second.volume_ml || 0) >= 2;
     const filterMatch = activeFilter === 'all' || activeFilter === status.key || (activeFilter === 'major' && major);
     const textMatch = !term || `${row.lesion_id} ${row.reference_segment}`.toLowerCase().includes(term);
