@@ -10,6 +10,7 @@ Responsive static web application containing:
 - Searchable and filterable lesion explorer
 - Full-resolution comparison images and measurements
 - Downloadable designed PDF report and CSV data
+- Custom iPhone/Home Screen application icon
 
 ## Preview locally
 
