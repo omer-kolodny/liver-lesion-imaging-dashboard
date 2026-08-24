@@ -7,8 +7,7 @@ const loading = document.querySelector('#modelLoading');
 
 if (container) {
   const touchDevice = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
-  const normalPixelRatio = Math.min(window.devicePixelRatio, touchDevice ? 1 : 1.5);
-  const interactionPixelRatio = touchDevice ? Math.min(normalPixelRatio, 0.8) : normalPixelRatio;
+  const normalPixelRatio = Math.min(window.devicePixelRatio, touchDevice ? 0.85 : 1.5);
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#07111e');
   scene.fog = new THREE.FogExp2('#07111e', 0.0015);
@@ -22,21 +21,15 @@ if (container) {
   container.appendChild(renderer.domElement);
 
   const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
+  controls.enableDamping = !touchDevice;
   controls.dampingFactor = 0.1;
-  controls.rotateSpeed = touchDevice ? 0.9 : 0.75;
+  controls.rotateSpeed = touchDevice ? 1.15 : 0.75;
   controls.zoomSpeed = 0.85;
   controls.autoRotate = false;
   controls.autoRotateSpeed = 1.1;
   controls.enablePan = !touchDevice;
-  controls.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
   controls.minDistance = 120;
   controls.maxDistance = 900;
-  let renderRequested = true;
-  let interacting = false;
-  let settleFrames = 0;
-  let viewerVisible = true;
-  let qualityTimer;
 
   scene.add(new THREE.HemisphereLight(0xbfe8ff, 0x172033, 2.4));
   const key = new THREE.DirectionalLight(0xffffff, 3.3); key.position.set(250, -350, 450); scene.add(key);
@@ -106,7 +99,6 @@ if (container) {
       button.setAttribute('aria-pressed', String(visible));
     });
     updateLayerCount();
-    renderRequested = true;
   }
 
   function applyPreset(name) {
@@ -147,7 +139,6 @@ if (container) {
         });
         scene.add(overlayRoot);
         overlaysReady = true;
-        renderRequested = true;
         document.querySelectorAll('.layer-toggle.loading').forEach(button => button.classList.remove('loading'));
         resolve();
       }, undefined, error => {
@@ -169,7 +160,6 @@ if (container) {
     controls.target.copy(center); camera.position.set(center.x + distance*.7, center.y - distance, center.z + distance*.52); camera.lookAt(center);
     controls.minDistance = distance*.35; controls.maxDistance = distance*3; controls.update();
     homeCamera = { position:camera.position.clone(), target:center.clone() };
-    renderRequested = true;
     loading?.remove();
   }, undefined, error => {
     console.error(error);
@@ -190,22 +180,9 @@ if (container) {
     controls.autoRotate = !controls.autoRotate; event.currentTarget.textContent = controls.autoRotate ? 'Pause rotation' : 'Auto-rotate';
   });
   controls.addEventListener('start', () => {
-    interacting = true;
-    settleFrames = 45;
-    clearTimeout(qualityTimer);
-    if (renderer.getPixelRatio() !== interactionPixelRatio) renderer.setPixelRatio(interactionPixelRatio);
     if (controls.autoRotate) controls.autoRotate = false;
     const button = document.querySelector('#rotateToggle');
     if (button) button.textContent = 'Auto-rotate';
-  });
-  controls.addEventListener('change', () => { renderRequested = true; });
-  controls.addEventListener('end', () => {
-    interacting = false;
-    settleFrames = 45;
-    qualityTimer = setTimeout(() => {
-      renderer.setPixelRatio(normalPixelRatio);
-      renderRequested = true;
-    }, 120);
   });
   document.querySelector('#resetCamera')?.addEventListener('click', () => {
     if (!homeCamera) return; camera.position.copy(homeCamera.position); controls.target.copy(homeCamera.target); controls.update();
@@ -217,20 +194,6 @@ if (container) {
     renderer.setSize(width,height,false); camera.aspect = width/height; camera.updateProjectionMatrix();
   }
   new ResizeObserver(resize).observe(container); resize();
-  new IntersectionObserver(entries => {
-    viewerVisible = entries[0]?.isIntersecting ?? true;
-    if (viewerVisible) renderRequested = true;
-  }, { rootMargin: '200px' }).observe(container);
-  const clock = new THREE.Clock();
-  renderer.setAnimationLoop(() => {
-    const delta = Math.min(clock.getDelta(), 0.05);
-    if (!viewerVisible) return;
-    const requested = renderRequested;
-    renderRequested = false;
-    const changed = controls.update(delta);
-    const animating = controls.autoRotate || interacting || settleFrames > 0;
-    if (requested || changed || animating) renderer.render(scene,camera);
-    if (!interacting && !controls.autoRotate && settleFrames > 0) settleFrames -= 1;
-  });
+  renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene,camera); });
   window.anatomyViewer = { setLayer, applyPreset };
 }
