@@ -2,6 +2,8 @@
 
 Public site: https://omer-kolodny.github.io/liver-lesion-imaging-dashboard/
 
+The dashboard includes selectable CT comparisons for 25 Dec 2025, 19 Jan 2026, and 23 Aug 2026, plus a latest-scan 3D anatomy model with optional vessel, segment, and organ layers.
+
 Responsive static web application containing:
 
 - Touch-controlled interactive GLB liver model

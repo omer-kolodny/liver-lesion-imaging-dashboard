@@ -131,7 +131,7 @@ if (container) {
     if (overlaysReady) return Promise.resolve();
     if (overlaysPromise) return overlaysPromise;
     overlaysPromise = new Promise((resolve, reject) => {
-      loader.load('assets/anatomy_overlays.glb?v=1', gltf => {
+      loader.load('assets/anatomy_overlays_aug.glb?v=1', gltf => {
         const overlayRoot = gltf.scene;
         overlayRoot.traverse(object => {
           prepareMesh(object);
@@ -151,7 +151,7 @@ if (container) {
     return overlaysPromise;
   }
 
-  loader.load('assets/liver_core.glb?v=1', gltf => {
+  loader.load('assets/liver_core_aug.glb?v=1', gltf => {
     rootModel = gltf.scene; scene.add(rootModel);
     rootModel.traverse(object => prepareMesh(object, true));
     Object.entries(initial).forEach(([name,visible]) => setLayer(name,visible));
@@ -167,7 +167,11 @@ if (container) {
   });
 
   document.querySelectorAll('.layer-toggle').forEach(button => button.addEventListener('click', () => {
-    const name = button.dataset.layer; setLayer(name, !button.classList.contains('active'));
+    const name = button.dataset.layer;
+    const visible = !button.classList.contains('active');
+    if (visible && name === 'segments') setLayer('liver', false);
+    if (visible && name === 'liver') setLayer('segments', false);
+    setLayer(name, visible);
   }));
   document.querySelectorAll('[data-preset]').forEach(button => button.addEventListener('click', () => applyPreset(button.dataset.preset)));
   const anatomyToolbar = document.querySelector('#anatomyToolbar');

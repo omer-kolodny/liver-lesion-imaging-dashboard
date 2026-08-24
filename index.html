@@ -12,10 +12,10 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
   <link rel="manifest" href="site.webmanifest?v=4">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
-  <script type="module" src="viewer.js?v=3"></script>
-  <script defer src="app.js?v=2"></script>
+  <script type="module" src="viewer.js?v=4"></script>
+  <script defer src="app.js?v=3"></script>
 </head>
 <body>
   <div class="privacy-strip">Derived and anonymized imaging data only · Automated analysis · Radiologist verification required</div>
@@ -23,6 +23,7 @@
     <a class="brand" href="#top"><span class="brand-mark">3D</span><span>RadioLens</span></a>
     <nav aria-label="Main navigation">
       <a href="#overview">Overview</a>
+      <a href="#timeline">Timeline</a>
       <a href="#model">3D model</a>
       <a href="#lesions">Lesions</a>
       <a href="#report">Report</a>
@@ -33,19 +34,32 @@
   <main id="top">
     <section class="hero shell">
       <div class="hero-copy">
-        <div class="eyebrow">CT comparison · 25 Dec 2025 → 19 Jan 2026</div>
+        <div class="eyebrow" id="comparisonLabel">CT comparison timeline</div>
         <h1>A clearer view of every liver lesion.</h1>
         <p class="lede">Explore a touch-enabled 3D liver reconstruction, lesion-level measurements, interval comparisons, and annotated source images in one responsive dashboard.</p>
         <div class="hero-actions">
           <a class="button primary" href="#model">Explore 3D model</a>
           <a class="button ghost" href="#lesions">Review lesions</a>
         </div>
-        <div class="hero-note"><span class="pulse"></span><b>Overall assessment:</b> broadly stable disease burden with minimal interval change.</div>
+        <div class="hero-note"><span class="pulse"></span><b>Image-only summary:</b> <span id="overallAssessment">Loading the latest comparison…</span></div>
       </div>
       <div class="hero-visual glass">
         <img src="assets/liver-3d.webp" alt="Three-dimensional liver model with highlighted lesions">
-        <div class="floating-stat"><span>Latest tumor burden</span><strong>10.22%</strong></div>
+        <div class="floating-stat"><span>Latest tumor burden</span><strong id="latestBurden">—</strong></div>
       </div>
+    </section>
+
+    <section id="timeline" class="section shell timeline-section">
+      <div class="section-heading">
+        <div><div class="eyebrow">Longitudinal imaging</div><h2>Choose any two CT dates</h2></div>
+        <p>The default comparison uses the latest scan and the immediately preceding scan.</p>
+      </div>
+      <div class="timeline-picker panel">
+        <label><span>Earlier CT</span><select id="fromStudy" aria-label="Earlier CT date"></select></label>
+        <div class="timeline-arrow">→</div>
+        <label><span>Later CT</span><select id="toStudy" aria-label="Later CT date"></select></label>
+      </div>
+      <div class="timeline-track" id="timelineTrack" aria-label="CT study timeline"></div>
     </section>
 
     <section id="overview" class="section shell">
@@ -54,29 +68,24 @@
         <p>Measurements are generated from automated 3D masks and should be treated as preliminary.</p>
       </div>
       <div class="stat-grid">
-        <article class="stat-card cyan"><span>Tumor volume</span><strong>+2.1%</strong><p>166.82 → 170.34 mL</p></article>
-        <article class="stat-card teal"><span>Tumor burden</span><strong>+0.44 pp</strong><p>9.78% → 10.22%</p></article>
-        <article class="stat-card amber"><span>Largest diameter</span><strong>+0.4%</strong><p>64.3 → 64.5 mm</p></article>
-        <article class="stat-card purple"><span>Tracked candidates</span><strong>16 + 1</strong><p>Matched plus uncertain</p></article>
+        <article class="stat-card cyan"><span>Tumor volume</span><strong id="volumeDelta">—</strong><p id="volumeValues">Loading…</p></article>
+        <article class="stat-card teal"><span>Tumor burden</span><strong id="burdenDelta">—</strong><p id="burdenValues">Loading…</p></article>
+        <article class="stat-card amber"><span>Largest diameter</span><strong id="diameterDelta">—</strong><p id="diameterValues">Loading…</p></article>
+        <article class="stat-card purple"><span>Tracked lesion groups</span><strong id="trackedCount">—</strong><p>Automated longitudinal matches</p></article>
       </div>
 
       <div class="overview-grid">
         <article class="panel burden-panel">
           <div class="panel-title"><div><span class="kicker">Tumor burden</span><h3>Percentage of liver volume</h3></div></div>
           <div class="donut-row">
-            <div class="donut-card"><div class="donut" style="--value:9.78%"><div><strong>9.78%</strong><span>December</span></div></div><p><b>166.82 mL</b> of 1,706.42 mL</p></div>
-            <div class="donut-card"><div class="donut follow" style="--value:10.22%"><div><strong>10.22%</strong><span>January</span></div></div><p><b>170.34 mL</b> of 1,667.05 mL</p></div>
+            <div class="donut-card"><div class="donut" id="fromDonut"><div><strong id="fromBurden">—</strong><span id="fromLabel">Earlier</span></div></div><p id="fromBurdenDetail">—</p></div>
+            <div class="donut-card"><div class="donut follow" id="toDonut"><div><strong id="toBurden">—</strong><span id="toLabel">Later</span></div></div><p id="toBurdenDetail">—</p></div>
           </div>
-          <div class="delta-line"><span>Change</span><b>+3.52 mL tumor volume</b><b>+0.44 percentage points</b></div>
+          <div class="delta-line" id="burdenChangeLine"><span>Change</span><b>—</b><b>—</b></div>
         </article>
         <article class="panel findings-panel">
           <div class="panel-title"><div><span class="kicker">Interpretation</span><h3>Key observations</h3></div></div>
-          <ul class="findings">
-            <li><span>01</span><div><b>Dominant segment 3 lesion</b><p>Stable axial diameter; automated volume increased 10.2%.</p></div></li>
-            <li><span>02</span><div><b>Segment 8 lesion</b><p>Essentially unchanged by diameter and volume.</p></div></li>
-            <li><span>03</span><div><b>Smaller lesions</b><p>Predominantly stable; volumetric percentages are contour-sensitive.</p></div></li>
-            <li class="warning-item"><span>!</span><div><b>Necrosis limitation</b><p>Low attenuation is only a proxy and cannot confirm necrosis.</p></div></li>
-          </ul>
+          <ul class="findings" id="findingsList"><li><span>…</span><div><b>Loading analysis</b><p>Preparing the selected comparison.</p></div></li></ul>
         </article>
       </div>
     </section>
@@ -122,13 +131,13 @@
             </div>
           </div>
           <aside class="model-info">
-            <div class="model-number">16</div>
-            <h3>Lesion candidates</h3>
-            <p>Colors identify distinct connected lesion masks. Lesion IDs correspond to the measurement report and comparison screenshots.</p>
-            <div class="mini-metrics"><div><span>Liver volume</span><b>1,667.05 mL</b></div><div><span>Tumor volume</span><b>170.34 mL</b></div><div><span>Voxel spacing</span><b>0.70 × 0.70 × 1.5 mm</b></div></div>
+            <div class="model-number" id="modelLesionCount">9</div>
+            <h3>Latest residual lesion groups</h3>
+            <p>The 3D viewer remains a visualization aid. Timeline measurements and source-image comparisons below use the selected dates.</p>
+            <div class="mini-metrics"><div><span>Latest liver volume</span><b id="modelLiverVolume">1,467.57 mL</b></div><div><span>Latest tumor volume</span><b id="modelTumorVolume">46.56 mL</b></div><div><span>Latest scan</span><b>23 Aug 2026</b></div></div>
             <div class="layer-heading">Interactive overlays</div>
             <p class="layer-help">Use the <b>Layers</b> button inside the 3D viewer to add vessels, liver segments, and nearby organs.</p>
-            <a class="button ghost wide" href="assets/liver_anatomy_layers.glb" download>Download layered 3D model</a>
+            <a class="button ghost wide" href="assets/liver_anatomy_aug.glb" download>Download latest layered 3D model</a>
           </aside>
         </div>
       </div>
@@ -147,8 +156,8 @@
       <div class="filters">
         <button class="filter active" data-filter="all">All</button>
         <button class="filter" data-filter="major">Major lesions</button>
-        <button class="filter" data-filter="stable">Broadly stable</button>
-        <button class="filter" data-filter="caution">Needs caution</button>
+        <button class="filter" data-filter="stable">Decreased / stable</button>
+        <button class="filter" data-filter="caution">Needs attention</button>
         <label class="search"><span>Search</span><input id="lesionSearch" type="search" placeholder="ID or segment…"></label>
       </div>
       <div id="lesionGrid" class="lesion-grid" aria-live="polite"></div>
@@ -158,13 +167,13 @@
       <div class="shell report-grid">
         <div>
           <div class="eyebrow">Designed clinical-style report</div>
-          <h2>Share the complete 21-page PDF</h2>
-          <p class="lede small-lede">Includes the executive summary, per-lesion pages, annotated CT comparisons, consolidated measurements, methodology, and safety limitations.</p>
-          <div class="hero-actions"><button class="button primary share-report" type="button">Share PDF report</button><a class="button ghost" href="assets/Liver_Lesion_CT_Comparison.pdf" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_comparison.csv" download>Download CSV</a></div>
+          <h2>Share the complete 20-page PDF</h2>
+          <p class="lede small-lede">Includes the three-date timeline, per-lesion trends, annotated January–August comparisons, attenuation proxies, vessel proximity, methodology, and safety limitations.</p>
+          <div class="hero-actions"><button class="button primary share-report" type="button">Share PDF report</button><a class="button ghost" href="assets/Liver_Lesion_CT_Comparison.pdf?v=2" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_comparison.csv" download>Download CSV</a></div>
           <p class="share-help">On iPhone, Share opens the native share sheet—send the report or choose <b>Save to Files</b>.</p>
           <p class="share-status" id="shareStatus" aria-live="polite"></p>
         </div>
-        <div class="report-preview"><img src="assets/liver-four-views.webp" alt="Four views of the 3D liver model"></div>
+        <div class="report-preview"><img src="assets/timeline/L01_2026-01-19_2026-08-23.webp" alt="Annotated January and August CT comparison for lesion L01"></div>
       </div>
     </section>
 
@@ -174,7 +183,7 @@
     </section>
   </main>
 
-  <footer class="site-footer shell"><span>Derived imaging dashboard · No original DICOM files published</span><span>CT series: 25 Dec 2025 and 19 Jan 2026</span></footer>
+  <footer class="site-footer shell"><span>Derived imaging dashboard · No original DICOM files published</span><span>CT timeline: 25 Dec 2025 · 19 Jan 2026 · 23 Aug 2026</span></footer>
 
   <dialog id="lesionDialog" class="lesion-dialog">
     <button class="dialog-close" aria-label="Close">×</button>

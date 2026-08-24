@@ -2,79 +2,203 @@ const grid = document.querySelector('#lesionGrid');
 const dialog = document.querySelector('#lesionDialog');
 const dialogContent = document.querySelector('#dialogContent');
 const search = document.querySelector('#lesionSearch');
+const fromSelect = document.querySelector('#fromStudy');
+const toSelect = document.querySelector('#toStudy');
+let studies = [];
+let studyMap = {};
 let lesions = [];
 let activeFilter = 'all';
+let fromDate;
+let toDate;
 
-const fmt = (n, digits = 1) => n == null ? '—' : Number(n).toFixed(digits);
-const delta = n => n == null ? '—' : `${n >= 0 ? '+' : ''}${Number(n).toFixed(1)}%`;
+const fmt = (value, digits = 1) => value == null ? '—' : Number(value).toFixed(digits);
+const signed = (value, suffix = '%') => value == null ? '—' : `${value >= 0 ? '+' : ''}${Number(value).toFixed(1)}${suffix}`;
+const change = (from, to) => from == null || !from || to == null ? null : (to - from) / from * 100;
+const measurement = (row, date) => row.measurements[date] || { detected:false };
 
 function classification(row) {
-  if (row.lesion_id === 'L13') return {key:'caution', cls:'unreliable', label:'Unreliable match', note:'The apparent reduction is most likely a segmentation or matching inconsistency and should not be read as true regression.'};
-  if (row.lesion_id === 'U01') return {key:'caution', cls:'caution', label:'Unmatched', note:'No distinct corresponding automated component was found on the January scan.'};
-  if (['L14','L15','L16'].includes(row.lesion_id)) return {key:'caution', cls:'caution', label:'Sub-centimeter', note:'Too small for dependable percentage volume or attenuation change.'};
-  if (Math.abs(row.long_change_pct) <= 5) return {key:'stable', cls:'stable', label:'Broadly stable', note:Math.abs(row.volume_change_pct) > 15 ? 'Stable by diameter; the volume percentage is contour-sensitive.' : 'Measurements are broadly stable within expected technical variation.'};
-  return {key:'caution', cls:'caution', label:row.long_change_pct < 0 ? 'Measured decrease' : 'Measured increase', note:'A measured change is present, but protocol and contour variability limit certainty.'};
+  const first = measurement(row, fromDate);
+  const second = measurement(row, toDate);
+  const volumeChange = change(first.volume_ml, second.volume_ml);
+  const small = Math.max(first.volume_ml || 0, second.volume_ml || 0) < 0.5;
+  if (first.detected && !second.detected) return { key:'stable', cls:'stable', label:'Not separately detected', note:'No separate residual focus was identified by the automated later-scan model. This does not prove complete resolution.' };
+  if (small) return { key:'caution', cls:'caution', label:'Small / uncertain', note:'Sub-centimeter lesion measurements and attenuation fractions are highly contour-sensitive.' };
+  if (second.confidence === 'low') return { key:'caution', cls:'unreliable', label:'Low-confidence match', note:'Registration and independent-model agreement are limited for this match.' };
+  if (volumeChange != null && volumeChange <= -30) return { key:'stable', cls:'stable', label:'Marked decrease', note:'The automated segmented volume decreased substantially over the selected interval.' };
+  if (volumeChange != null && volumeChange <= -10) return { key:'stable', cls:'stable', label:'Measured decrease', note:'The automated segmented volume decreased over the selected interval.' };
+  if (volumeChange != null && volumeChange >= 20) return { key:'caution', cls:'caution', label:'Measured increase', note:'The automated segmented volume increased and should be reviewed on the source images.' };
+  return { key:'stable', cls:'stable', label:'Broadly stable', note:'No large automated volume change was measured over the selected interval.' };
 }
 
 function imageFor(row) {
-  return `assets/lesions/${row.lesion_id === 'U01' ? 'old_only_U01' : `lesion_${row.lesion_id}`}.webp`;
+  return `assets/timeline/${row.lesion_id}_${fromDate}_${toDate}.webp`;
+}
+
+function renderSelectors() {
+  const options = studies.map(study => `<option value="${study.date}">${study.label}</option>`).join('');
+  fromSelect.innerHTML = options;
+  toSelect.innerHTML = options;
+  fromSelect.value = fromDate;
+  toSelect.value = toDate;
+}
+
+function renderTimelineTrack() {
+  document.querySelector('#timelineTrack').innerHTML = studies.map((study, index) => {
+    const selected = study.date === fromDate || study.date === toDate;
+    const latest = index === studies.length - 1;
+    return `<div class="timeline-point ${selected ? 'selected' : ''} ${latest ? 'latest' : ''}">
+      <span>${index + 1}</span><b>${study.label}</b><small>${fmt(study.tumor_burden_pct,2)}% burden</small>
+    </div>`;
+  }).join('');
+}
+
+function renderOverview() {
+  const first = studyMap[fromDate];
+  const second = studyMap[toDate];
+  const volumeChange = change(first.tumor_volume_ml, second.tumor_volume_ml);
+  const burdenChange = second.tumor_burden_pct - first.tumor_burden_pct;
+  const lead = lesions[0];
+  const leadFirst = measurement(lead, fromDate);
+  const leadSecond = measurement(lead, toDate);
+  const diameterChange = change(leadFirst.long_mm, leadSecond.long_mm);
+  const detected = lesions.filter(row => measurement(row, toDate).detected).length;
+
+  document.querySelector('#comparisonLabel').textContent = `CT comparison · ${first.label} → ${second.label}`;
+  document.querySelector('#latestBurden').textContent = `${fmt(studies.at(-1).tumor_burden_pct,2)}%`;
+  document.querySelector('#volumeDelta').textContent = signed(volumeChange);
+  document.querySelector('#volumeValues').textContent = `${fmt(first.tumor_volume_ml,2)} → ${fmt(second.tumor_volume_ml,2)} mL`;
+  document.querySelector('#burdenDelta').textContent = signed(burdenChange, ' pp');
+  document.querySelector('#burdenValues').textContent = `${fmt(first.tumor_burden_pct,2)}% → ${fmt(second.tumor_burden_pct,2)}%`;
+  document.querySelector('#diameterDelta').textContent = signed(diameterChange);
+  document.querySelector('#diameterValues').textContent = `${fmt(leadFirst.long_mm)} → ${fmt(leadSecond.long_mm)} mm`;
+  document.querySelector('#trackedCount').textContent = `${detected} / 16`;
+
+  const fromDonut = document.querySelector('#fromDonut');
+  const toDonut = document.querySelector('#toDonut');
+  fromDonut.style.setProperty('--value', `${first.tumor_burden_pct}%`);
+  toDonut.style.setProperty('--value', `${second.tumor_burden_pct}%`);
+  document.querySelector('#fromBurden').textContent = `${fmt(first.tumor_burden_pct,2)}%`;
+  document.querySelector('#toBurden').textContent = `${fmt(second.tumor_burden_pct,2)}%`;
+  document.querySelector('#fromLabel').textContent = first.label;
+  document.querySelector('#toLabel').textContent = second.label;
+  document.querySelector('#fromBurdenDetail').innerHTML = `<b>${fmt(first.tumor_volume_ml,2)} mL</b> of ${fmt(first.liver_volume_ml,2)} mL`;
+  document.querySelector('#toBurdenDetail').innerHTML = `<b>${fmt(second.tumor_volume_ml,2)} mL</b> of ${fmt(second.liver_volume_ml,2)} mL`;
+  document.querySelector('#burdenChangeLine').innerHTML = `<span>Change</span><b>${signed(second.tumor_volume_ml-first.tumor_volume_ml,' mL')}</b><b>${signed(burdenChange,' percentage points')}</b>`;
+
+  const assessment = volumeChange <= -30
+    ? 'substantially lower automated tumor burden on the later scan; compatible with response, pending radiologist confirmation.'
+    : volumeChange >= 20
+      ? 'higher automated tumor burden on the later scan; specialist review is recommended.'
+      : 'no large automated change in total tumor burden.';
+  document.querySelector('#overallAssessment').textContent = assessment;
+
+  const l01 = lesions.find(row => row.lesion_id === 'L01');
+  const l02 = lesions.find(row => row.lesion_id === 'L02');
+  const l01Change = change(measurement(l01, fromDate).volume_ml, measurement(l01, toDate).volume_ml);
+  const l02Later = measurement(l02, toDate);
+  const distances = l02Later.proximity_mm ? Object.values(l02Later.proximity_mm).filter(value => value != null) : [];
+  const nearest = distances.length ? Math.min(...distances) : null;
+  document.querySelector('#findingsList').innerHTML = `
+    <li><span>01</span><div><b>Total segmented burden</b><p>${signed(volumeChange)} volume change and ${signed(burdenChange,' percentage points')} burden change.</p></div></li>
+    <li><span>02</span><div><b>Dominant segment 3 lesion</b><p>${signed(l01Change)} automated volume change over the selected interval.</p></div></li>
+    <li><span>03</span><div><b>Vessel proximity</b><p>${nearest == null ? 'Available on the latest segmented scan.' : `L02 is approximately ${fmt(nearest)} mm from the nearest automated major-vessel mask.`}</p></div></li>
+    <li class="warning-item"><span>!</span><div><b>Viability limitation</b><p>Low attenuation and enhancement ratios are proxies; single-phase CT cannot determine whether tumor cells are alive.</p></div></li>`;
 }
 
 function renderCards() {
   const term = search.value.trim().toLowerCase();
   const visible = lesions.filter(row => {
     const status = classification(row);
-    const major = row.jan_volume_ml >= 2 || row.dec_volume_ml >= 2;
+    const first = measurement(row, fromDate);
+    const second = measurement(row, toDate);
+    const major = Math.max(first.volume_ml || 0, second.volume_ml || 0) >= 2;
     const filterMatch = activeFilter === 'all' || activeFilter === status.key || (activeFilter === 'major' && major);
-    const textMatch = !term || `${row.lesion_id} ${row.segment}`.toLowerCase().includes(term);
+    const textMatch = !term || `${row.lesion_id} ${row.reference_segment}`.toLowerCase().includes(term);
     return filterMatch && textMatch;
   });
   grid.innerHTML = visible.map(row => {
     const status = classification(row);
+    const first = measurement(row, fromDate);
+    const second = measurement(row, toDate);
     return `<article class="lesion-card" tabindex="0" data-id="${row.lesion_id}" aria-label="Open ${row.lesion_id} details">
       <img loading="lazy" src="${imageFor(row)}" alt="${row.lesion_id} CT comparison">
       <div class="lesion-body">
-        <div class="lesion-top"><h3>${row.lesion_id} · Segment ${row.segment || '—'}</h3><span class="status ${status.cls}">${status.label}</span></div>
+        <div class="lesion-top"><h3>${row.lesion_id} · Segment ${row.reference_segment}</h3><span class="status ${status.cls}">${status.label}</span></div>
         <div class="lesion-metrics">
-          <div><span>Long axis</span><b>${fmt(row.dec_long_mm)} → ${fmt(row.jan_long_mm)} mm</b></div>
-          <div><span>Volume</span><b>${fmt(row.dec_volume_ml,2)} → ${fmt(row.jan_volume_ml,2)} mL</b></div>
-          <div><span>Diameter change</span><b>${delta(row.long_change_pct)}</b></div>
-          <div><span>Volume change</span><b>${delta(row.volume_change_pct)}</b></div>
+          <div><span>Long axis</span><b>${fmt(first.long_mm)} → ${fmt(second.long_mm)} mm</b></div>
+          <div><span>Volume</span><b>${fmt(first.volume_ml,2)} → ${fmt(second.volume_ml,2)} mL</b></div>
+          <div><span>Diameter change</span><b>${signed(change(first.long_mm,second.long_mm))}</b></div>
+          <div><span>Volume change</span><b>${signed(change(first.volume_ml,second.volume_ml))}</b></div>
         </div>
       </div>
     </article>`;
   }).join('') || '<p class="muted">No lesions match this filter.</p>';
 }
 
+function renderVolumeChart() {
+  const rows = lesions.slice(0, 12);
+  const values = rows.flatMap(row => [measurement(row, fromDate).volume_ml || 0, measurement(row, toDate).volume_ml || 0]);
+  const max = Math.max(...values, 1);
+  const width = value => Math.max(value ? 1.5 : 0, Math.sqrt((value || 0) / max) * 100);
+  document.querySelector('#volumeChart').innerHTML = `<div class="chart-legend"><span><i class="legend-from"></i>${studyMap[fromDate].label}</span><span><i class="legend-to"></i>${studyMap[toDate].label}</span><span>Square-root scale</span></div>` + rows.map(row => {
+    const first = measurement(row, fromDate).volume_ml || 0;
+    const second = measurement(row, toDate).volume_ml || 0;
+    return `<div class="chart-row"><div class="chart-label">${row.lesion_id}</div><div class="bars"><div class="bar from" style="width:${width(first)}%"></div><div class="bar to" style="width:${width(second)}%"></div></div><div class="chart-values">${fmt(first,2)} / ${fmt(second,2)} mL</div></div>`;
+  }).join('');
+}
+
 function openLesion(id) {
   const row = lesions.find(item => item.lesion_id === id);
+  const first = measurement(row, fromDate);
+  const second = measurement(row, toDate);
   const status = classification(row);
+  const proximity = second.proximity_mm && Object.keys(second.proximity_mm).length
+    ? `<div class="proximity"><h3>Approximate edge-to-edge proximity on ${studyMap[toDate].label}</h3><div class="proximity-grid">${Object.entries(second.proximity_mm).map(([name,distance]) => `<div class="${distance < 5 ? 'near' : ''}"><span>${name.replaceAll('_',' ')}</span><b>${fmt(distance)} mm</b></div>`).join('')}</div><small>Automated masks only. These distances are not suitable for operative planning.</small></div>` : '';
+  const attenuation = second.median_hu == null ? '' : `<div class="proxy-panel"><h3>Attenuation proxies on ${studyMap[toDate].label}</h3><div class="dialog-stats"><div><span>Median attenuation</span><b>${fmt(second.median_hu)} HU</b></div><div><span>Local liver median</span><b>${fmt(second.local_liver_median_hu)} HU</b></div><div><span>Core below 40 HU</span><b>${fmt(second.below_40hu_pct)}%</b></div><div><span>Relative low attenuation</span><b>${fmt(second.relative_low_attenuation_pct)}%</b></div></div><small>These values describe appearance only and do not measure live tumor cells or prove necrosis.</small></div>`;
+  const trend = studies.map(study => {
+    const value = measurement(row, study.date);
+    return `<div><span>${study.label}</span><b>${value.detected ? `${fmt(value.volume_ml,2)} mL` : 'Not detected'}</b><small>${value.long_mm == null ? '—' : `${fmt(value.long_mm)} mm long axis`}</small></div>`;
+  }).join('');
   dialogContent.innerHTML = `<div class="dialog-inner">
-    <div class="dialog-header"><div><div class="eyebrow">Lesion detail</div><h2>${row.lesion_id} · Liver segment ${row.segment || '—'}</h2></div><span class="status ${status.cls}">${status.label}</span></div>
+    <div class="dialog-header"><div><div class="eyebrow">Lesion timeline</div><h2>${row.lesion_id} · Reference segment ${row.reference_segment}</h2></div><span class="status ${status.cls}">${status.label}</span></div>
     <img src="${imageFor(row)}" alt="${row.lesion_id} full CT comparison">
     <div class="dialog-stats">
-      <div><span>Long axis</span><b>${fmt(row.dec_long_mm)} → ${fmt(row.jan_long_mm)} mm (${delta(row.long_change_pct)})</b></div>
-      <div><span>Perpendicular</span><b>${fmt(row.dec_short_mm)} → ${fmt(row.jan_short_mm)} mm</b></div>
-      <div><span>Craniocaudal</span><b>${fmt(row.dec_cc_mm)} → ${fmt(row.jan_cc_mm)} mm</b></div>
-      <div><span>Volume</span><b>${fmt(row.dec_volume_ml,2)} → ${fmt(row.jan_volume_ml,2)} mL (${delta(row.volume_change_pct)})</b></div>
-      <div><span>Median attenuation</span><b>${fmt(row.dec_median_hu)} → ${fmt(row.jan_median_hu)} HU</b></div>
-      <div><span>Core below 40 HU</span><b>${fmt(row.dec_fraction_below_40hu_pct)}% → ${fmt(row.jan_fraction_below_40hu_pct)}%</b></div>
+      <div><span>Long axis</span><b>${fmt(first.long_mm)} → ${fmt(second.long_mm)} mm (${signed(change(first.long_mm,second.long_mm))})</b></div>
+      <div><span>Perpendicular</span><b>${fmt(first.short_mm)} → ${fmt(second.short_mm)} mm</b></div>
+      <div><span>Craniocaudal</span><b>${fmt(first.cc_mm)} → ${fmt(second.cc_mm)} mm</b></div>
+      <div><span>Volume</span><b>${fmt(first.volume_ml,2)} → ${fmt(second.volume_ml,2)} mL (${signed(change(first.volume_ml,second.volume_ml))})</b></div>
     </div>
-    ${row.proximity_mm ? `<div class="proximity"><h3>Approximate edge-to-edge proximity</h3><div class="proximity-grid">${Object.entries(row.proximity_mm).map(([name,distance]) => `<div><span>${name.replaceAll('_',' ')}</span><b>${fmt(distance)} mm</b></div>`).join('')}</div><small>Distances come from automated masks and are not suitable for operative planning.</small></div>` : ''}
-    <div class="dialog-note"><b>Assessment:</b> ${status.note}<br><b>Confidence:</b> ${row.confidence}<br><small>The below-40-HU value is a low-attenuation proxy and does not establish necrosis.</small></div>
+    <div class="trend-strip">${trend}</div>
+    ${attenuation}${proximity}
+    <div class="dialog-note"><b>Automated trend:</b> ${row.trend}<br><b>Selected-pair assessment:</b> ${status.note}<br><b>Latest segment-mask overlap:</b> ${second.segment || row.reference_segment}.<br><b>Match confidence:</b> ${second.confidence || 'historical automated match'}.</div>
   </div>`;
   dialog.showModal();
 }
 
-function renderVolumeChart() {
-  const rows = lesions.filter(r => r.lesion_id !== 'U01').slice(0, 12);
-  const max = Math.max(...rows.flatMap(r => [r.dec_volume_ml || 0, r.jan_volume_ml || 0]));
-  const width = value => Math.max(1.5, Math.sqrt(value / max) * 100);
-  document.querySelector('#volumeChart').innerHTML = `<div class="chart-legend"><span><i style="background:#38bdf8"></i>25 Dec</span><span><i style="background:#5eead4"></i>19 Jan</span><span>Square-root scale</span></div>` + rows.map(row => `<div class="chart-row"><div class="chart-label">${row.lesion_id}</div><div class="bars"><div class="bar dec" style="width:${width(row.dec_volume_ml)}%"></div><div class="bar jan" style="width:${width(row.jan_volume_ml)}%"></div></div><div class="chart-values">${fmt(row.dec_volume_ml,2)} / ${fmt(row.jan_volume_ml,2)} mL</div></div>`).join('');
+function updateComparison() {
+  if (studies.findIndex(study => study.date === fromDate) >= studies.findIndex(study => study.date === toDate)) {
+    const toIndex = studies.findIndex(study => study.date === toDate);
+    fromDate = studies[Math.max(0, toIndex - 1)].date;
+    fromSelect.value = fromDate;
+  }
+  renderTimelineTrack();
+  renderOverview();
+  renderVolumeChart();
+  renderCards();
 }
 
-fetch('lesions.json').then(r => r.json()).then(data => { lesions = data; renderCards(); renderVolumeChart(); });
+fetch('assets/timeline.json?v=1').then(response => response.json()).then(data => {
+  studies = data.studies;
+  studyMap = Object.fromEntries(studies.map(study => [study.date, study]));
+  lesions = data.lesions;
+  toDate = studies.at(-1).date;
+  fromDate = studies.at(-2).date;
+  renderSelectors();
+  updateComparison();
+});
 
+fromSelect.addEventListener('change', () => { fromDate = fromSelect.value; updateComparison(); });
+toSelect.addEventListener('change', () => { toDate = toSelect.value; updateComparison(); });
 document.querySelectorAll('.filter').forEach(button => button.addEventListener('click', () => {
   document.querySelectorAll('.filter').forEach(item => item.classList.remove('active'));
   button.classList.add('active'); activeFilter = button.dataset.filter; renderCards();
@@ -85,19 +209,14 @@ grid.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.
 document.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
 
-const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf', window.location.href).href;
+const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=2', window.location.href).href;
 const shareStatus = document.querySelector('#shareStatus');
-
 async function shareReport(event) {
   const button = event.currentTarget;
   const originalLabel = button.textContent;
   try {
     if (navigator.share) {
-      await navigator.share({
-        title: 'RadioLens Liver Imaging Report',
-        text: 'Interactive liver imaging analysis and lesion comparison report.',
-        url: reportUrl,
-      });
+      await navigator.share({ title:'RadioLens Liver Imaging Report', text:'Interactive liver imaging analysis and lesion comparison report.', url:reportUrl });
       if (shareStatus) shareStatus.textContent = 'Report shared.';
       return;
     }
@@ -111,5 +230,4 @@ async function shareReport(event) {
     if (shareStatus) shareStatus.textContent = 'The PDF opened. Use your browser Share button to send it or save it.';
   }
 }
-
 document.querySelectorAll('.share-report').forEach(button => button.addEventListener('click', shareReport));
