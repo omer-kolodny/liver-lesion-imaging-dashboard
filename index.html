@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="Interactive liver lesion visualization and CT comparison dashboard.">
+  <title>Liver Lesion Imaging Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="model-viewer.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="privacy-strip">Derived and anonymized imaging data only · Automated analysis · Radiologist verification required</div>
+  <header class="nav shell">
+    <a class="brand" href="#top"><span class="brand-mark">3D</span><span>Hepatic Imaging</span></a>
+    <nav aria-label="Main navigation">
+      <a href="#overview">Overview</a>
+      <a href="#model">3D model</a>
+      <a href="#lesions">Lesions</a>
+      <a href="#report">Report</a>
+    </nav>
+    <a class="button small" href="assets/Liver_Lesion_CT_Comparison.pdf" download>Download PDF</a>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <div class="hero-copy">
+        <div class="eyebrow">CT comparison · 25 Dec 2025 → 19 Jan 2026</div>
+        <h1>A clearer view of every liver lesion.</h1>
+        <p class="lede">Explore a touch-enabled 3D liver reconstruction, lesion-level measurements, interval comparisons, and annotated source images in one responsive dashboard.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#model">Explore 3D model</a>
+          <a class="button ghost" href="#lesions">Review lesions</a>
+        </div>
+        <div class="hero-note"><span class="pulse"></span><b>Overall assessment:</b> broadly stable disease burden with minimal interval change.</div>
+      </div>
+      <div class="hero-visual glass">
+        <img src="assets/liver-3d.webp" alt="Three-dimensional liver model with highlighted lesions">
+        <div class="floating-stat"><span>Latest tumor burden</span><strong>10.22%</strong></div>
+      </div>
+    </section>
+
+    <section id="overview" class="section shell">
+      <div class="section-heading">
+        <div><div class="eyebrow">At a glance</div><h2>Disease burden dashboard</h2></div>
+        <p>Measurements are generated from automated 3D masks and should be treated as preliminary.</p>
+      </div>
+      <div class="stat-grid">
+        <article class="stat-card cyan"><span>Tumor volume</span><strong>+2.1%</strong><p>166.82 → 170.34 mL</p></article>
+        <article class="stat-card teal"><span>Tumor burden</span><strong>+0.44 pp</strong><p>9.78% → 10.22%</p></article>
+        <article class="stat-card amber"><span>Largest diameter</span><strong>+0.4%</strong><p>64.3 → 64.5 mm</p></article>
+        <article class="stat-card purple"><span>Tracked candidates</span><strong>16 + 1</strong><p>Matched plus uncertain</p></article>
+      </div>
+
+      <div class="overview-grid">
+        <article class="panel burden-panel">
+          <div class="panel-title"><div><span class="kicker">Tumor burden</span><h3>Percentage of liver volume</h3></div></div>
+          <div class="donut-row">
+            <div class="donut-card"><div class="donut" style="--value:9.78%"><div><strong>9.78%</strong><span>December</span></div></div><p><b>166.82 mL</b> of 1,706.42 mL</p></div>
+            <div class="donut-card"><div class="donut follow" style="--value:10.22%"><div><strong>10.22%</strong><span>January</span></div></div><p><b>170.34 mL</b> of 1,667.05 mL</p></div>
+          </div>
+          <div class="delta-line"><span>Change</span><b>+3.52 mL tumor volume</b><b>+0.44 percentage points</b></div>
+        </article>
+        <article class="panel findings-panel">
+          <div class="panel-title"><div><span class="kicker">Interpretation</span><h3>Key observations</h3></div></div>
+          <ul class="findings">
+            <li><span>01</span><div><b>Dominant segment 3 lesion</b><p>Stable axial diameter; automated volume increased 10.2%.</p></div></li>
+            <li><span>02</span><div><b>Segment 8 lesion</b><p>Essentially unchanged by diameter and volume.</p></div></li>
+            <li><span>03</span><div><b>Smaller lesions</b><p>Predominantly stable; volumetric percentages are contour-sensitive.</p></div></li>
+            <li class="warning-item"><span>!</span><div><b>Necrosis limitation</b><p>Low attenuation is only a proxy and cannot confirm necrosis.</p></div></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="model" class="section model-section">
+      <div class="shell">
+        <div class="section-heading">
+          <div><div class="eyebrow">Touch, rotate, inspect</div><h2>Interactive 3D anatomy</h2></div>
+          <p>The translucent liver and each colored lesion are separate high-resolution objects.</p>
+        </div>
+        <div class="model-layout">
+          <div class="model-shell glass" id="modelShell">
+            <model-viewer id="liverModel" src="assets/liver_with_lesions.glb" poster="assets/liver-3d.webp" alt="Interactive 3D liver with highlighted lesions" camera-controls auto-rotate rotation-per-second="10deg" shadow-intensity="1.2" shadow-softness=".8" exposure="1.15" environment-image="neutral" interaction-prompt="auto" touch-action="pan-y">
+              <div class="model-loading" slot="poster"><img src="assets/liver-3d.webp" alt=""><span>Loading interactive model…</span></div>
+            </model-viewer>
+            <div class="model-controls">
+              <button id="rotateToggle" type="button">Pause rotation</button>
+              <button id="resetCamera" type="button">Reset view</button>
+              <button id="fullscreenModel" type="button">Fullscreen</button>
+            </div>
+          </div>
+          <aside class="model-info">
+            <div class="model-number">16</div>
+            <h3>Lesion candidates</h3>
+            <p>Colors identify distinct connected lesion masks. Lesion IDs correspond to the measurement report and comparison screenshots.</p>
+            <div class="mini-metrics"><div><span>Liver volume</span><b>1,667.05 mL</b></div><div><span>Tumor volume</span><b>170.34 mL</b></div><div><span>Voxel spacing</span><b>0.70 × 0.70 × 1.5 mm</b></div></div>
+            <a class="button ghost wide" href="assets/liver_with_lesions.glb" download>Download 3D model</a>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section shell">
+      <div class="section-heading"><div><div class="eyebrow">Volume distribution</div><h2>Which lesions drive total burden?</h2></div><p>The two largest lesions account for the great majority of segmented tumor volume.</p></div>
+      <div class="panel chart-panel"><div id="volumeChart" class="volume-chart" aria-label="Lesion volume comparison chart"></div></div>
+    </section>
+
+    <section id="lesions" class="section shell">
+      <div class="section-heading">
+        <div><div class="eyebrow">Lesion explorer</div><h2>Measurements and source-image comparisons</h2></div>
+        <p>Select any card for a full-resolution comparison and detailed metrics.</p>
+      </div>
+      <div class="filters">
+        <button class="filter active" data-filter="all">All</button>
+        <button class="filter" data-filter="major">Major lesions</button>
+        <button class="filter" data-filter="stable">Broadly stable</button>
+        <button class="filter" data-filter="caution">Needs caution</button>
+        <label class="search"><span>Search</span><input id="lesionSearch" type="search" placeholder="ID or segment…"></label>
+      </div>
+      <div id="lesionGrid" class="lesion-grid" aria-live="polite"></div>
+    </section>
+
+    <section id="report" class="section report-section">
+      <div class="shell report-grid">
+        <div>
+          <div class="eyebrow">Designed clinical-style report</div>
+          <h2>Download the complete 21-page PDF</h2>
+          <p class="lede small-lede">Includes the executive summary, per-lesion pages, annotated CT comparisons, consolidated measurements, methodology, and safety limitations.</p>
+          <div class="hero-actions"><a class="button primary" href="assets/Liver_Lesion_CT_Comparison.pdf" download>Download formatted PDF</a><a class="button ghost" href="assets/lesion_comparison.csv" download>Download CSV</a></div>
+        </div>
+        <div class="report-preview"><img src="assets/liver-four-views.webp" alt="Four views of the 3D liver model"></div>
+      </div>
+    </section>
+
+    <section class="section shell safety">
+      <div class="safety-icon">!</div>
+      <div><h2>Clinical safety notice</h2><p>This dashboard is a computer-assisted visualization, not a radiologist-signed diagnosis, formal RECIST assessment, or surgical-planning system. Do not use it alone to start, stop, or alter treatment. Small lesions, lesion matching, and low-attenuation estimates require specialist review.</p></div>
+    </section>
+  </main>
+
+  <footer class="site-footer shell"><span>Derived imaging dashboard · No original DICOM files published</span><span>CT series: 25 Dec 2025 and 19 Jan 2026</span></footer>
+
+  <dialog id="lesionDialog" class="lesion-dialog">
+    <button class="dialog-close" aria-label="Close">×</button>
+    <div id="dialogContent"></div>
+  </dialog>
+</body>
+</html>
