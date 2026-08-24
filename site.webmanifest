@@ -1,6 +1,6 @@
 {
-  "name": "HepatoMap 3D · Liver Imaging Dashboard",
-  "short_name": "HepatoMap",
+  "name": "RadioLens · Liver Imaging Dashboard",
+  "short_name": "RadioLens",
   "description": "Interactive liver lesion visualization and CT comparison dashboard.",
   "start_url": "./",
   "display": "standalone",

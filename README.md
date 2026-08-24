@@ -1,4 +1,4 @@
-# HepatoMap 3D
+# RadioLens
 
 Public site: https://omer-kolodny.github.io/liver-lesion-imaging-dashboard/
 
