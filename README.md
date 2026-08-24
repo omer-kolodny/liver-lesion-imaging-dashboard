@@ -2,7 +2,7 @@
 
 Public site: https://omer-kolodny.github.io/liver-lesion-imaging-dashboard/
 
-The dashboard includes selectable CT comparisons for 25 Dec 2025, 19 Jan 2026, and 23 Aug 2026, plus a latest-scan 3D anatomy model with optional vessel, segment, and organ layers.
+The dashboard includes selectable CT comparisons for 25 Dec 2025, 19 Jan 2026, 26 Apr 2026, and 23 Aug 2026, plus a latest-scan 3D anatomy model with optional vessel, segment, and organ layers.
 
 Responsive static web application containing:
 
@@ -10,8 +10,8 @@ Responsive static web application containing:
 - Switchable liver segments, hepatic vessels, portal vein, IVC, aorta, gallbladder, pancreas, spleen, kidneys, and duodenum
 - Per-lesion distance estimates to selected vessels and nearby organs
 - Liver and tumor-volume summary
-- Selectable comparisons across all three CT dates
-- VNC-corrected lesion enhancement normalized to local liver and portal-vein enhancement for January–August
+- Selectable comparisons across all four CT dates
+- VNC-corrected lesion enhancement normalized to local liver and portal-vein enhancement for January, April, and August
 - Pair-specific attenuation comparability indicators based on contrast protocol and internal blood-pool references
 - Searchable and filterable lesion explorer
 - Full-resolution comparison images and measurements

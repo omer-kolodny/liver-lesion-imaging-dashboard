@@ -209,7 +209,7 @@ function updateComparison() {
   renderCards();
 }
 
-fetch('assets/timeline.json?v=2').then(response => response.json()).then(data => {
+fetch('assets/timeline.json?v=3').then(response => response.json()).then(data => {
   studies = data.studies;
   studyMap = Object.fromEntries(studies.map(study => [study.date, study]));
   lesions = data.lesions;
@@ -232,7 +232,7 @@ grid.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.
 document.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
 
-const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=3', window.location.href).href;
+const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=4', window.location.href).href;
 const shareStatus = document.querySelector('#shareStatus');
 async function shareReport(event) {
   const button = event.currentTarget;

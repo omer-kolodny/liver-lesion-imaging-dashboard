@@ -1,6 +1,6 @@
 {
   "generated": "2026-08-24",
-  "method": "Automated image-only segmentation and affine longitudinal registration. January and August attenuation metrics include VNC correction and internal liver/blood-pool normalization; no radiology report was used for measurements or matching.",
+  "method": "Automated image-only segmentation with longitudinal registration. Matching uses spatial overlap/centroid, segment, morphology and vessel topology; split/merge and ambiguous tracks are flagged for review. Attenuation uses VNC correction and internal liver/blood-pool normalization.",
   "studies": [
     {
       "date": "2025-12-25",
@@ -55,6 +55,49 @@
           "vnc_median_hu": 33.7,
           "enhancement_hu": 108.0,
           "paired_voxels": 85132
+        }
+      }
+    },
+    {
+      "date": "2026-04-26",
+      "label": "26 Apr 2026",
+      "liver_volume_ml": 1504.11,
+      "tumor_volume_ml": 97.64,
+      "tumor_burden_pct": 6.49,
+      "residual_lesion_groups": 8,
+      "residual_foci": 9,
+      "contrast_timing_sec": 91.8,
+      "contrast_volume_ml": 80.0,
+      "contrast_flow_ml_s": 1.7,
+      "iodine_concentration_mg_ml": 300.0,
+      "reconstruction": "70 keV VMI",
+      "vnc_available": true,
+      "attenuation_confidence": "higher",
+      "hemodynamic_references": {
+        "liver": {
+          "contrast_median_hu": 113.0,
+          "vnc_median_hu": 60.1,
+          "enhancement_hu": 52.4
+        },
+        "portal_vein_and_splenic_vein": {
+          "contrast_median_hu": 181.0,
+          "vnc_median_hu": 37.7,
+          "enhancement_hu": 143.9
+        },
+        "aorta": {
+          "contrast_median_hu": 177.0,
+          "vnc_median_hu": 34.1,
+          "enhancement_hu": 143.4
+        },
+        "spleen": {
+          "contrast_median_hu": 118.0,
+          "vnc_median_hu": 52.8,
+          "enhancement_hu": 65.7
+        },
+        "inferior_vena_cava": {
+          "contrast_median_hu": 154.0,
+          "vnc_median_hu": 33.2,
+          "enhancement_hu": 121.8
         }
       }
     },
@@ -115,12 +158,36 @@
       "explanation": "The December PET-CT is contrast enhanced, but its exact contrast-start timestamp and matched VNC series are unavailable. Size and volume remain comparable with the stated segmentation limitations; attenuation trends are less reliable.",
       "contrast_protocol_match": false
     },
+    "2025-12-25__2026-04-26": {
+      "level": "limited",
+      "score_pct": null,
+      "label": "Limited attenuation comparability",
+      "explanation": "The December PET-CT lacks a matched VNC series and exact contrast-start timestamp. Morphology is comparable with segmentation limitations; attenuation trends are less reliable.",
+      "contrast_protocol_match": false
+    },
     "2025-12-25__2026-08-23": {
       "level": "limited",
       "score_pct": null,
       "label": "Limited attenuation comparability",
       "explanation": "The December PET-CT is contrast enhanced, but its exact contrast-start timestamp and matched VNC series are unavailable. Size and volume remain comparable with the stated segmentation limitations; attenuation trends are less reliable.",
       "contrast_protocol_match": false
+    },
+    "2026-01-19__2026-04-26": {
+      "level": "high",
+      "score_pct": 95.0,
+      "median_reference_difference_pct": 5.0,
+      "maximum_reference_difference_pct": 12.0,
+      "reference_enhancement_difference_pct": {
+        "liver": 5.0,
+        "portal_vein_and_splenic_vein": 2.4,
+        "aorta": 5.8,
+        "spleen": 0.8,
+        "inferior_vena_cava": 12.0
+      },
+      "basis": "VNC-corrected enhancement of normal liver, portal vein, aorta, spleen, and IVC.",
+      "label": "High hemodynamic comparability",
+      "explanation": "Both scans used matched 90-second timing and the same 80 mL iodine injection at 1.7 mL/s; VNC-corrected internal references are similar.",
+      "contrast_protocol_match": true
     },
     "2026-01-19__2026-08-23": {
       "level": "high",
@@ -138,14 +205,33 @@
       "label": "High hemodynamic comparability",
       "explanation": "Both scans were acquired 90 seconds after an identical 80 mL iodine injection at 1.7 mL/s. VNC-corrected internal liver and blood-pool references are also similar.",
       "contrast_protocol_match": true
+    },
+    "2026-04-26__2026-08-23": {
+      "level": "high",
+      "score_pct": 97.9,
+      "median_reference_difference_pct": 2.1,
+      "maximum_reference_difference_pct": 6.9,
+      "reference_enhancement_difference_pct": {
+        "liver": 6.9,
+        "portal_vein_and_splenic_vein": 2.1,
+        "aorta": 2.6,
+        "spleen": 2.0,
+        "inferior_vena_cava": 1.5
+      },
+      "basis": "VNC-corrected enhancement of normal liver, portal vein, aorta, spleen, and IVC.",
+      "label": "High hemodynamic comparability",
+      "explanation": "Both scans used matched 90-second timing and the same 80 mL iodine injection at 1.7 mL/s; VNC-corrected internal references are similar.",
+      "contrast_protocol_match": true
     }
   },
   "overall": {
     "jan_to_aug_tumor_volume_change_pct": -72.7,
     "jan_to_aug_burden_change_points": -7.05,
     "independent_model_tumor_volume_ml": 49.05,
-    "bottom_line": "The image-only automated models show substantially less segmented liver tumor volume in August than January, driven mainly by L01 and L02. This is compatible with interval treatment response, but protocol differences, registration, and segmentation uncertainty require radiologist confirmation.",
-    "viability_note": "CT attenuation and low-attenuation fractions are imaging proxies only. VNC correction and internal-reference normalization reduce contrast-delivery and hemodynamic bias, but portal-venous CT still cannot determine whether tumor cells are alive or establish true necrosis."
+    "bottom_line": "The automated models show lower segmented liver tumor volume in August than April, with the largest residual groups remaining L01 and L02. This is compatible with interval treatment response, but registration, segmentation, and protocol uncertainty require radiologist confirmation.",
+    "viability_note": "CT attenuation and low-attenuation fractions are imaging proxies only. VNC correction and internal-reference normalization reduce contrast-delivery and hemodynamic bias, but portal-venous CT still cannot determine whether tumor cells are alive or establish true necrosis.",
+    "april_to_aug_tumor_volume_change_pct": -52.3,
+    "april_to_aug_burden_change_points": -3.32
   },
   "components": [
     {
@@ -290,6 +376,43 @@
           "minimal_enhancement_pct": 13.4,
           "vnc_coverage_pct": 100.0
         },
+        "2026-04-26": {
+          "detected": true,
+          "segment": "3",
+          "fragment_count": 1,
+          "volume_ml": 49.597,
+          "long_mm": 60.0,
+          "short_mm": 38.6,
+          "cc_mm": 51.0,
+          "max3d_mm": 62.5,
+          "pca_axes_mm": [
+            62.5,
+            50.9,
+            38.6
+          ],
+          "median_hu": 59.0,
+          "mean_hu": 58.8,
+          "p10_hu": 36.0,
+          "p90_hu": 90.0,
+          "local_liver_median_hu": 110.0,
+          "lesion_liver_ratio": 0.536,
+          "below_40hu_pct": 16.6,
+          "relative_low_attenuation_pct": null,
+          "higher_attenuation_fraction_pct": 83.4,
+          "vnc_median_hu": 46.7,
+          "vnc_corrected_enhancement_hu": 10.8,
+          "enhancement_vs_liver_pct": 20.2,
+          "enhancement_vs_portal_pct": 7.5,
+          "minimal_enhancement_pct": 48.0,
+          "proximity_mm": {
+            "aorta": 35.3,
+            "hepatic_vessels": 3.1,
+            "ivc": 41.1,
+            "portal_vein": 10.7
+          },
+          "confidence": "moderate",
+          "match_basis": "registered liver-relative position, segment, morphology, and vessel topology"
+        },
         "2026-08-23": {
           "detected": true,
           "segment": "3/2",
@@ -378,6 +501,43 @@
           "enhancement_vs_portal_pct": 33.8,
           "minimal_enhancement_pct": 0.3,
           "vnc_coverage_pct": 100.0
+        },
+        "2026-04-26": {
+          "detected": true,
+          "segment": "8",
+          "fragment_count": 1,
+          "volume_ml": 37.621,
+          "long_mm": 47.5,
+          "short_mm": 12.1,
+          "cc_mm": 54.0,
+          "max3d_mm": 60.3,
+          "pca_axes_mm": [
+            52.3,
+            48.3,
+            38.1
+          ],
+          "median_hu": 89.0,
+          "mean_hu": 88.2,
+          "p10_hu": 73.0,
+          "p90_hu": 107.0,
+          "local_liver_median_hu": 112.0,
+          "lesion_liver_ratio": 0.795,
+          "below_40hu_pct": 0.3,
+          "relative_low_attenuation_pct": null,
+          "higher_attenuation_fraction_pct": 99.7,
+          "vnc_median_hu": 38.8,
+          "vnc_corrected_enhancement_hu": 49.5,
+          "enhancement_vs_liver_pct": 94.0,
+          "enhancement_vs_portal_pct": 34.4,
+          "minimal_enhancement_pct": 0.2,
+          "proximity_mm": {
+            "aorta": 26.7,
+            "hepatic_vessels": 1.5,
+            "ivc": 0.6,
+            "portal_vein": 9.0
+          },
+          "confidence": "moderate",
+          "match_basis": "registered liver-relative position, segment, morphology, and vessel topology"
         },
         "2026-08-23": {
           "detected": true,
@@ -468,6 +628,43 @@
           "minimal_enhancement_pct": 0.6,
           "vnc_coverage_pct": 100.0
         },
+        "2026-04-26": {
+          "detected": true,
+          "segment": "7",
+          "fragment_count": 1,
+          "volume_ml": 3.538,
+          "long_mm": 23.4,
+          "short_mm": 16.4,
+          "cc_mm": 18.0,
+          "max3d_mm": 22.9,
+          "pca_axes_mm": [
+            21.6,
+            18.4,
+            16.6
+          ],
+          "median_hu": 94.0,
+          "mean_hu": 94.0,
+          "p10_hu": 83.0,
+          "p90_hu": 114.0,
+          "local_liver_median_hu": 115.0,
+          "lesion_liver_ratio": 0.817,
+          "below_40hu_pct": 0.0,
+          "relative_low_attenuation_pct": null,
+          "higher_attenuation_fraction_pct": 100.0,
+          "vnc_median_hu": 37.2,
+          "vnc_corrected_enhancement_hu": 57.3,
+          "enhancement_vs_liver_pct": 101.2,
+          "enhancement_vs_portal_pct": 39.8,
+          "minimal_enhancement_pct": 0.0,
+          "proximity_mm": {
+            "aorta": 70.8,
+            "hepatic_vessels": 7.9,
+            "ivc": 52.8,
+            "portal_vein": 46.4
+          },
+          "confidence": "moderate",
+          "match_basis": "registered liver-relative position, segment, morphology, and vessel topology"
+        },
         "2026-08-23": {
           "detected": true,
           "segment": "7",
@@ -556,6 +753,44 @@
           "enhancement_vs_portal_pct": 24.0,
           "minimal_enhancement_pct": 3.6,
           "vnc_coverage_pct": 100.0
+        },
+        "2026-04-26": {
+          "detected": true,
+          "segment": "4/8",
+          "fragment_count": 2,
+          "volume_ml": 5.051,
+          "long_mm": 20.4,
+          "short_mm": 15.4,
+          "cc_mm": 28.5,
+          "max3d_mm": 29.0,
+          "pca_axes_mm": [
+            28.9,
+            19.5,
+            15.7
+          ],
+          "median_hu": 95.2,
+          "mean_hu": 95.3,
+          "p10_hu": 83.4,
+          "p90_hu": 110.9,
+          "local_liver_median_hu": 113.2,
+          "lesion_liver_ratio": 0.841,
+          "below_40hu_pct": 0.0,
+          "relative_low_attenuation_pct": null,
+          "higher_attenuation_fraction_pct": 100.0,
+          "vnc_median_hu": 53.8,
+          "vnc_corrected_enhancement_hu": 41.6,
+          "enhancement_vs_liver_pct": 80.1,
+          "enhancement_vs_portal_pct": 28.9,
+          "minimal_enhancement_pct": 0.2,
+          "proximity_mm": {
+            "aorta": 65.1,
+            "hepatic_vessels": 2.5,
+            "ivc": 43.7,
+            "portal_vein": 9.1
+          },
+          "confidence": "moderate",
+          "match_basis": "registered liver-relative position, segment, morphology, and vessel topology",
+          "tracking_note": "Two adjacent April components are treated as one historical lesion group (split/merge event)."
         },
         "2026-08-23": {
           "detected": true,
@@ -646,6 +881,43 @@
           "minimal_enhancement_pct": 0.1,
           "vnc_coverage_pct": 100.0
         },
+        "2026-04-26": {
+          "detected": true,
+          "segment": "8",
+          "fragment_count": 1,
+          "volume_ml": 0.494,
+          "long_mm": 12.1,
+          "short_mm": 7.4,
+          "cc_mm": 12.0,
+          "max3d_mm": 12.9,
+          "pca_axes_mm": [
+            11.9,
+            9.7,
+            7.8
+          ],
+          "median_hu": 95.5,
+          "mean_hu": 96.1,
+          "p10_hu": 87.0,
+          "p90_hu": 109.0,
+          "local_liver_median_hu": 111.0,
+          "lesion_liver_ratio": 0.86,
+          "below_40hu_pct": 0.0,
+          "relative_low_attenuation_pct": null,
+          "higher_attenuation_fraction_pct": 100.0,
+          "vnc_median_hu": 47.2,
+          "vnc_corrected_enhancement_hu": 47.7,
+          "enhancement_vs_liver_pct": 94.4,
+          "enhancement_vs_portal_pct": 33.2,
+          "minimal_enhancement_pct": 0.0,
+          "proximity_mm": {
+            "aorta": 80.2,
+            "hepatic_vessels": 13.0,
+            "ivc": 53.1,
+            "portal_vein": 23.8
+          },
+          "confidence": "moderate",
+          "match_basis": "registered liver-relative position, segment, morphology, and vessel topology"
+        },
         "2026-08-23": {
           "detected": true,
           "segment": "8",
@@ -734,6 +1006,11 @@
           "enhancement_vs_portal_pct": 24.7,
           "minimal_enhancement_pct": 0.4,
           "vnc_coverage_pct": 100.0
+        },
+        "2026-04-26": {
+          "detected": false,
+          "confidence": "review",
+          "tracking_note": "No separate April component was confidently assigned; this does not prove resolution."
         },
         "2026-08-23": {
           "detected": true,
@@ -824,6 +1101,43 @@
           "minimal_enhancement_pct": 0.0,
           "vnc_coverage_pct": 100.0
         },
+        "2026-04-26": {
+          "detected": true,
+          "segment": "6",
+          "fragment_count": 1,
+          "volume_ml": 0.816,
+          "long_mm": 13.4,
+          "short_mm": 10.2,
+          "cc_mm": 12.0,
+          "max3d_mm": 14.1,
+          "pca_axes_mm": [
+            13.5,
+            10.7,
+            10.4
+          ],
+          "median_hu": 92.0,
+          "mean_hu": 91.6,
+          "p10_hu": 82.0,
+          "p90_hu": 110.0,
+          "local_liver_median_hu": 116.0,
+          "lesion_liver_ratio": 0.793,
+          "below_40hu_pct": 0.0,
+          "relative_low_attenuation_pct": null,
+          "higher_attenuation_fraction_pct": 100.0,
+          "vnc_median_hu": 40.5,
+          "vnc_corrected_enhancement_hu": 49.4,
+          "enhancement_vs_liver_pct": 90.5,
+          "enhancement_vs_portal_pct": 34.3,
+          "minimal_enhancement_pct": 0.0,
+          "proximity_mm": {
+            "aorta": 79.0,
+            "hepatic_vessels": 1.5,
+            "ivc": 51.0,
+            "portal_vein": 79.1
+          },
+          "confidence": "moderate",
+          "match_basis": "registered liver-relative position, segment, morphology, and vessel topology"
+        },
         "2026-08-23": {
           "detected": true,
           "segment": "6",
@@ -912,6 +1226,43 @@
           "enhancement_vs_portal_pct": 19.9,
           "minimal_enhancement_pct": 3.5,
           "vnc_coverage_pct": 100.0
+        },
+        "2026-04-26": {
+          "detected": true,
+          "segment": "5",
+          "fragment_count": 1,
+          "volume_ml": 0.216,
+          "long_mm": 7.9,
+          "short_mm": 6.6,
+          "cc_mm": 9.0,
+          "max3d_mm": 9.1,
+          "pca_axes_mm": [
+            9.0,
+            6.9,
+            6.5
+          ],
+          "median_hu": 45.0,
+          "mean_hu": 46.0,
+          "p10_hu": 43.0,
+          "p90_hu": 87.0,
+          "local_liver_median_hu": 113.0,
+          "lesion_liver_ratio": 0.398,
+          "below_40hu_pct": 13.3,
+          "relative_low_attenuation_pct": null,
+          "higher_attenuation_fraction_pct": 86.7,
+          "vnc_median_hu": 39.2,
+          "vnc_corrected_enhancement_hu": 6.4,
+          "enhancement_vs_liver_pct": 12.9,
+          "enhancement_vs_portal_pct": 4.5,
+          "minimal_enhancement_pct": 70.0,
+          "proximity_mm": {
+            "aorta": 82.7,
+            "hepatic_vessels": 7.6,
+            "ivc": 52.3,
+            "portal_vein": 22.0
+          },
+          "confidence": "moderate",
+          "match_basis": "registered liver-relative position, segment, morphology, and vessel topology"
         },
         "2026-08-23": {
           "detected": true,
@@ -1002,6 +1353,43 @@
           "minimal_enhancement_pct": 1.8,
           "vnc_coverage_pct": 100.0
         },
+        "2026-04-26": {
+          "detected": true,
+          "segment": "5",
+          "fragment_count": 1,
+          "volume_ml": 0.305,
+          "long_mm": 9.3,
+          "short_mm": 6.6,
+          "cc_mm": 9.0,
+          "max3d_mm": 9.2,
+          "pca_axes_mm": [
+            8.8,
+            7.8,
+            6.6
+          ],
+          "median_hu": 79.0,
+          "mean_hu": 78.9,
+          "p10_hu": 75.0,
+          "p90_hu": 104.0,
+          "local_liver_median_hu": 114.0,
+          "lesion_liver_ratio": 0.693,
+          "below_40hu_pct": 0.0,
+          "relative_low_attenuation_pct": null,
+          "higher_attenuation_fraction_pct": 100.0,
+          "vnc_median_hu": 47.5,
+          "vnc_corrected_enhancement_hu": 31.7,
+          "enhancement_vs_liver_pct": 61.4,
+          "enhancement_vs_portal_pct": 22.0,
+          "minimal_enhancement_pct": 2.8,
+          "proximity_mm": {
+            "aorta": 70.7,
+            "hepatic_vessels": 6.0,
+            "ivc": 47.1,
+            "portal_vein": 47.6
+          },
+          "confidence": "moderate",
+          "match_basis": "registered liver-relative position, segment, morphology, and vessel topology"
+        },
         "2026-08-23": {
           "detected": true,
           "segment": "5",
@@ -1091,6 +1479,11 @@
           "minimal_enhancement_pct": 1.0,
           "vnc_coverage_pct": 100.0
         },
+        "2026-04-26": {
+          "detected": false,
+          "confidence": "review",
+          "tracking_note": "No separate April component was confidently assigned; this does not prove resolution."
+        },
         "2026-08-23": {
           "detected": false,
           "segment": "7",
@@ -1155,6 +1548,11 @@
           "enhancement_vs_portal_pct": 22.9,
           "minimal_enhancement_pct": 0.4,
           "vnc_coverage_pct": 100.0
+        },
+        "2026-04-26": {
+          "detected": false,
+          "confidence": "review",
+          "tracking_note": "No separate April component was confidently assigned; this does not prove resolution."
         },
         "2026-08-23": {
           "detected": false,
@@ -1221,6 +1619,11 @@
           "minimal_enhancement_pct": 0.8,
           "vnc_coverage_pct": 100.0
         },
+        "2026-04-26": {
+          "detected": false,
+          "confidence": "review",
+          "tracking_note": "No separate April component was confidently assigned; this does not prove resolution."
+        },
         "2026-08-23": {
           "detected": false,
           "segment": "8",
@@ -1285,6 +1688,11 @@
           "enhancement_vs_portal_pct": 21.4,
           "minimal_enhancement_pct": 11.1,
           "vnc_coverage_pct": 100.0
+        },
+        "2026-04-26": {
+          "detected": false,
+          "confidence": "review",
+          "tracking_note": "No separate April component was confidently assigned; this does not prove resolution."
         },
         "2026-08-23": {
           "detected": false,
@@ -1351,6 +1759,11 @@
           "minimal_enhancement_pct": 0.0,
           "vnc_coverage_pct": 100.0
         },
+        "2026-04-26": {
+          "detected": false,
+          "confidence": "review",
+          "tracking_note": "No separate April component was confidently assigned; this does not prove resolution."
+        },
         "2026-08-23": {
           "detected": false,
           "segment": "6",
@@ -1416,6 +1829,11 @@
           "minimal_enhancement_pct": 2.5,
           "vnc_coverage_pct": 100.0
         },
+        "2026-04-26": {
+          "detected": false,
+          "confidence": "review",
+          "tracking_note": "No separate April component was confidently assigned; this does not prove resolution."
+        },
         "2026-08-23": {
           "detected": false,
           "segment": "2",
@@ -1480,6 +1898,11 @@
           "enhancement_vs_portal_pct": 24.5,
           "minimal_enhancement_pct": 0.4,
           "vnc_coverage_pct": 100.0
+        },
+        "2026-04-26": {
+          "detected": false,
+          "confidence": "review",
+          "tracking_note": "No separate April component was confidently assigned; this does not prove resolution."
         },
         "2026-08-23": {
           "detected": false,
