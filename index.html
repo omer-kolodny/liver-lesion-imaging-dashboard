@@ -12,10 +12,10 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
   <link rel="manifest" href="site.webmanifest?v=4">
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
   <script type="module" src="viewer.js?v=3"></script>
-  <script defer src="app.js"></script>
+  <script defer src="app.js?v=2"></script>
 </head>
 <body>
   <div class="privacy-strip">Derived and anonymized imaging data only · Automated analysis · Radiologist verification required</div>
@@ -27,7 +27,7 @@
       <a href="#lesions">Lesions</a>
       <a href="#report">Report</a>
     </nav>
-    <a class="button small" href="assets/Liver_Lesion_CT_Comparison.pdf" download>Download PDF</a>
+    <button class="button small share-report" type="button">Share report</button>
   </header>
 
   <main id="top">
@@ -158,9 +158,11 @@
       <div class="shell report-grid">
         <div>
           <div class="eyebrow">Designed clinical-style report</div>
-          <h2>Download the complete 21-page PDF</h2>
+          <h2>Share the complete 21-page PDF</h2>
           <p class="lede small-lede">Includes the executive summary, per-lesion pages, annotated CT comparisons, consolidated measurements, methodology, and safety limitations.</p>
-          <div class="hero-actions"><a class="button primary" href="assets/Liver_Lesion_CT_Comparison.pdf" download>Download formatted PDF</a><a class="button ghost" href="assets/lesion_comparison.csv" download>Download CSV</a></div>
+          <div class="hero-actions"><button class="button primary share-report" type="button">Share PDF report</button><a class="button ghost" href="assets/Liver_Lesion_CT_Comparison.pdf" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_comparison.csv" download>Download CSV</a></div>
+          <p class="share-help">On iPhone, Share opens the native share sheet—send the report or choose <b>Save to Files</b>.</p>
+          <p class="share-status" id="shareStatus" aria-live="polite"></p>
         </div>
         <div class="report-preview"><img src="assets/liver-four-views.webp" alt="Four views of the 3D liver model"></div>
       </div>

@@ -84,3 +84,32 @@ grid.addEventListener('click', event => { const card = event.target.closest('.le
 grid.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.key === ' ') && event.target.matches('.lesion-card')) openLesion(event.target.dataset.id); });
 document.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
+
+const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf', window.location.href).href;
+const shareStatus = document.querySelector('#shareStatus');
+
+async function shareReport(event) {
+  const button = event.currentTarget;
+  const originalLabel = button.textContent;
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: 'RadioLens Liver Imaging Report',
+        text: 'Interactive liver imaging analysis and lesion comparison report.',
+        url: reportUrl,
+      });
+      if (shareStatus) shareStatus.textContent = 'Report shared.';
+      return;
+    }
+    await navigator.clipboard.writeText(reportUrl);
+    button.textContent = 'Link copied';
+    if (shareStatus) shareStatus.textContent = 'The public PDF link was copied to your clipboard.';
+    setTimeout(() => { button.textContent = originalLabel; }, 1800);
+  } catch (error) {
+    if (error.name === 'AbortError') return;
+    window.open(reportUrl, '_blank', 'noopener');
+    if (shareStatus) shareStatus.textContent = 'The PDF opened. Use your browser Share button to send it or save it.';
+  }
+}
+
+document.querySelectorAll('.share-report').forEach(button => button.addEventListener('click', shareReport));
