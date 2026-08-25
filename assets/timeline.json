@@ -459,7 +459,80 @@
           "diameter_change_from_jan_pct": -48.8
         }
       },
-      "trend": "Marked automated volume decrease since January."
+      "trend": "Marked automated volume decrease since January.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 78.9,
+            "smaller_mask_overlap_pct": 82.9,
+            "centroid_distance_mm": 7.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 62.5,
+            "smaller_mask_overlap_pct": 98.2,
+            "centroid_distance_mm": 7.0,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-04-26__2026-08-23": {
+          "decision": "supported",
+          "confidence": "high",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 48.5,
+            "smaller_mask_overlap_pct": 94.3,
+            "centroid_distance_mm": 7.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "pass",
+            "confidence": "high",
+            "kind": "independent reconstruction segmentation",
+            "reproduced_components": 1,
+            "expected_components": 1,
+            "minimum_smaller_mask_overlap_pct": 96.2,
+            "minimum_registered_dice_pct": 93.9,
+            "maximum_centroid_distance_mm": 0.9,
+            "note": "The August mask was reproduced on an independently reconstructed CT series."
+          },
+          "requires_radiologist_review": false,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L02",
@@ -585,7 +658,80 @@
           "diameter_change_from_jan_pct": -20.0
         }
       },
-      "trend": "Automated volume decrease since January. The residual mask is split into 2 foci."
+      "trend": "Automated volume decrease since January. The residual mask is split into 2 foci.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 80.3,
+            "smaller_mask_overlap_pct": 83.0,
+            "centroid_distance_mm": 5.2,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 83.8,
+            "smaller_mask_overlap_pct": 88.4,
+            "centroid_distance_mm": 1.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-04-26__2026-08-23": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 38.8,
+            "smaller_mask_overlap_pct": 50.0,
+            "centroid_distance_mm": 12.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Main focus is supported; August also contains a reproducible nearby segment 1 focus, treated as a possible split/satellite."
+          },
+          "ai": {
+            "status": "pass",
+            "confidence": "high",
+            "kind": "independent reconstruction segmentation",
+            "reproduced_components": 2,
+            "expected_components": 2,
+            "minimum_smaller_mask_overlap_pct": 91.4,
+            "minimum_registered_dice_pct": 89.3,
+            "maximum_centroid_distance_mm": 0.8,
+            "note": "Both August components, including the possible satellite focus, were reproduced on iMAR."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L03",
@@ -711,7 +857,80 @@
           "diameter_change_from_jan_pct": -41.4
         }
       },
-      "trend": "Marked automated volume decrease since January."
+      "trend": "Marked automated volume decrease since January.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 55.1,
+            "smaller_mask_overlap_pct": 55.7,
+            "centroid_distance_mm": 8.3,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 47.3,
+            "smaller_mask_overlap_pct": 89.9,
+            "centroid_distance_mm": 5.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-04-26__2026-08-23": {
+          "decision": "supported",
+          "confidence": "high",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 56.2,
+            "smaller_mask_overlap_pct": 94.3,
+            "centroid_distance_mm": 2.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "pass",
+            "confidence": "high",
+            "kind": "independent reconstruction segmentation",
+            "reproduced_components": 1,
+            "expected_components": 1,
+            "minimum_smaller_mask_overlap_pct": 91.8,
+            "minimum_registered_dice_pct": 89.2,
+            "maximum_centroid_distance_mm": 0.9,
+            "note": "The August mask was reproduced on an independently reconstructed CT series."
+          },
+          "requires_radiologist_review": false,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L04",
@@ -838,7 +1057,80 @@
           "diameter_change_from_jan_pct": -30.1
         }
       },
-      "trend": "No large automated volume change. The residual mask is split into 2 foci."
+      "trend": "No large automated volume change. The residual mask is split into 2 foci.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 31.2,
+            "smaller_mask_overlap_pct": 31.5,
+            "centroid_distance_mm": 7.1,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 46.8,
+            "smaller_mask_overlap_pct": 86.6,
+            "centroid_distance_mm": 6.2,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Primary focus is supported, but April contains an adjacent segment 8 component: possible split/merge."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-04-26__2026-08-23": {
+          "decision": "review",
+          "confidence": "low",
+          "deterministic": {
+            "status": "review",
+            "confidence": "low",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 8.6,
+            "smaller_mask_overlap_pct": 12.1,
+            "centroid_distance_mm": 9.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Compound segment 4/8 region with split/merge behavior; do not interpret it as an exact one-to-one lesion measurement."
+          },
+          "ai": {
+            "status": "review",
+            "confidence": "low",
+            "kind": "independent reconstruction segmentation",
+            "reproduced_components": 1,
+            "expected_components": 2,
+            "missing_series2_components": [
+              7
+            ],
+            "note": "At least one very small series-2 component was not reproduced on the independent iMAR reconstruction."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L05",
@@ -964,7 +1256,80 @@
           "diameter_change_from_jan_pct": -62.3
         }
       },
-      "trend": "Marked automated volume decrease since January."
+      "trend": "Marked automated volume decrease since January.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 53.7,
+            "smaller_mask_overlap_pct": 59.8,
+            "centroid_distance_mm": 4.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 30.7,
+            "smaller_mask_overlap_pct": 75.3,
+            "centroid_distance_mm": 5.2,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-04-26__2026-08-23": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 0.0,
+            "smaller_mask_overlap_pct": 0.0,
+            "centroid_distance_mm": 12.3,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Small focus is anatomically compatible but has no voxel overlap after global liver registration."
+          },
+          "ai": {
+            "status": "pass",
+            "confidence": "high",
+            "kind": "independent reconstruction segmentation",
+            "reproduced_components": 1,
+            "expected_components": 1,
+            "minimum_smaller_mask_overlap_pct": 83.8,
+            "minimum_registered_dice_pct": 80.0,
+            "maximum_centroid_distance_mm": 0.7,
+            "note": "The August mask was reproduced on an independently reconstructed CT series."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L06",
@@ -1058,7 +1423,74 @@
           "diameter_change_from_jan_pct": -70.8
         }
       },
-      "trend": "Marked automated volume decrease since January."
+      "trend": "Marked automated volume decrease since January.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 23.7,
+            "smaller_mask_overlap_pct": 24.4,
+            "centroid_distance_mm": 8.8,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "not-established",
+          "confidence": "low",
+          "deterministic": {
+            "status": "not-established",
+            "confidence": "low",
+            "method": "registered mask geometry",
+            "anatomy_consistency": "not assessable",
+            "note": "No sufficiently supported one-to-one correspondence was found; absence of a separate component does not prove resolution."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-04-26__2026-08-23": {
+          "decision": "not-established",
+          "confidence": "low",
+          "deterministic": {
+            "status": "not-established",
+            "confidence": "low",
+            "method": "registered mask geometry",
+            "anatomy_consistency": "not assessable",
+            "note": "No sufficiently supported one-to-one correspondence was found; absence of a separate component does not prove resolution."
+          },
+          "ai": {
+            "status": "review",
+            "confidence": "low",
+            "kind": "independent reconstruction segmentation",
+            "reproduced_components": 0,
+            "expected_components": 1,
+            "missing_series2_components": [
+              11
+            ],
+            "note": "At least one very small series-2 component was not reproduced on the independent iMAR reconstruction."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L07",
@@ -1184,7 +1616,80 @@
           "diameter_change_from_jan_pct": -35.1
         }
       },
-      "trend": "Marked automated volume decrease since January."
+      "trend": "Marked automated volume decrease since January.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 23.8,
+            "smaller_mask_overlap_pct": 26.9,
+            "centroid_distance_mm": 6.8,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 49.6,
+            "smaller_mask_overlap_pct": 67.0,
+            "centroid_distance_mm": 3.8,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-04-26__2026-08-23": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 0.0,
+            "smaller_mask_overlap_pct": 0.0,
+            "centroid_distance_mm": 9.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Small focus is anatomically compatible but has no voxel overlap after global liver registration."
+          },
+          "ai": {
+            "status": "pass",
+            "confidence": "high",
+            "kind": "independent reconstruction segmentation",
+            "reproduced_components": 1,
+            "expected_components": 1,
+            "minimum_smaller_mask_overlap_pct": 89.3,
+            "minimum_registered_dice_pct": 81.9,
+            "maximum_centroid_distance_mm": 0.8,
+            "note": "The August mask was reproduced on an independently reconstructed CT series."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L08",
@@ -1310,7 +1815,80 @@
           "diameter_change_from_jan_pct": -50.4
         }
       },
-      "trend": "Marked automated volume decrease since January."
+      "trend": "Marked automated volume decrease since January.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 35.6,
+            "smaller_mask_overlap_pct": 35.7,
+            "centroid_distance_mm": 5.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "review",
+          "confidence": "low",
+          "deterministic": {
+            "status": "review",
+            "confidence": "low",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 5.8,
+            "smaller_mask_overlap_pct": 15.5,
+            "centroid_distance_mm": 7.6,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Small focus with limited registered overlap."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-04-26__2026-08-23": {
+          "decision": "review",
+          "confidence": "low",
+          "deterministic": {
+            "status": "review",
+            "confidence": "low",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 1.7,
+            "smaller_mask_overlap_pct": 3.0,
+            "centroid_distance_mm": 5.6,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Very small focus; identity is highly sensitive to contour and reconstruction."
+          },
+          "ai": {
+            "status": "review",
+            "confidence": "moderate",
+            "kind": "independent reconstruction segmentation",
+            "reproduced_components": 1,
+            "expected_components": 1,
+            "minimum_smaller_mask_overlap_pct": 78.0,
+            "minimum_registered_dice_pct": 73.6,
+            "maximum_centroid_distance_mm": 0.8,
+            "note": "The August mask was reproduced on an independently reconstructed CT series."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L09",
@@ -1436,7 +2014,80 @@
           "diameter_change_from_jan_pct": -34.9
         }
       },
-      "trend": "Marked automated volume decrease since January."
+      "trend": "Marked automated volume decrease since January.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 44.2,
+            "smaller_mask_overlap_pct": 46.0,
+            "centroid_distance_mm": 4.8,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 35.3,
+            "smaller_mask_overlap_pct": 68.0,
+            "centroid_distance_mm": 4.2,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-04-26__2026-08-23": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 32.4,
+            "smaller_mask_overlap_pct": 41.1,
+            "centroid_distance_mm": 3.3,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "pass",
+            "confidence": "high",
+            "kind": "independent reconstruction segmentation",
+            "reproduced_components": 1,
+            "expected_components": 1,
+            "minimum_smaller_mask_overlap_pct": 85.1,
+            "minimum_registered_dice_pct": 84.5,
+            "maximum_centroid_distance_mm": 0.6,
+            "note": "The August mask was reproduced on an independently reconstructed CT series."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L10",
@@ -1506,7 +2157,50 @@
           "diameter_change_from_jan_pct": null
         }
       },
-      "trend": "Not separately detected by the automated August model; this does not prove complete resolution."
+      "trend": "Not separately detected by the automated August model; this does not prove complete resolution.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 24.0,
+            "smaller_mask_overlap_pct": 25.6,
+            "centroid_distance_mm": 5.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "not-established",
+          "confidence": "low",
+          "deterministic": {
+            "status": "not-established",
+            "confidence": "low",
+            "method": "registered mask geometry",
+            "anatomy_consistency": "not assessable",
+            "note": "No sufficiently supported one-to-one correspondence was found; absence of a separate component does not prove resolution."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L11",
@@ -1576,7 +2270,50 @@
           "diameter_change_from_jan_pct": null
         }
       },
-      "trend": "Not separately detected by the automated August model; this does not prove complete resolution."
+      "trend": "Not separately detected by the automated August model; this does not prove complete resolution.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "provisional",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "pass",
+            "confidence": "high",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 57.6,
+            "smaller_mask_overlap_pct": 61.6,
+            "centroid_distance_mm": 3.1,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "not-established",
+          "confidence": "low",
+          "deterministic": {
+            "status": "not-established",
+            "confidence": "low",
+            "method": "registered mask geometry",
+            "anatomy_consistency": "not assessable",
+            "note": "No sufficiently supported one-to-one correspondence was found; absence of a separate component does not prove resolution."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L12",
@@ -1646,7 +2383,50 @@
           "diameter_change_from_jan_pct": null
         }
       },
-      "trend": "Not separately detected by the automated August model; this does not prove complete resolution."
+      "trend": "Not separately detected by the automated August model; this does not prove complete resolution.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "moderate",
+          "deterministic": {
+            "status": "review",
+            "confidence": "moderate",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 33.8,
+            "smaller_mask_overlap_pct": 34.6,
+            "centroid_distance_mm": 5.2,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Registered location and mask overlap support this correspondence."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "not-established",
+          "confidence": "low",
+          "deterministic": {
+            "status": "not-established",
+            "confidence": "low",
+            "method": "registered mask geometry",
+            "anatomy_consistency": "not assessable",
+            "note": "No sufficiently supported one-to-one correspondence was found; absence of a separate component does not prove resolution."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L13",
@@ -1716,7 +2496,50 @@
           "diameter_change_from_jan_pct": null
         }
       },
-      "trend": "Not separately detected by the automated August model; this does not prove complete resolution."
+      "trend": "Not separately detected by the automated August model; this does not prove complete resolution.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "low",
+          "deterministic": {
+            "status": "review",
+            "confidence": "low",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 4.2,
+            "smaller_mask_overlap_pct": 17.3,
+            "centroid_distance_mm": 13.2,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Small nearby segment 4/5 candidates remain difficult to distinguish."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "not-established",
+          "confidence": "low",
+          "deterministic": {
+            "status": "not-established",
+            "confidence": "low",
+            "method": "registered mask geometry",
+            "anatomy_consistency": "not assessable",
+            "note": "No sufficiently supported one-to-one correspondence was found; absence of a separate component does not prove resolution."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L14",
@@ -1786,7 +2609,50 @@
           "diameter_change_from_jan_pct": null
         }
       },
-      "trend": "Not separately detected by the automated August model; this does not prove complete resolution."
+      "trend": "Not separately detected by the automated August model; this does not prove complete resolution.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "low",
+          "deterministic": {
+            "status": "review",
+            "confidence": "low",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 26.6,
+            "smaller_mask_overlap_pct": 32.3,
+            "centroid_distance_mm": 3.9,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Sub-centimeter correspondence is contour-sensitive."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "not-established",
+          "confidence": "low",
+          "deterministic": {
+            "status": "not-established",
+            "confidence": "low",
+            "method": "registered mask geometry",
+            "anatomy_consistency": "not assessable",
+            "note": "No sufficiently supported one-to-one correspondence was found; absence of a separate component does not prove resolution."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L15",
@@ -1856,7 +2722,50 @@
           "diameter_change_from_jan_pct": null
         }
       },
-      "trend": "Not separately detected by the automated August model; this does not prove complete resolution."
+      "trend": "Not separately detected by the automated August model; this does not prove complete resolution.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "low",
+          "deterministic": {
+            "status": "review",
+            "confidence": "low",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 16.4,
+            "smaller_mask_overlap_pct": 18.4,
+            "centroid_distance_mm": 5.2,
+            "anatomy_consistency": "reference segment retained",
+            "note": "Sub-centimeter correspondence is contour-sensitive."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "not-established",
+          "confidence": "low",
+          "deterministic": {
+            "status": "not-established",
+            "confidence": "low",
+            "method": "registered mask geometry",
+            "anatomy_consistency": "not assessable",
+            "note": "No sufficiently supported one-to-one correspondence was found; absence of a separate component does not prove resolution."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     },
     {
       "lesion_id": "L16",
@@ -1926,7 +2835,135 @@
           "diameter_change_from_jan_pct": null
         }
       },
-      "trend": "Not separately detected by the automated August model; this does not prove complete resolution."
+      "trend": "Not separately detected by the automated August model; this does not prove complete resolution.",
+      "match_validation": {
+        "2025-12-25__2026-01-19": {
+          "decision": "review",
+          "confidence": "low",
+          "deterministic": {
+            "status": "review",
+            "confidence": "low",
+            "method": "rigid liver-mask registration plus lesion overlap and centroid",
+            "registered_dice_pct": 0.0,
+            "smaller_mask_overlap_pct": 0.0,
+            "centroid_distance_mm": 7.8,
+            "anatomy_consistency": "reference segment retained",
+            "note": "No voxel overlap after registration; proximity alone supports only a tentative match."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        },
+        "2026-01-19__2026-04-26": {
+          "decision": "not-established",
+          "confidence": "low",
+          "deterministic": {
+            "status": "not-established",
+            "confidence": "low",
+            "method": "registered mask geometry",
+            "anatomy_consistency": "not assessable",
+            "note": "No sufficiently supported one-to-one correspondence was found; absence of a separate component does not prove resolution."
+          },
+          "ai": {
+            "status": "unavailable",
+            "confidence": "unavailable",
+            "kind": "independent reconstruction/model repeat",
+            "note": "No independent repeat segmentation was available for both studies in this pair; AI confirmation is therefore not claimed."
+          },
+          "requires_radiologist_review": true,
+          "clinical_ground_truth": false
+        }
+      }
     }
-  ]
+  ],
+  "validation": {
+    "version": "dual-channel-audit-2026-08-25",
+    "independent_of_radiology_report": true,
+    "pair_summaries": {
+      "2025-12-25__2026-01-19": {
+        "liver_registration_dice_pct": 91.5,
+        "counts": {
+          "supported": 0,
+          "provisional": 5,
+          "review": 11,
+          "not-established": 0
+        },
+        "deterministic_method": "Independent rigid liver-mask registration plus lesion voxel overlap, centroid distance and anatomy consistency.",
+        "ai_method": "Independent repeat segmentation on a second August reconstruction where available; otherwise explicitly unavailable."
+      },
+      "2026-01-19__2026-04-26": {
+        "liver_registration_dice_pct": 92.0,
+        "counts": {
+          "supported": 0,
+          "provisional": 6,
+          "review": 2,
+          "not-established": 8
+        },
+        "deterministic_method": "Independent rigid liver-mask registration plus lesion voxel overlap, centroid distance and anatomy consistency.",
+        "ai_method": "Independent repeat segmentation on a second August reconstruction where available; otherwise explicitly unavailable."
+      },
+      "2026-04-26__2026-08-23": {
+        "liver_registration_dice_pct": 90.3,
+        "counts": {
+          "supported": 2,
+          "provisional": 0,
+          "review": 6,
+          "not-established": 1
+        },
+        "deterministic_method": "Independent rigid liver-mask registration plus lesion voxel overlap, centroid distance and anatomy consistency.",
+        "ai_method": "Independent repeat segmentation on a second August reconstruction where available; otherwise explicitly unavailable."
+      }
+    },
+    "measurement_reconciliation": [
+      {
+        "date": "2025-12-25",
+        "reported_tumor_volume_ml": 166.82,
+        "tracked_volume_ml": 166.57,
+        "untracked_or_rounding_volume_ml": 0.25,
+        "reported_burden_pct": 9.78,
+        "recomputed_burden_pct": 9.776,
+        "arithmetic_check": "pass"
+      },
+      {
+        "date": "2026-01-19",
+        "reported_tumor_volume_ml": 170.34,
+        "tracked_volume_ml": 170.328,
+        "untracked_or_rounding_volume_ml": 0.012,
+        "reported_burden_pct": 10.22,
+        "recomputed_burden_pct": 10.218,
+        "arithmetic_check": "pass"
+      },
+      {
+        "date": "2026-04-26",
+        "reported_tumor_volume_ml": 97.64,
+        "tracked_volume_ml": 97.638,
+        "untracked_or_rounding_volume_ml": 0.002,
+        "reported_burden_pct": 6.49,
+        "recomputed_burden_pct": 6.492,
+        "arithmetic_check": "pass"
+      },
+      {
+        "date": "2026-08-23",
+        "reported_tumor_volume_ml": 46.56,
+        "tracked_volume_ml": 46.478,
+        "untracked_or_rounding_volume_ml": 0.082,
+        "reported_burden_pct": 3.17,
+        "recomputed_burden_pct": 3.173,
+        "arithmetic_check": "pass"
+      }
+    ],
+    "august_reconstruction_consensus": {
+      "liver_dice_pct": 98.5,
+      "reproduced_imar_components": 9,
+      "series_2_components": 11,
+      "note": "All nine iMAR components correspond to series-2 components. One series-2 component is a reconstruction-dependent split and one 0.045 mL focus was not reproduced on iMAR."
+    },
+    "gate_policy": "Supported requires deterministic high-confidence correspondence plus an independent AI/reconstruction pass. Missing AI evidence is shown as provisional, never silently treated as passed.",
+    "limitations": "Agreement between algorithms or reconstructions is not clinical ground truth. Every match, measurement and trend remains subject to radiologist source-image review."
+  }
 }

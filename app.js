@@ -8,6 +8,7 @@ let studies = [];
 let studyMap = {};
 let lesions = [];
 let comparisons = {};
+let validation = {};
 let activeFilter = 'all';
 let fromDate;
 let toDate;
@@ -21,6 +22,16 @@ const selectedComparison = () => comparisons[comparisonKey(fromDate, toDate)] ||
   level:'limited', label:'Attenuation comparability not established', score_pct:null,
   explanation:'Matched contrast timing and internal-reference measurements are not available for this pair.'
 };
+const matchValidation = row => row.match_validation?.[comparisonKey(fromDate, toDate)] || {
+  decision:'not-audited', confidence:'unavailable', requires_radiologist_review:true,
+  deterministic:{ status:'unavailable', confidence:'unavailable', note:'This non-consecutive date pair has not undergone the independent registered-mask audit.' },
+  ai:{ status:'unavailable', confidence:'unavailable', note:'No independent repeat segmentation is available for this selected pair.' }
+};
+const validationSummary = () => validation.pair_summaries?.[comparisonKey(fromDate, toDate)] || null;
+const decisionLabel = decision => ({
+  supported:'Dual-check supported', provisional:'Geometry supported · AI unavailable', review:'Review required',
+  'not-established':'Match not established', 'not-audited':'Pair not independently audited'
+}[decision] || 'Review required');
 const metricPair = (first, second, key, suffix = '', digits = 1) =>
   `${fmt(first[key], digits)}${first[key] == null ? '' : suffix} → ${fmt(second[key], digits)}${second[key] == null ? '' : suffix}`;
 
@@ -32,7 +43,9 @@ function classification(row) {
   if (!first.detected && !second.detected) return { key:'inactive', cls:'unreliable', label:'Absent in selected pair', note:'This historical track was not separately detected in either selected study.' };
   if (first.detected && !second.detected) return { key:'stable', cls:'stable', label:'Not separately detected', note:'No separate residual focus was identified by the automated later-scan model. This does not prove complete resolution.' };
   if (small) return { key:'caution', cls:'caution', label:'Small / uncertain', note:'Sub-centimeter lesion measurements and attenuation fractions are highly contour-sensitive.' };
-  if (second.confidence === 'low') return { key:'caution', cls:'unreliable', label:'Low-confidence match', note:'Registration and independent-model agreement are limited for this match.' };
+  const audit = matchValidation(row);
+  if (audit.decision === 'not-established') return { key:'caution', cls:'unreliable', label:'Match not established', note:'Independent registration did not establish a reliable one-to-one correspondence.' };
+  if (audit.decision === 'review') return { key:'caution', cls:'caution', label:'Match needs review', note:'At least one deterministic or independent-AI validation gate did not pass.' };
   if (volumeChange != null && volumeChange <= -30) return { key:'stable', cls:'stable', label:'Marked decrease', note:'The automated segmented volume decreased substantially over the selected interval.' };
   if (volumeChange != null && volumeChange <= -10) return { key:'stable', cls:'stable', label:'Measured decrease', note:'The automated segmented volume decreased over the selected interval.' };
   if (volumeChange != null && volumeChange >= 20) return { key:'caution', cls:'caution', label:'Measured increase', note:'The automated segmented volume increased and should be reviewed on the source images.' };
@@ -40,7 +53,7 @@ function classification(row) {
 }
 
 function imageFor(row) {
-  return `assets/timeline/${row.lesion_id}_${fromDate}_${toDate}.webp?v=5`;
+  return `assets/timeline/${row.lesion_id}_${fromDate}_${toDate}.webp?v=6`;
 }
 
 function renderSelectors() {
@@ -73,6 +86,7 @@ function renderOverview() {
   const relevant = lesions.filter(row => measurement(row, fromDate).detected || measurement(row, toDate).detected);
   const matched = relevant.filter(row => measurement(row, fromDate).detected && measurement(row, toDate).detected).length;
   const quality = selectedComparison();
+  const auditSummary = validationSummary();
 
   document.querySelector('#comparisonLabel').textContent = `CT comparison · ${first.label} → ${second.label}`;
   document.querySelector('#latestBurden').textContent = `${fmt(studies.at(-1).tumor_burden_pct,2)}%`;
@@ -109,10 +123,14 @@ function renderOverview() {
   const l02Later = measurement(l02, toDate);
   const distances = l02Later.proximity_mm ? Object.values(l02Later.proximity_mm).filter(value => value != null) : [];
   const nearest = distances.length ? Math.min(...distances) : null;
+  const auditLine = auditSummary
+    ? `${auditSummary.liver_registration_dice_pct}% liver-registration Dice · ${auditSummary.counts.supported} supported · ${auditSummary.counts.provisional} provisional · ${auditSummary.counts.review + auditSummary.counts['not-established']} review/not established.`
+    : 'This selected non-consecutive pair has not undergone the independent registered-mask matching audit.';
   document.querySelector('#findingsList').innerHTML = `
     <li><span>01</span><div><b>Total segmented burden</b><p>${signed(volumeChange)} volume change and ${signed(burdenChange,' percentage points')} burden change.</p></div></li>
     <li><span>02</span><div><b>Dominant segment 3 lesion</b><p>${signed(l01Change)} automated volume change over the selected interval.</p></div></li>
     <li class="quality-${quality.level}"><span>03</span><div><b>${quality.label}${quality.score_pct == null ? '' : ` · ${fmt(quality.score_pct)}% internal-reference similarity`}</b><p>${quality.explanation}</p></div></li>
+    <li class="validation-finding"><span>V</span><div><b>Dual-channel match validation</b><p>${auditLine}</p></div></li>
     <li><span>04</span><div><b>Vessel proximity</b><p>${nearest == null ? 'Available on the latest segmented scan.' : `L02 is approximately ${fmt(nearest)} mm from the nearest automated major-vessel mask.`}</p></div></li>
     <li class="warning-item"><span>!</span><div><b>Viability limitation</b><p>Low attenuation and enhancement ratios are proxies; single-phase CT cannot determine whether tumor cells are alive.</p></div></li>`;
 }
@@ -133,6 +151,7 @@ function renderCards() {
     const status = classification(row);
     const first = measurement(row, fromDate);
     const second = measurement(row, toDate);
+    const audit = matchValidation(row);
     return `<article class="lesion-card" tabindex="0" data-id="${row.lesion_id}" aria-label="Open ${row.lesion_id} details">
       <img loading="lazy" src="${imageFor(row)}" alt="${row.lesion_id} CT comparison">
       <div class="lesion-body">
@@ -143,6 +162,7 @@ function renderCards() {
           <div><span>Diameter change</span><b>${signed(change(first.long_mm,second.long_mm))}</b></div>
           <div><span>Volume change</span><b>${signed(change(first.volume_ml,second.volume_ml))}</b></div>
         </div>
+        <div class="validation-chip validation-${audit.decision}"><span>Match validation</span><b>${decisionLabel(audit.decision)}</b></div>
       </div>
     </article>`;
   }).join('') || '<p class="muted">No lesions match this filter.</p>';
@@ -165,6 +185,7 @@ function openLesion(id) {
   const first = measurement(row, fromDate);
   const second = measurement(row, toDate);
   const status = classification(row);
+  const audit = matchValidation(row);
   const quality = selectedComparison();
   const proximity = second.proximity_mm && Object.keys(second.proximity_mm).length
     ? `<div class="proximity"><h3>Approximate edge-to-edge proximity on ${studyMap[toDate].label}</h3><div class="proximity-grid">${Object.entries(second.proximity_mm).map(([name,distance]) => `<div class="${distance < 5 ? 'near' : ''}"><span>${name.replaceAll('_',' ')}</span><b>${fmt(distance)} mm</b></div>`).join('')}</div><small>Automated masks only. These distances are not suitable for operative planning.</small></div>` : '';
@@ -184,6 +205,22 @@ function openLesion(id) {
     const value = measurement(row, study.date);
     return `<div><span>${study.label}</span><b>${value.detected ? `${fmt(value.volume_ml,2)} mL` : 'Not detected'}</b><small>${value.long_mm == null ? '—' : `${fmt(value.long_mm)} mm long axis`}</small></div>`;
   }).join('');
+  const deterministic = audit.deterministic || {};
+  const ai = audit.ai || {};
+  const deterministicMetrics = deterministic.registered_dice_pct == null
+    ? '<span>No quantitative overlap result</span>'
+    : `<span>Registered Dice <b>${fmt(deterministic.registered_dice_pct)}%</b></span><span>Smaller-mask overlap <b>${fmt(deterministic.smaller_mask_overlap_pct)}%</b></span><span>Centroid distance <b>${fmt(deterministic.centroid_distance_mm)} mm</b></span>`;
+  const aiMetrics = ai.minimum_smaller_mask_overlap_pct == null
+    ? '<span>No independent repeat metric</span>'
+    : `<span>Minimum overlap <b>${fmt(ai.minimum_smaller_mask_overlap_pct)}%</b></span><span>Minimum Dice <b>${fmt(ai.minimum_registered_dice_pct)}%</b></span><span>Maximum centroid distance <b>${fmt(ai.maximum_centroid_distance_mm)} mm</b></span>`;
+  const validationPanel = `<div class="validation-panel validation-${audit.decision}">
+    <div class="validation-heading"><div><h3>Independent lesion-match validation</h3><p>${studyMap[fromDate].label} → ${studyMap[toDate].label}</p></div><span>${decisionLabel(audit.decision)}</span></div>
+    <div class="validation-columns">
+      <div><div class="validation-channel"><i>D</i><b>Deterministic geometry</b><em>${deterministic.status || 'unavailable'}</em></div><div class="validation-metrics">${deterministicMetrics}</div><p>${deterministic.anatomy_consistency ? `Anatomy: ${deterministic.anatomy_consistency}. ` : ''}${deterministic.note || ''}</p></div>
+      <div><div class="validation-channel"><i>AI</i><b>Independent AI / reconstruction</b><em>${ai.status || 'unavailable'}</em></div><div class="validation-metrics">${aiMetrics}</div><p>${ai.note || ''}</p></div>
+    </div>
+    <small>Algorithmic agreement is not clinical ground truth. ${audit.requires_radiologist_review ? 'This track remains explicitly flagged for radiologist source-image review.' : 'The automated correspondence is supported by both available channels but still requires clinical confirmation.'}</small>
+  </div>`;
   dialogContent.innerHTML = `<div class="dialog-inner">
     <div class="dialog-header"><div><div class="eyebrow">Lesion timeline</div><h2>${row.lesion_id} · Reference segment ${row.reference_segment}</h2></div><span class="status ${status.cls}">${status.label}</span></div>
     <img src="${imageFor(row)}" alt="${row.lesion_id} full CT comparison">
@@ -194,8 +231,8 @@ function openLesion(id) {
       <div><span>Volume</span><b>${fmt(first.volume_ml,2)} → ${fmt(second.volume_ml,2)} mL (${signed(change(first.volume_ml,second.volume_ml))})</b></div>
     </div>
     <div class="trend-strip">${trend}</div>
-    ${attenuation}${proximity}
-    <div class="dialog-note"><b>Automated trend:</b> ${row.trend}<br><b>Selected-pair assessment:</b> ${status.note}<br><b>Latest segment-mask overlap:</b> ${second.segment || row.reference_segment}.<br><b>Match confidence:</b> ${second.confidence || 'historical automated match'}.</div>
+    ${validationPanel}${attenuation}${proximity}
+    <div class="dialog-note"><b>Automated trend:</b> ${row.trend}<br><b>Selected-pair assessment:</b> ${status.note}<br><b>Latest segment-mask assignment:</b> ${second.segment || row.reference_segment}.<br><b>Validation decision:</b> ${decisionLabel(audit.decision)}.</div>
   </div>`;
   dialog.showModal();
 }
@@ -212,11 +249,12 @@ function updateComparison() {
   renderCards();
 }
 
-fetch('assets/timeline.json?v=3').then(response => response.json()).then(data => {
+fetch('assets/timeline.json?v=4').then(response => response.json()).then(data => {
   studies = data.studies;
   studyMap = Object.fromEntries(studies.map(study => [study.date, study]));
   lesions = data.lesions;
   comparisons = data.comparisons || {};
+  validation = data.validation || {};
   toDate = studies.at(-1).date;
   fromDate = studies.at(-2).date;
   renderSelectors();
@@ -235,7 +273,7 @@ grid.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.
 document.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
 
-const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=5', window.location.href).href;
+const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=6', window.location.href).href;
 const shareStatus = document.querySelector('#shareStatus');
 async function shareReport(event) {
   const button = event.currentTarget;

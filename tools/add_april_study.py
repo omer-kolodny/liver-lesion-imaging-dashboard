@@ -272,7 +272,7 @@ def write_pdf(timeline: dict):
     small = ParagraphStyle("SmallX", parent=body, fontSize=7.8, leading=10)
     story = [
         Paragraph("RadioLens · Longitudinal Liver CT", title),
-        Paragraph("Four-study image-derived lesion analysis · updated 24 Aug 2026", h2),
+        Paragraph("Four-study image-derived lesion analysis · dual-channel validation added 25 Aug 2026", h2),
         Spacer(1, 5*mm),
     ]
     study_rows = [["Study", "Liver volume", "Segmented lesion volume", "Burden"]]
@@ -299,6 +299,10 @@ def write_pdf(timeline: dict):
     april = next(study for study in timeline["studies"] if study["date"] == APRIL_DATE)
     august = timeline["studies"][-1]
     volume_change = (august["tumor_volume_ml"] - april["tumor_volume_ml"]) / april["tumor_volume_ml"] * 100
+    april_aug_validation = timeline.get("validation", {}).get("pair_summaries", {}).get(
+        f"{APRIL_DATE}__2026-08-23", {}
+    )
+    validation_counts = april_aug_validation.get("counts", {})
     story += [
         Paragraph("April → August summary", h2),
         Paragraph(
@@ -310,16 +314,27 @@ def write_pdf(timeline: dict):
         Paragraph(
             "Tracks are assigned using registered spatial overlap/centroid, Couinaud segment, morphology and vessel topology. One-to-one assignment is preferred; ambiguous matches and split/merge events are explicitly flagged. "
             "L04 is a split/merge case in April. A missing separate component does not prove lesion resolution.", body),
+        Spacer(1, 4*mm),
+        Paragraph("Independent validation gate", h2),
+        Paragraph(
+            f"April-to-August liver-mask registration Dice was {april_aug_validation.get('liver_registration_dice_pct', 0):.1f}%. "
+            f"The dual-channel gate classified {validation_counts.get('supported', 0)} tracks as supported, "
+            f"{validation_counts.get('review', 0)} for review, and {validation_counts.get('not-established', 0)} as not established. "
+            "The deterministic channel uses registered voxel overlap, centroid distance and anatomy consistency. The AI channel uses independent repeat segmentation on the August iMAR reconstruction. "
+            "Algorithmic agreement is not clinical ground truth; all findings require radiologist source-image confirmation.", body),
         PageBreak(),
     ]
     for lesion in timeline["lesions"]:
         lid = lesion["lesion_id"]
         first = lesion["measurements"][APRIL_DATE]
         second = lesion["measurements"]["2026-08-23"]
+        audit = lesion.get("match_validation", {}).get(f"{APRIL_DATE}__2026-08-23", {})
+        deterministic = audit.get("deterministic", {})
+        ai = audit.get("ai", {})
         image_path = ROOT / "assets" / "timeline" / f"{lid}_{APRIL_DATE}_2026-08-23.webp"
         story += [Paragraph(f"{lid} · reference segment {lesion['reference_segment']}", h2)]
         if image_path.exists():
-            story += [PdfImage(str(image_path), width=252*mm, height=119.7*mm), Spacer(1, 2*mm)]
+            story += [PdfImage(str(image_path), width=190*mm, height=90.25*mm), Spacer(1, 1*mm)]
         rows = [
             ["Metric", "26 Apr 2026", "23 Aug 2026"],
             ["Detection", "Detected" if first.get("detected") else "Not separate", "Detected" if second.get("detected") else "Not separate"],
@@ -327,6 +342,18 @@ def write_pdf(timeline: dict):
             ["Long × short × CC", f"{first.get('long_mm', 0):.1f} × {first.get('short_mm', 0):.1f} × {first.get('cc_mm', 0):.1f} mm" if first.get("detected") else "—", f"{second.get('long_mm', 0):.1f} × {second.get('short_mm', 0):.1f} × {second.get('cc_mm', 0):.1f} mm" if second.get("detected") else "—"],
             ["VNC-corrected enhancement", f"{first.get('vnc_corrected_enhancement_hu', 0):.1f} HU" if first.get("detected") else "—", f"{second.get('vnc_corrected_enhancement_hu', 0):.1f} HU" if second.get("detected") else "—"],
             ["Below 40 HU", f"{first.get('below_40hu_pct', 0):.1f}%" if first.get("detected") else "—", f"{second.get('below_40hu_pct', 0):.1f}%" if second.get("detected") else "—"],
+            ["Validation decision", audit.get("decision", "not audited").replace("-", " ").title(), f"Confidence: {audit.get('confidence', 'unavailable')}"],
+            ["Deterministic geometry", (
+                f"Dice {deterministic.get('registered_dice_pct', 0):.1f}% · overlap {deterministic.get('smaller_mask_overlap_pct', 0):.1f}%"
+                if deterministic.get("registered_dice_pct") is not None else "No one-to-one match established"
+            ), (
+                f"Centroid {deterministic.get('centroid_distance_mm', 0):.1f} mm · {deterministic.get('anatomy_consistency', 'not assessable')}"
+                if deterministic.get("centroid_distance_mm") is not None else deterministic.get("anatomy_consistency", "not assessable")
+            )],
+            ["Independent AI / reconstruction", ai.get("status", "unavailable").title(), (
+                f"Minimum overlap {ai.get('minimum_smaller_mask_overlap_pct', 0):.1f}%"
+                if ai.get("minimum_smaller_mask_overlap_pct") is not None else "No independent repeat metric"
+            )],
         ]
         lesion_table = Table(rows, colWidths=[60*mm, 75*mm, 75*mm])
         lesion_table.setStyle(TableStyle([
@@ -334,11 +361,15 @@ def write_pdf(timeline: dict):
             ("TEXTCOLOR", (0,0), (-1,0), colors.white),
             ("BACKGROUND", (0,1), (-1,-1), colors.HexColor("#f5f8fb")),
             ("GRID", (0,0), (-1,-1), 0.4, colors.HexColor("#c5d1dc")),
-            ("FONTSIZE", (0,0), (-1,-1), 8),
-            ("TOPPADDING", (0,0), (-1,-1), 3),
-            ("BOTTOMPADDING", (0,0), (-1,-1), 3),
+            ("FONTSIZE", (0,0), (-1,-1), 7.4),
+            ("TOPPADDING", (0,0), (-1,-1), 2),
+            ("BOTTOMPADDING", (0,0), (-1,-1), 2),
         ]))
-        story += [lesion_table, Spacer(1, 2*mm), Paragraph(lesion.get("trend", ""), small)]
+        validation_note = f"Deterministic: {deterministic.get('note', 'Not audited')} AI/reconstruction: {ai.get('note', 'Not audited')}"
+        story += [
+            lesion_table, Spacer(1, 2*mm), Paragraph(lesion.get("trend", ""), small),
+            Spacer(1, 1*mm), Paragraph(validation_note, small),
+        ]
         if lid != timeline["lesions"][-1]["lesion_id"]:
             story.append(PageBreak())
     doc.build(story)
