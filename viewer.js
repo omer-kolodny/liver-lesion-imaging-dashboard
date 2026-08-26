@@ -83,6 +83,26 @@ if (container) {
     sprite.scale.set(18, 8.4, 1); return sprite;
   }
 
+  function exteriorSide(geometry) {
+    const position = geometry?.attributes?.position;
+    if (!position) return THREE.DoubleSide;
+    const index = geometry.index;
+    const a = new THREE.Vector3(), b = new THREE.Vector3(), c = new THREE.Vector3(), cross = new THREE.Vector3();
+    const elementCount = index ? index.count : position.count;
+    let signedVolume = 0;
+    for (let offset = 0; offset + 2 < elementCount; offset += 3) {
+      const ia = index ? index.getX(offset) : offset;
+      const ib = index ? index.getX(offset + 1) : offset + 1;
+      const ic = index ? index.getX(offset + 2) : offset + 2;
+      a.fromBufferAttribute(position, ia);
+      b.fromBufferAttribute(position, ib);
+      c.fromBufferAttribute(position, ic);
+      cross.crossVectors(b, c);
+      signedVolume += a.dot(cross);
+    }
+    return signedVolume < 0 ? THREE.BackSide : THREE.FrontSide;
+  }
+
   function setLayer(name, visible) {
     if (visible && overlayLayerNames.has(name) && !overlaysReady) {
       document.querySelectorAll(`[data-layer="${name}"]`).forEach(button => button.classList.add('loading'));
@@ -116,10 +136,20 @@ if (container) {
     if (layer) layers[layer].push(object);
     object.castShadow = false;
     object.receiveShadow = false;
+    const outside = exteriorSide(object.geometry);
     const materials = Array.isArray(object.material) ? object.material : [object.material];
     materials.forEach(material => {
-      material.side = material.transparent ? THREE.DoubleSide : THREE.FrontSide;
-      if (material.transparent) material.depthWrite = false;
+      if (layer === 'liver') {
+        // A closed liver shell only needs its outward-facing surface. Rendering
+        // both transparent sides can resemble a flat cut through the organ.
+        material.side = outside;
+        material.depthWrite = false;
+        material.transparent = true;
+        material.needsUpdate = true;
+      } else {
+        material.side = material.transparent ? THREE.DoubleSide : outside;
+        if (material.transparent) material.depthWrite = false;
+      }
     });
     if (includeLabels && object.name.startsWith('Lesion_')) {
       const box = new THREE.Box3().setFromObject(object); const center = box.getCenter(new THREE.Vector3());
@@ -155,10 +185,23 @@ if (container) {
     rootModel = gltf.scene; scene.add(rootModel);
     rootModel.traverse(object => prepareMesh(object, true));
     Object.entries(initial).forEach(([name,visible]) => setLayer(name,visible));
-    const box = new THREE.Box3().setFromObject(rootModel); const center = box.getCenter(new THREE.Vector3()); const size = box.getSize(new THREE.Vector3());
-    const distance = Math.max(size.x,size.y,size.z) * 1.65;
-    controls.target.copy(center); camera.position.set(center.x + distance*.7, center.y - distance, center.z + distance*.52); camera.lookAt(center);
-    controls.minDistance = distance*.35; controls.maxDistance = distance*3; controls.update();
+    const box = new THREE.Box3().setFromObject(rootModel);
+    const modelSphere = box.getBoundingSphere(new THREE.Sphere());
+    const center = modelSphere.center;
+    const verticalFov = THREE.MathUtils.degToRad(camera.fov);
+    const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * camera.aspect);
+    const limitingFov = Math.max(.1, Math.min(verticalFov, horizontalFov));
+    const distance = modelSphere.radius / Math.sin(limitingFov / 2) * 1.08;
+    const direction = new THREE.Vector3(.7, -1, .52).normalize();
+    controls.target.copy(center); camera.position.copy(center).addScaledVector(direction, distance); camera.lookAt(center);
+    camera.near = Math.max(.1, modelSphere.radius / 100);
+    camera.far = Math.max(3000, modelSphere.radius * 20);
+    camera.updateProjectionMatrix();
+    // Never allow the camera to enter the organ, which visually clips it into
+    // a cross-section on trackpads and mobile pinch gestures.
+    controls.minDistance = modelSphere.radius * 1.35;
+    controls.maxDistance = modelSphere.radius * 8;
+    controls.update();
     homeCamera = { position:camera.position.clone(), target:center.clone() };
     loading?.remove();
   }, undefined, error => {
