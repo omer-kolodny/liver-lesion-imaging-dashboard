@@ -2,7 +2,11 @@
 
 Public site: https://omer-kolodny.github.io/liver-lesion-imaging-dashboard/
 
+MRI dashboard: https://omer-kolodny.github.io/liver-lesion-imaging-dashboard/mri/
+
 The dashboard includes selectable CT comparisons for 25 Dec 2025, 19 Jan 2026, 26 Apr 2026, and 23 Aug 2026, plus a latest-scan 3D anatomy model with optional vessel, segment, and organ layers.
+
+The separate MRI dashboard includes 18 Dec 2025, 22 Jan 2026, 28 Apr 2026, and 26 Aug 2026. It provides conservative registered lesion tracking, locked-axis measurements, ADC/DWI/T2 and dynamic signal features, repeat-AI validation, a latest-study 3D liver model, and downloadable PDF/CSV output. The recovered 26 Aug archive is truncated; the dashboard explicitly marks unavailable DWI/ADC data and uses the latest complete axial dynamic phase for morphology.
 
 Responsive static web application containing:
 

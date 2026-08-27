@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0a0715">
+  <meta name="description" content="Longitudinal liver MRI lesion visualization and comparison dashboard.">
+  <title>RadioLens MRI · Noa</title>
+  <link rel="stylesheet" href="styles.css?v=1">
+  <script type="importmap">{"imports":{"three":"../vendor/three.module.js"}}</script>
+  <script type="module" src="viewer.js?v=1"></script>
+  <script defer src="app.js?v=1"></script>
+</head>
+<body>
+  <div class="privacy-strip">Derived anonymized MRI data · Automated research visualization · Radiologist verification required</div>
+  <header class="nav shell">
+    <a class="brand" href="#top"><span class="brand-mark">MR</span><span>RadioLens MRI</span></a>
+    <nav><a href="#overview">Overview</a><a href="#model">3D</a><a href="#lesions">Lesions</a><a href="#report">Report</a></nav>
+    <a class="mode-link" href="../">Open CT dashboard</a>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <div class="hero-copy">
+        <div class="eyebrow">Multiparametric liver MRI · 18 Dec 2025 → 26 Aug 2026</div>
+        <h1>See change beyond size alone.</h1>
+        <p class="lede">Registered lesion tracking combines 3D morphology with ADC, high-b DWI, T2 fat-sat, late post-contrast signal, dynamic phase behavior, and independent repeat-AI validation.</p>
+        <div class="hero-actions"><a class="button primary" href="#lesions">Explore every lesion</a><a class="button ghost" href="#model">Open latest MRI 3D</a></div>
+        <div class="hero-note"><span class="pulse"></span><b>Important:</b> MRI signal ratios and activity proxies are exploratory. They are not a diagnosis of viable tumor or necrosis.</div>
+      </div>
+      <div class="hero-visual glass"><img src="assets/mri-hero.png" alt="Latest MRI-derived 3D liver and lesion map"><div class="floating-stat"><span>Latest automated burden</span><strong id="heroBurden">—</strong></div></div>
+    </section>
+
+    <section class="section shell timeline-section">
+      <div class="section-heading"><div><div class="eyebrow">MRI timeline</div><h2>Choose any two MRI dates</h2></div><p>The default comparison uses the first and latest available MRI.</p></div>
+      <div class="timeline-picker panel"><label><span>Earlier MRI</span><select id="fromStudy"></select></label><div>→</div><label><span>Later MRI</span><select id="toStudy"></select></label></div>
+      <div class="timeline-track" id="timelineTrack"></div>
+      <div class="data-warning"><b>26 Aug DICOM completeness:</b> the downloaded ZIP is truncated. Four complete dynamic phases and T2 are included; DWI/ADC and the separate axial late series are missing. Dynamic phase 4 is used transparently for morphology and 3D.</div>
+    </section>
+
+    <section id="overview" class="section shell">
+      <div class="section-heading"><div><div class="eyebrow">At a glance</div><h2>MRI disease-burden dashboard</h2></div><p>All measurements come from automated 3D masks and require specialist verification.</p></div>
+      <div class="stat-grid">
+        <article class="stat-card violet"><span>Segmented tumor volume</span><strong id="volumeDelta">—</strong><p id="volumeValues">—</p></article>
+        <article class="stat-card pink"><span>Tumor burden</span><strong id="burdenDelta">—</strong><p id="burdenValues">—</p></article>
+        <article class="stat-card indigo"><span>Tracked in selected pair</span><strong id="matchCount">—</strong><p>Weak tiny-focus matches are not forced</p></article>
+        <article class="stat-card blue"><span>Repeat-AI agreement</span><strong id="repeatDice">—</strong><p>Whole-mask Dice, December / January</p></article>
+      </div>
+      <div class="overview-grid">
+        <article class="panel"><span class="kicker">Longitudinal summary</span><h3>What changed?</h3><ul class="findings" id="findings"></ul></article>
+        <article class="panel metric-guide"><span class="kicker">MRI-specific metrics</span><h3>How to read the signals</h3>
+          <div><b>ADC</b><p>Quantitative diffusion map in 10⁻³ mm²/s. Lower values can reflect restriction but are not specific for viable tumor.</p></div>
+          <div><b>DWI / liver & T2 / liver</b><p>Lesion signal divided by background liver to reduce—but not eliminate—scanner and sequence dependence.</p></div>
+          <div><b>Low late-signal fraction</b><p>An exploratory low-enhancement proxy. It must not be interpreted as a measured necrotic percentage.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="model" class="section model-section">
+      <div class="shell">
+        <div class="section-heading"><div><div class="eyebrow">Latest MRI · 26 Aug 2026</div><h2>Interactive 3D lesion map</h2></div><p>The model uses the latest complete axial dynamic phase available in the recovered August DICOM. Toggle Couinaud segment context without slowing the default view.</p></div>
+        <div class="model-layout">
+          <div class="model-shell glass" id="modelShell">
+            <div id="threeViewer" class="three-viewer" aria-label="Interactive MRI-derived liver and lesion model"><div class="model-loading" id="modelLoading"><img src="assets/mri-hero.png" alt=""><span>Loading MRI 3D model…</span></div></div>
+            <div class="anatomy-toolbar" id="anatomyToolbar">
+              <button class="layer-panel-toggle" id="layerPanelToggle" type="button" aria-expanded="false"><span>Layers</span><b id="visibleLayerCount">2 on</b></button>
+              <div class="layer-panel"><strong>Anatomy layers</strong><p>Latest MRI reconstruction</p>
+                <button class="layer-toggle active" data-layer="liver"><i style="--swatch:#a855f7"></i>Liver shell</button>
+                <button class="layer-toggle active" data-layer="lesions"><i style="--swatch:#f448b3"></i>Lesions</button>
+                <button class="layer-toggle" data-layer="segments"><i style="--swatch:#6d78ff"></i>Couinaud segments</button>
+              </div>
+            </div>
+            <div class="model-controls"><button id="rotateToggle">Auto-rotate</button><button id="resetCamera">Reset view</button><button id="fullscreenModel">Fullscreen</button></div>
+          </div>
+          <aside class="model-info"><div class="model-number" id="latestCount">—</div><h3>Latest segmented foci</h3><p>Colored lesion surfaces are separate objects. The translucent shell represents the latest MRI-derived liver segmentation.</p><div class="mini-metrics"><div><span>Liver volume</span><b id="latestLiver">—</b></div><div><span>Lesion volume</span><b id="latestTumor">—</b></div><div><span>Source</span><b>Dynamic post-contrast phase 4</b></div></div><a class="button ghost wide" href="assets/mri_liver_core.glb" download>Download latest MRI 3D</a></aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="lesions" class="section shell">
+      <div class="section-heading"><div><div class="eyebrow">Lesion explorer</div><h2>Multiparametric analysis per lesion</h2></div><p>Cards update to the two selected dates. Open one for high-resolution panels and its full four-date trend.</p></div>
+      <div class="filters"><button class="filter active" data-filter="all">All tracks</button><button class="filter" data-filter="major">Major lesions</button><button class="filter" data-filter="matched">Accepted matches</button><button class="filter" data-filter="review">Review required</button><label class="search"><span>Search</span><input id="search" type="search" placeholder="ID or segment…"></label></div>
+      <div class="lesion-grid" id="lesionGrid"></div>
+    </section>
+
+    <section id="report" class="section report-section">
+      <div class="shell report-grid"><div><div class="eyebrow">MRI report package</div><h2>Download or share the full report</h2><p class="lede small">Includes methodology, validation, registered lesion matching, high-resolution multiparametric comparisons, morphology, ADC/DWI/T2 features, dynamic signal ratios, and explicit limitations.</p><div class="hero-actions"><button class="button primary" id="sharePdf">Share PDF report</button><a class="button ghost" href="assets/Noa_Liver_MRI_Comparison.pdf" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_metrics.csv" download>Download CSV</a></div><p class="share-status" id="shareStatus"></p></div><div class="report-preview"><img src="assets/panels/M01_2026-08-26.webp" alt="Latest MRI multiparametric lesion panel"></div></div>
+    </section>
+
+    <section class="section shell safety"><div class="safety-icon">!</div><div><h2>Clinical safety notice</h2><p>This is a computer-assisted research visualization, not a radiologist-signed report, formal RECIST assessment, pathology result, or treatment recommendation. Lesion matching, segment assignment, ADC findings, enhancement proxies, and small foci require review on the original DICOM images by a qualified radiologist.</p></div></section>
+  </main>
+  <footer class="site-footer shell"><span>RadioLens MRI · No original DICOM files published</span><span>18 Dec 2025 · 22 Jan 2026 · 28 Apr 2026 · 26 Aug 2026</span></footer>
+  <dialog id="lesionDialog" class="lesion-dialog"><button class="dialog-close" aria-label="Close">×</button><div id="dialogContent"></div></dialog>
+</body>
+</html>
