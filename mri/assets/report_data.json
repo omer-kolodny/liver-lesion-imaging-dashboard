@@ -11,80 +11,82 @@
     {
       "date": "2025-12-18",
       "label": "18 Dec 2025",
-      "tumor_volume_ml": 29.661749999999998,
+      "tumor_volume_ml": 91.371375,
       "liver_volume_ml": 1322.1719999999998,
-      "tumor_burden_pct": 2.243410842159719,
-      "lesion_count": 9,
+      "tumor_burden_pct": 6.910702616603589,
+      "lesion_count": 10,
       "raw_detector_count": 12,
       "excluded_off_liver_count": 2,
-      "extrahepatic_target_volume_ml": 61.709624999999996,
-      "repeat_dice": 0.9937459727855058,
+      "extrahepatic_target_volume_ml": null,
+      "repeat_dice": 0.9951298701298701,
       "dwi_adc_available": true
     },
     {
       "date": "2026-01-22",
       "label": "22 Jan 2026",
-      "tumor_volume_ml": 33.5595703125,
+      "tumor_volume_ml": 115.274658203125,
       "liver_volume_ml": 1374.71923828125,
-      "tumor_burden_pct": 2.441194491062628,
-      "lesion_count": 10,
+      "tumor_burden_pct": 8.385323707788345,
+      "lesion_count": 11,
       "raw_detector_count": 13,
       "excluded_off_liver_count": 2,
-      "extrahepatic_target_volume_ml": 81.715087890625,
-      "repeat_dice": 0.9916565175503972,
+      "extrahepatic_target_volume_ml": null,
+      "repeat_dice": 0.9951085893171591,
       "dwi_adc_available": true
     },
     {
       "date": "2026-04-28",
       "label": "28 Apr 2026",
-      "tumor_volume_ml": 9.58984375,
+      "tumor_volume_ml": 42.1630859375,
       "liver_volume_ml": 1111.907958984375,
-      "tumor_burden_pct": 0.8624674077123645,
-      "lesion_count": 6,
+      "tumor_burden_pct": 3.7919582818718265,
+      "lesion_count": 7,
       "raw_detector_count": 11,
       "excluded_off_liver_count": 4,
-      "extrahepatic_target_volume_ml": 32.5732421875,
-      "repeat_dice": 0.9826196473551637,
+      "extrahepatic_target_volume_ml": null,
+      "repeat_dice": 0.9925904569698717,
       "dwi_adc_available": true
     },
     {
       "date": "2026-08-26",
       "label": "26 Aug 2026",
-      "tumor_volume_ml": 6.217041015625,
+      "tumor_volume_ml": 22.901611328125,
       "liver_volume_ml": 1268.83544921875,
-      "tumor_burden_pct": 0.48998008523902525,
-      "lesion_count": 5,
+      "tumor_burden_pct": 1.80493154902206,
+      "lesion_count": 6,
       "raw_detector_count": 7,
       "excluded_off_liver_count": 1,
-      "extrahepatic_target_volume_ml": 16.6845703125,
-      "repeat_dice": 0.17569733889067007,
+      "extrahepatic_target_volume_ml": null,
+      "repeat_dice": 0.7494707127734651,
       "dwi_adc_available": true
     }
   ],
   "summary": {
-    "accepted_end_to_end": 2,
-    "total_hepatic_tracks": 18,
-    "extrahepatic_tracks": 1,
+    "accepted_end_to_end": 3,
+    "total_hepatic_tracks": 19,
+    "extrahepatic_tracks": 0,
     "registration_quality": {
       "2025-12-18__2026-01-22": 0.9380987015432215,
       "2026-01-22__2026-04-28": 0.8569114240227158,
       "2026-04-28__2026-08-26": 0.8950669031361951,
       "2026-01-22__2026-08-26_direct": 0.9158872635353855
     },
-    "volume_change_pct": -79.04020829645924,
-    "burden_change_pp": -1.753430756920694
+    "volume_change_pct": -74.93568272544329,
+    "burden_change_pp": -5.105771067581529
   },
   "ct_crosscheck": {
     "ct_date": "2026-08-23",
     "mri_date": "2026-08-26",
     "registration_liver_dice": 0.853,
-    "ct_hepatic_candidates": 8,
+    "ct_hepatic_candidates": 9,
     "ct_extrahepatic_targets": 1,
-    "mri_hepatic_foci": 5,
-    "confirmed_mask_matches": 4,
-    "automatic_mri_supported_hepatic_targets": 4,
+    "extrahepatic_target_status": "Known portocaval node; no validated automatic contour available.",
+    "mri_hepatic_foci": 6,
+    "confirmed_mask_matches": 5,
+    "automatic_mri_supported_hepatic_targets": 5,
     "unresolved_small_mri_foci": null,
     "ct_locations_without_accepted_mri_mask": 4,
+    "dwi_adc_available": true,
     "targets": [
       {
         "id": "H01",
@@ -98,8 +100,8 @@
         "panel": "assets/targets/H01_2026-08-26.webp"
       },
       {
-        "id": "N01",
-        "kind": "node",
+        "id": "H02",
+        "kind": "hepatic",
         "ct_segment": "3/2",
         "ct_volume_ml": 16.361,
         "supported_by_sequences": [
@@ -107,10 +109,10 @@
           "Late"
         ],
         "status": "multi-sequence supported",
-        "panel": "assets/targets/N01_2026-08-26.webp"
+        "panel": "assets/targets/H02_2026-08-26.webp"
       },
       {
-        "id": "H02",
+        "id": "H03",
         "kind": "hepatic",
         "ct_segment": "5/8",
         "ct_volume_ml": 2.058,
@@ -118,10 +120,10 @@
           "Late"
         ],
         "status": "single-sequence support",
-        "panel": "assets/targets/H02_2026-08-26.webp"
+        "panel": "assets/targets/H03_2026-08-26.webp"
       },
       {
-        "id": "H03",
+        "id": "H04",
         "kind": "hepatic",
         "ct_segment": "7",
         "ct_volume_ml": 1.588,
@@ -131,10 +133,10 @@
           "T2"
         ],
         "status": "multi-sequence supported",
-        "panel": "assets/targets/H03_2026-08-26.webp"
+        "panel": "assets/targets/H04_2026-08-26.webp"
       },
       {
-        "id": "H04",
+        "id": "H05",
         "kind": "hepatic",
         "ct_segment": "1",
         "ct_volume_ml": 1.182,
@@ -142,22 +144,13 @@
           "P4"
         ],
         "status": "single-sequence support",
-        "panel": "assets/targets/H04_2026-08-26.webp"
-      },
-      {
-        "id": "H05",
-        "kind": "hepatic",
-        "ct_segment": "6",
-        "ct_volume_ml": 0.347,
-        "supported_by_sequences": [],
-        "status": "not confidently contoured",
         "panel": "assets/targets/H05_2026-08-26.webp"
       },
       {
         "id": "H06",
         "kind": "hepatic",
-        "ct_segment": "5",
-        "ct_volume_ml": 0.207,
+        "ct_segment": "6",
+        "ct_volume_ml": 0.347,
         "supported_by_sequences": [],
         "status": "not confidently contoured",
         "panel": "assets/targets/H06_2026-08-26.webp"
@@ -165,8 +158,8 @@
       {
         "id": "H07",
         "kind": "hepatic",
-        "ct_segment": "8",
-        "ct_volume_ml": 0.123,
+        "ct_segment": "5",
+        "ct_volume_ml": 0.207,
         "supported_by_sequences": [],
         "status": "not confidently contoured",
         "panel": "assets/targets/H07_2026-08-26.webp"
@@ -174,18 +167,418 @@
       {
         "id": "H08",
         "kind": "hepatic",
+        "ct_segment": "8",
+        "ct_volume_ml": 0.123,
+        "supported_by_sequences": [],
+        "status": "not confidently contoured",
+        "panel": "assets/targets/H08_2026-08-26.webp"
+      },
+      {
+        "id": "H09",
+        "kind": "hepatic",
         "ct_segment": "5",
         "ct_volume_ml": 0.079,
         "supported_by_sequences": [],
         "status": "not confidently contoured",
-        "panel": "assets/targets/H08_2026-08-26.webp"
+        "panel": "assets/targets/H09_2026-08-26.webp"
       }
     ],
-    "note": "Eight CT-anchored liver targets remain the working inventory. Automatic contours support only some targets on individual MRI sequences; this is a segmentation-quality result, not a lesion count. True late T1, DWI, ADC, T2 and phase-4 images are included."
+    "note": "Nine CT-anchored liver targets remain the automatic working inventory. Automatic contours support only some targets on individual MRI sequences; this is a segmentation-quality result, not a lesion count. The separate portocaval node remains unsegmented. True late T1, DWI, ADC, T2 and phase-4 images are included."
   },
   "lesions": [
     {
       "id": "M01",
+      "kind": "hepatic",
+      "measurements": {
+        "2025-12-18": {
+          "component_index": 12,
+          "volume_ml": 61.709624999999996,
+          "centroid_index": [
+            275.09818970703515,
+            188.87727198147778,
+            61.741199205148305
+          ],
+          "centroid_world": [
+            -29.146777656252937,
+            -7.0685527409911515,
+            69.97855319545286
+          ],
+          "long_mm": 56.34991126878551,
+          "short_mm": 39.5625,
+          "dimensions_3d_mm": [
+            55.137797260762724,
+            53.63417141269214,
+            40.88789692054736
+          ],
+          "segment": 2,
+          "features": {
+            "t2_fatsat": {
+              "median": 548.715087890625,
+              "liver_median": 146.59146118164062,
+              "ratio": 3.743158595102039
+            },
+            "dwi_b800": {
+              "median": 484.2096252441406,
+              "liver_median": 89.44721221923828,
+              "ratio": 5.4133562492403415
+            },
+            "adc": {
+              "median": 1.0112762451171875,
+              "liver_median": 1.30137038230896,
+              "ratio": 0.777085646688015
+            },
+            "late": {
+              "median": 873.9059448242188,
+              "liver_median": 856.131591796875,
+              "ratio": 1.0207612395076304
+            },
+            "dynamic_1": {
+              "median": 672.7401123046875,
+              "liver_median": 768.8458862304688,
+              "ratio": 0.8749999503841104
+            },
+            "dynamic_2": {
+              "median": 1412.33642578125,
+              "liver_median": 1065.5201416015625,
+              "ratio": 1.3254901250936417
+            },
+            "dynamic_3": {
+              "median": 1424.8719482421875,
+              "liver_median": 1529.334716796875,
+              "ratio": 0.9316939794752844
+            },
+            "dynamic_4": {
+              "median": 1312.05224609375,
+              "liver_median": 1383.0869140625,
+              "ratio": 0.9486404887165754
+            },
+            "adc_median": 1.0112762451171875,
+            "low_adc_fraction_pct": 47.06397097697482,
+            "low_late_signal_fraction_pct": 28.275572894827995,
+            "dynamic_liver_normalized": [
+              0.8749999503841104,
+              1.3254901250936417,
+              0.9316939794752844,
+              0.9486404887165754
+            ],
+            "peak_phase": 2,
+            "peak_to_phase1_pct": 51.48459431475094,
+            "late_phase_change_pct": -28.430965213750127
+          }
+        },
+        "2026-01-22": {
+          "component_index": 13,
+          "volume_ml": 81.715087890625,
+          "centroid_index": [
+            319.46841248263394,
+            247.46185446886065,
+            77.97039183758832
+          ],
+          "centroid_world": [
+            -3.1791033799874526,
+            -5.683455639734888,
+            125.45035093591883
+          ],
+          "long_mm": 61.36667777079838,
+          "short_mm": 40.234375,
+          "dimensions_3d_mm": [
+            69.88900359052265,
+            58.30098047183591,
+            45.71456027990001
+          ],
+          "segment": 2,
+          "features": {
+            "t2_fatsat": {
+              "median": 886.64111328125,
+              "liver_median": 262.5332336425781,
+              "ratio": 3.377252856635873
+            },
+            "dwi_b800": {
+              "median": 526.0615844726562,
+              "liver_median": 85.87812805175781,
+              "ratio": 6.125675959722884
+            },
+            "adc": {
+              "median": 0.9373683333396912,
+              "liver_median": 1.240969181060791,
+              "ratio": 0.7553518231116914
+            },
+            "late": {
+              "median": 473.7485046386719,
+              "liver_median": 435.8974609375,
+              "ratio": 1.086834742326244
+            },
+            "dynamic_1": {
+              "median": 472.4749450683594,
+              "liver_median": 463.6847229003906,
+              "ratio": 1.0189573253847681
+            },
+            "dynamic_2": {
+              "median": 740.5770263671875,
+              "liver_median": 602.130859375,
+              "ratio": 1.2299270413343237
+            },
+            "dynamic_3": {
+              "median": 927.3694458007812,
+              "liver_median": 1004.2839965820312,
+              "ratio": 0.9234135453287914
+            },
+            "dynamic_4": {
+              "median": 958.13525390625,
+              "liver_median": 964.7279052734375,
+              "ratio": 0.9931663100744257
+            },
+            "adc_median": 0.9373718500137329,
+            "low_adc_fraction_pct": 63.703725835848104,
+            "low_late_signal_fraction_pct": 5.842458284160679,
+            "dynamic_liver_normalized": [
+              1.0189573253847681,
+              1.2299270413343237,
+              0.9234135453287914,
+              0.9931663100744257
+            ],
+            "peak_phase": 2,
+            "peak_to_phase1_pct": 20.704470216148785,
+            "late_phase_change_pct": -19.249981771523693
+          }
+        },
+        "2026-04-28": {
+          "component_index": 10,
+          "volume_ml": 32.5732421875,
+          "centroid_index": [
+            209.58649377904362,
+            140.25846949482838,
+            64.0729275970619
+          ],
+          "centroid_world": [
+            -15.990501121323149,
+            -1.4505178548463817,
+            -36.401859039274626
+          ],
+          "long_mm": 45.72148402624853,
+          "short_mm": 37.5,
+          "dimensions_3d_mm": [
+            46.7402849901475,
+            40.58666431919086,
+            38.1294083231884
+          ],
+          "segment": null,
+          "features": {
+            "t2_fatsat": {
+              "median": 365.67193603515625,
+              "liver_median": 210.5057373046875,
+              "ratio": 1.737111494998733
+            },
+            "dwi_b800": {
+              "median": 79.37968444824219,
+              "liver_median": 50.01258850097656,
+              "ratio": 1.5871940810800504
+            },
+            "adc": {
+              "median": 1.652068853378296,
+              "liver_median": 1.4035844802856445,
+              "ratio": 1.1770355661399747
+            },
+            "late": {
+              "median": 667.8876953125,
+              "liver_median": 760.6837768554688,
+              "ratio": 0.8780096482054984
+            },
+            "dynamic_1": {
+              "median": 742.6813354492188,
+              "liver_median": 723.9267578125,
+              "ratio": 1.0259067335670666
+            },
+            "dynamic_2": {
+              "median": 791.4432373046875,
+              "liver_median": 855.2088012695312,
+              "ratio": 0.9254386018125799
+            },
+            "dynamic_3": {
+              "median": 977.1135864257812,
+              "liver_median": 1706.6666259765625,
+              "ratio": 0.5725275056964756
+            },
+            "dynamic_4": {
+              "median": 1054.00732421875,
+              "liver_median": 1524.747314453125,
+              "ratio": 0.691266883520819
+            },
+            "adc_median": 1.652068853378296,
+            "low_adc_fraction_pct": 13.416279418378055,
+            "low_late_signal_fraction_pct": 53.867486134012886,
+            "dynamic_liver_normalized": [
+              1.0259067335670666,
+              0.9254386018125799,
+              0.5725275056964756,
+              0.691266883520819
+            ],
+            "peak_phase": 1,
+            "peak_to_phase1_pct": 0.0,
+            "late_phase_change_pct": -32.61893494769339
+          }
+        },
+        "2026-08-26": {
+          "component_index": 7,
+          "volume_ml": 16.6845703125,
+          "centroid_index": [
+            304.29770266315484,
+            226.85842844600526,
+            65.17522680714076
+          ],
+          "centroid_world": [
+            -13.316961309105352,
+            1.4488138361286929,
+            -28.641703368140355
+          ],
+          "long_mm": 32.63531027219597,
+          "short_mm": 24.609375,
+          "dimensions_3d_mm": [
+            38.13154445480433,
+            32.29885236523092,
+            25.054066688945543
+          ],
+          "segment": 2,
+          "features": {
+            "t2_fatsat": {
+              "median": 410.54864501953125,
+              "liver_median": 198.09153747558594,
+              "ratio": 2.072519857493306
+            },
+            "dwi_b800": {
+              "median": 67.80387115478516,
+              "liver_median": 57.15932083129883,
+              "ratio": 1.1862259762480885
+            },
+            "adc": {
+              "median": 1.7645609378814697,
+              "liver_median": 1.5437288284301758,
+              "ratio": 1.1430511015823026
+            },
+            "late": {
+              "median": 705.7387084960938,
+              "liver_median": 736.2637939453125,
+              "ratio": 0.9585405588319802
+            },
+            "dynamic_1": {
+              "median": 610.2261352539062,
+              "liver_median": 608.890869140625,
+              "ratio": 1.002192948163545
+            },
+            "dynamic_2": {
+              "median": 713.0432739257812,
+              "liver_median": 883.9599609375,
+              "ratio": 0.8066465738669318
+            },
+            "dynamic_3": {
+              "median": 814.5250244140625,
+              "liver_median": 1104.2823486328125,
+              "ratio": 0.7376057630754561
+            },
+            "dynamic_4": {
+              "median": 790.4898681640625,
+              "liver_median": 998.794677734375,
+              "ratio": 0.7914438130138792
+            },
+            "adc_median": 1.7645609378814697,
+            "low_adc_fraction_pct": 5.53116769095698,
+            "low_late_signal_fraction_pct": 45.86625695054141,
+            "dynamic_liver_normalized": [
+              1.002192948163545,
+              0.8066465738669318,
+              0.7376057630754561,
+              0.7914438130138792
+            ],
+            "peak_phase": 1,
+            "peak_to_phase1_pct": 0.0,
+            "late_phase_change_pct": -21.028798450024034
+          }
+        }
+      },
+      "component_indices": {
+        "2025-12-18": 9,
+        "2026-01-22": 10,
+        "2026-04-28": 6,
+        "2026-08-26": 5
+      },
+      "pair_evidence": {
+        "2026-01-22": {
+          "distance_mm": 3.931370390696035,
+          "registered_dice": 0.8315545796524196,
+          "cost": 0.9452868706248141
+        },
+        "2026-04-28": {
+          "distance_mm": 8.68291886750547,
+          "registered_dice": 0.5686875701084344,
+          "cost": 2.445680896723851
+        },
+        "2026-08-26": {
+          "distance_mm": 10.597772962356196,
+          "registered_dice": 0.4619159747180568,
+          "cost": 2.6966625704838307
+        }
+      },
+      "validation": {
+        "2025-12-18": {
+          "dice": 0.995794571173697,
+          "centroid_distance_mm": 0.11829716653889806,
+          "volume_delta_pct": 0.2771042604780005,
+          "status": "supported"
+        },
+        "2026-01-22": {
+          "dice": 0.9965248258684206,
+          "centroid_distance_mm": 0.09073939956158063,
+          "volume_delta_pct": 0.31669679269805684,
+          "status": "supported"
+        },
+        "2026-04-28": {
+          "dice": 0.9955505702000373,
+          "centroid_distance_mm": 0.06837166450954008,
+          "volume_delta_pct": 0.45720281816818975,
+          "status": "supported"
+        },
+        "2026-08-26": {
+          "dice": 0.8852882024816909,
+          "centroid_distance_mm": 2.576418779456439,
+          "volume_delta_pct": -7.191981270119985,
+          "status": "supported"
+        }
+      },
+      "display_centers": {
+        "2025-12-18": [
+          275.09818970703515,
+          188.87727198147778,
+          61.741199205148305
+        ],
+        "2026-01-22": [
+          319.46841248263394,
+          247.46185446886065,
+          77.97039183758832
+        ],
+        "2026-04-28": [
+          209.58649377904362,
+          140.25846949482838,
+          64.0729275970619
+        ],
+        "2026-08-26": [
+          304.29770266315484,
+          226.85842844600526,
+          65.17522680714076
+        ]
+      },
+      "direct_evidence": {
+        "2026-01-22__2026-08-26": {
+          "distance_mm": 11.566850539853348,
+          "registered_dice": 0.3345160409895045,
+          "cost": 3.7397421192994558,
+          "validation_path": "direct January-to-August audit"
+        }
+      },
+      "segment_label": "S2",
+      "volume_change_pct": -72.96277474948194
+    },
+    {
+      "id": "M02",
       "kind": "hepatic",
       "measurements": {
         "2025-12-18": {
@@ -481,7 +874,7 @@
       "volume_change_pct": -78.23017046284129
     },
     {
-      "id": "M02",
+      "id": "M03",
       "kind": "hepatic",
       "measurements": {
         "2025-12-18": {
@@ -872,7 +1265,7 @@
       "volume_change_pct": -85.35239475029827
     },
     {
-      "id": "M03",
+      "id": "M04",
       "kind": "hepatic",
       "measurements": {
         "2026-04-28": {
@@ -990,7 +1383,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M04",
+      "id": "M05",
       "kind": "hepatic",
       "measurements": {
         "2025-12-18": {
@@ -1285,7 +1678,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M05",
+      "id": "M06",
       "kind": "hepatic",
       "measurements": {
         "2026-04-28": {
@@ -1403,7 +1796,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M06",
+      "id": "M07",
       "kind": "hepatic",
       "measurements": {
         "2025-12-18": {
@@ -1610,7 +2003,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M07",
+      "id": "M08",
       "kind": "hepatic",
       "measurements": {
         "2026-01-22": {
@@ -1818,7 +2211,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M08",
+      "id": "M09",
       "kind": "hepatic",
       "measurements": {
         "2025-12-18": {
@@ -2025,7 +2418,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M09",
+      "id": "M10",
       "kind": "hepatic",
       "measurements": {
         "2025-12-18": {
@@ -2232,7 +2625,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M10",
+      "id": "M11",
       "kind": "hepatic",
       "measurements": {
         "2025-12-18": {
@@ -2439,7 +2832,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M11",
+      "id": "M12",
       "kind": "hepatic",
       "measurements": {
         "2026-01-22": {
@@ -2557,7 +2950,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M12",
+      "id": "M13",
       "kind": "hepatic",
       "measurements": {
         "2025-12-18": {
@@ -2675,7 +3068,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M13",
+      "id": "M14",
       "kind": "hepatic",
       "measurements": {
         "2026-04-28": {
@@ -2793,7 +3186,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M14",
+      "id": "M15",
       "kind": "hepatic",
       "measurements": {
         "2026-01-22": {
@@ -2911,7 +3304,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M15",
+      "id": "M16",
       "kind": "hepatic",
       "measurements": {
         "2026-08-26": {
@@ -3029,7 +3422,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M16",
+      "id": "M17",
       "kind": "hepatic",
       "measurements": {
         "2026-08-26": {
@@ -3147,7 +3540,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M17",
+      "id": "M18",
       "kind": "hepatic",
       "measurements": {
         "2026-04-28": {
@@ -3265,7 +3658,7 @@
       "volume_change_pct": null
     },
     {
-      "id": "M18",
+      "id": "M19",
       "kind": "hepatic",
       "measurements": {
         "2025-12-18": {
@@ -3381,391 +3774,17 @@
       },
       "segment_label": "S6",
       "volume_change_pct": null
-    },
-    {
-      "id": "N01",
-      "kind": "node",
-      "measurements": {
-        "2025-12-18": {
-          "component_index": 12,
-          "volume_ml": 61.709624999999996,
-          "centroid_index": [
-            275.09818970703515,
-            188.87727198147778,
-            61.741199205148305
-          ],
-          "centroid_world": [
-            -29.146777656252937,
-            -7.0685527409911515,
-            69.97855319545286
-          ],
-          "long_mm": 56.34991126878551,
-          "short_mm": 39.5625,
-          "dimensions_3d_mm": [
-            55.137797260762724,
-            53.63417141269214,
-            40.88789692054736
-          ],
-          "segment": null,
-          "features": {
-            "t2_fatsat": {
-              "median": 548.715087890625,
-              "liver_median": 146.59146118164062,
-              "ratio": 3.743158595102039
-            },
-            "dwi_b800": {
-              "median": 484.2096252441406,
-              "liver_median": 89.44721221923828,
-              "ratio": 5.4133562492403415
-            },
-            "adc": {
-              "median": 1.0112762451171875,
-              "liver_median": 1.30137038230896,
-              "ratio": 0.777085646688015
-            },
-            "late": {
-              "median": 873.9059448242188,
-              "liver_median": 856.131591796875,
-              "ratio": 1.0207612395076304
-            },
-            "dynamic_1": {
-              "median": 672.7401123046875,
-              "liver_median": 768.8458862304688,
-              "ratio": 0.8749999503841104
-            },
-            "dynamic_2": {
-              "median": 1412.33642578125,
-              "liver_median": 1065.5201416015625,
-              "ratio": 1.3254901250936417
-            },
-            "dynamic_3": {
-              "median": 1424.8719482421875,
-              "liver_median": 1529.334716796875,
-              "ratio": 0.9316939794752844
-            },
-            "dynamic_4": {
-              "median": 1312.05224609375,
-              "liver_median": 1383.0869140625,
-              "ratio": 0.9486404887165754
-            },
-            "adc_median": 1.0112762451171875,
-            "low_adc_fraction_pct": 47.06397097697482,
-            "low_late_signal_fraction_pct": 28.275572894827995,
-            "dynamic_liver_normalized": [
-              0.8749999503841104,
-              1.3254901250936417,
-              0.9316939794752844,
-              0.9486404887165754
-            ],
-            "peak_phase": 2,
-            "peak_to_phase1_pct": 51.48459431475094,
-            "late_phase_change_pct": -28.430965213750127
-          }
-        },
-        "2026-01-22": {
-          "component_index": 13,
-          "volume_ml": 81.715087890625,
-          "centroid_index": [
-            319.46841248263394,
-            247.46185446886065,
-            77.97039183758832
-          ],
-          "centroid_world": [
-            -3.1791033799874526,
-            -5.683455639734888,
-            125.45035093591883
-          ],
-          "long_mm": 61.36667777079838,
-          "short_mm": 40.234375,
-          "dimensions_3d_mm": [
-            69.88900359052265,
-            58.30098047183591,
-            45.71456027990001
-          ],
-          "segment": null,
-          "features": {
-            "t2_fatsat": {
-              "median": 886.64111328125,
-              "liver_median": 262.5332336425781,
-              "ratio": 3.377252856635873
-            },
-            "dwi_b800": {
-              "median": 526.0615844726562,
-              "liver_median": 85.87812805175781,
-              "ratio": 6.125675959722884
-            },
-            "adc": {
-              "median": 0.9373683333396912,
-              "liver_median": 1.240969181060791,
-              "ratio": 0.7553518231116914
-            },
-            "late": {
-              "median": 473.7485046386719,
-              "liver_median": 435.8974609375,
-              "ratio": 1.086834742326244
-            },
-            "dynamic_1": {
-              "median": 472.4749450683594,
-              "liver_median": 463.6847229003906,
-              "ratio": 1.0189573253847681
-            },
-            "dynamic_2": {
-              "median": 740.5770263671875,
-              "liver_median": 602.130859375,
-              "ratio": 1.2299270413343237
-            },
-            "dynamic_3": {
-              "median": 927.3694458007812,
-              "liver_median": 1004.2839965820312,
-              "ratio": 0.9234135453287914
-            },
-            "dynamic_4": {
-              "median": 958.13525390625,
-              "liver_median": 964.7279052734375,
-              "ratio": 0.9931663100744257
-            },
-            "adc_median": 0.9373718500137329,
-            "low_adc_fraction_pct": 63.703725835848104,
-            "low_late_signal_fraction_pct": 5.842458284160679,
-            "dynamic_liver_normalized": [
-              1.0189573253847681,
-              1.2299270413343237,
-              0.9234135453287914,
-              0.9931663100744257
-            ],
-            "peak_phase": 2,
-            "peak_to_phase1_pct": 20.704470216148785,
-            "late_phase_change_pct": -19.249981771523693
-          }
-        },
-        "2026-04-28": {
-          "component_index": 10,
-          "volume_ml": 32.5732421875,
-          "centroid_index": [
-            209.58649377904362,
-            140.25846949482838,
-            64.0729275970619
-          ],
-          "centroid_world": [
-            -15.990501121323149,
-            -1.4505178548463817,
-            -36.401859039274626
-          ],
-          "long_mm": 45.72148402624853,
-          "short_mm": 37.5,
-          "dimensions_3d_mm": [
-            46.7402849901475,
-            40.58666431919086,
-            38.1294083231884
-          ],
-          "segment": null,
-          "features": {
-            "t2_fatsat": {
-              "median": 365.67193603515625,
-              "liver_median": 210.5057373046875,
-              "ratio": 1.737111494998733
-            },
-            "dwi_b800": {
-              "median": 79.37968444824219,
-              "liver_median": 50.01258850097656,
-              "ratio": 1.5871940810800504
-            },
-            "adc": {
-              "median": 1.652068853378296,
-              "liver_median": 1.4035844802856445,
-              "ratio": 1.1770355661399747
-            },
-            "late": {
-              "median": 667.8876953125,
-              "liver_median": 760.6837768554688,
-              "ratio": 0.8780096482054984
-            },
-            "dynamic_1": {
-              "median": 742.6813354492188,
-              "liver_median": 723.9267578125,
-              "ratio": 1.0259067335670666
-            },
-            "dynamic_2": {
-              "median": 791.4432373046875,
-              "liver_median": 855.2088012695312,
-              "ratio": 0.9254386018125799
-            },
-            "dynamic_3": {
-              "median": 977.1135864257812,
-              "liver_median": 1706.6666259765625,
-              "ratio": 0.5725275056964756
-            },
-            "dynamic_4": {
-              "median": 1054.00732421875,
-              "liver_median": 1524.747314453125,
-              "ratio": 0.691266883520819
-            },
-            "adc_median": 1.652068853378296,
-            "low_adc_fraction_pct": 13.416279418378055,
-            "low_late_signal_fraction_pct": 53.867486134012886,
-            "dynamic_liver_normalized": [
-              1.0259067335670666,
-              0.9254386018125799,
-              0.5725275056964756,
-              0.691266883520819
-            ],
-            "peak_phase": 1,
-            "peak_to_phase1_pct": 0.0,
-            "late_phase_change_pct": -32.61893494769339
-          }
-        },
-        "2026-08-26": {
-          "component_index": 7,
-          "volume_ml": 16.6845703125,
-          "centroid_index": [
-            304.29770266315484,
-            226.85842844600526,
-            65.17522680714076
-          ],
-          "centroid_world": [
-            -13.316961309105352,
-            1.4488138361286929,
-            -28.641703368140355
-          ],
-          "long_mm": 32.63531027219597,
-          "short_mm": 24.609375,
-          "dimensions_3d_mm": [
-            38.13154445480433,
-            32.29885236523092,
-            25.054066688945543
-          ],
-          "segment": null,
-          "features": {
-            "t2_fatsat": {
-              "median": 410.54864501953125,
-              "liver_median": 198.09153747558594,
-              "ratio": 2.072519857493306
-            },
-            "dwi_b800": {
-              "median": 67.80387115478516,
-              "liver_median": 57.15932083129883,
-              "ratio": 1.1862259762480885
-            },
-            "adc": {
-              "median": 1.7645609378814697,
-              "liver_median": 1.5437288284301758,
-              "ratio": 1.1430511015823026
-            },
-            "late": {
-              "median": 705.7387084960938,
-              "liver_median": 736.2637939453125,
-              "ratio": 0.9585405588319802
-            },
-            "dynamic_1": {
-              "median": 610.2261352539062,
-              "liver_median": 608.890869140625,
-              "ratio": 1.002192948163545
-            },
-            "dynamic_2": {
-              "median": 713.0432739257812,
-              "liver_median": 883.9599609375,
-              "ratio": 0.8066465738669318
-            },
-            "dynamic_3": {
-              "median": 814.5250244140625,
-              "liver_median": 1104.2823486328125,
-              "ratio": 0.7376057630754561
-            },
-            "dynamic_4": {
-              "median": 790.4898681640625,
-              "liver_median": 998.794677734375,
-              "ratio": 0.7914438130138792
-            },
-            "adc_median": 1.7645609378814697,
-            "low_adc_fraction_pct": 5.53116769095698,
-            "low_late_signal_fraction_pct": 45.86625695054141,
-            "dynamic_liver_normalized": [
-              1.002192948163545,
-              0.8066465738669318,
-              0.7376057630754561,
-              0.7914438130138792
-            ],
-            "peak_phase": 1,
-            "peak_to_phase1_pct": 0.0,
-            "late_phase_change_pct": -21.028798450024034
-          }
-        }
-      },
-      "component_indices": {},
-      "pair_evidence": {
-        "2026-01-22": {
-          "distance_mm": 3.931370390696035,
-          "registered_dice": 0.8315545796524196
-        },
-        "2026-04-28": {
-          "distance_mm": 8.68291886750547,
-          "registered_dice": 0.5686875701084344
-        },
-        "2026-08-26": {
-          "distance_mm": 10.597772962356196,
-          "registered_dice": 0.4619159747180568
-        }
-      },
-      "validation": {
-        "2025-12-18": {
-          "dice": 0.995794571173697,
-          "centroid_distance_mm": 0.11829716653889806,
-          "volume_delta_pct": 0.2771042604780005,
-          "status": "supported"
-        },
-        "2026-01-22": {
-          "dice": 0.9965248258684206,
-          "centroid_distance_mm": 0.09073939956158063,
-          "volume_delta_pct": 0.31669679269805684,
-          "status": "supported"
-        },
-        "2026-04-28": {
-          "dice": 0.9955505702000373,
-          "centroid_distance_mm": 0.06837166450954008,
-          "volume_delta_pct": 0.45720281816818975,
-          "status": "supported"
-        },
-        "2026-08-26": {
-          "dice": 0.8852882024816909,
-          "centroid_distance_mm": 2.576418779456439,
-          "volume_delta_pct": -7.191981270119985,
-          "status": "supported"
-        }
-      },
-      "display_centers": {
-        "2025-12-18": [
-          275.09818970703515,
-          188.87727198147778,
-          61.741199205148305
-        ],
-        "2026-01-22": [
-          319.46841248263394,
-          247.46185446886065,
-          77.97039183758832
-        ],
-        "2026-04-28": [
-          209.58649377904362,
-          140.25846949482838,
-          64.0729275970619
-        ],
-        "2026-08-26": [
-          304.29770266315484,
-          226.85842844600526,
-          65.17522680714076
-        ]
-      },
-      "segment_label": "Extrahepatic nodal target",
-      "volume_change_pct": -72.96277474948194
     }
   ],
   "limitations": [
     "Automated research visualization; radiologist verification is required.",
-    "The working inventory is 8 CT-anchored hepatic targets plus 1 separate nodal target. Automatic MRI contour count is not lesion count.",
+    "The working inventory is 9 CT-anchored hepatic targets. The distinct portocaval node is not automatically contoured. Automatic MRI contour count is not lesion count.",
     "Aggregate automatic-mask volume is quality-control information and must not be treated as total MRI disease burden.",
     "The complete August archive was verified and includes true late T1, DWI b=800, ADC, T2 fat-sat, and all four dynamic phases.",
     "August primary contours were generated on dynamic phase 4 and cross-checked against a separate run on true late T1; agreement tests sequence sensitivity, not clinical correctness.",
     "MRI signal is not absolute and is normalized to background liver.",
     "ADC and low-signal fractions are exploratory proxies, not direct tumor-viability or necrosis measurements.",
+    "The August nominal arterial phase is late/mistimed and is not used for arterial-response comparison.",
     "Dynamic enhancement depends on acquisition timing, contrast delivery and patient hemodynamics.",
     "Tiny lesions with weak registered overlap are not forced into longitudinal matches."
   ]

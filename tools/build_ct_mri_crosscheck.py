@@ -106,13 +106,11 @@ def main():
         resampled = sitk.Resample(source, fixed, sitk.Transform(3, sitk.sitkIdentity), sitk.sitkLinear, 0.0, source.GetPixelID())
         display_volumes[label] = np.transpose(sitk.GetArrayFromImage(resampled), (2, 1, 0))
     TARGET_DIR.mkdir(parents=True, exist_ok=True)
-    labels = {
-        "L01": ("H01", "hepatic"), "L02": ("N01", "extrahepatic node"),
-        "L03": ("H02", "hepatic"), "L04": ("H03", "hepatic"),
-        "L05": ("H04", "hepatic"), "L06": ("H05", "hepatic"),
-        "L07": ("H06", "hepatic"), "L08": ("H07", "hepatic"),
-        "L09": ("H08", "hepatic"),
-    }
+    # The independent geometry audit established that all nine source
+    # components are hepatic.  The prior L02 -> node mapping was wrong: it is
+    # the left-lobe segment II/III mass.  The real portocaval node is separate
+    # and is not represented by this liver-restricted mask.
+    labels = {f"L{index:02d}": (f"H{index:02d}", "hepatic") for index in range(1, 10)}
     rows = []
     audit_targets = []
     for item in report:
@@ -223,20 +221,21 @@ def main():
     center = liver_points_world.mean(axis=0); span = np.ptp(liver_points_world, axis=0).max() / 2
     hero_ax.set_xlim(center[0]-span, center[0]+span); hero_ax.set_ylim(center[1]-span, center[1]+span); hero_ax.set_zlim(center[2]-span, center[2]+span)
     hero_ax.view_init(elev=18, azim=-58); hero_ax.set_axis_off(); hero_ax.set_box_aspect((1,1,.75))
-    hero.text(.06,.92,"MRI",color="#b784ff",fontsize=18,fontweight="bold");hero.text(.06,.865,"8 CT-anchored liver targets",color="white",fontsize=24,fontweight="bold")
+    hero.text(.06,.92,"MRI",color="#b784ff",fontsize=18,fontweight="bold");hero.text(.06,.865,"9 CT-anchored liver targets",color="white",fontsize=24,fontweight="bold")
     hero.savefig(WEB_ROOT / "mri" / "assets" / "mri-hero.png", facecolor=hero.get_facecolor(), bbox_inches="tight", pad_inches=.1)
     plt.close(hero)
     fig.suptitle("23 Aug CT targets registered onto complete 26 Aug MRI\ncyan = CT anchor · pink = phase 4 · yellow = late · green = T2 · orange = DWI",
                  color="white", fontsize=18, fontweight="bold")
-    fig.text(.5, .008, f"8 CT-anchored liver targets retained; {supported_hepatic} have an automatic contour on at least one MRI sequence. Lack of a contour is not disappearance.",
+    fig.text(.5, .008, f"9 CT-anchored liver targets retained; {supported_hepatic} have an automatic contour on at least one MRI sequence. Lack of a contour is not disappearance.",
              ha="center", color="#d7cce6", fontsize=10)
     plt.tight_layout(rect=(0, .025, 1, .95))
     fig.savefig(OUTPUT, facecolor=fig.get_facecolor(), bbox_inches="tight")
     plt.close(fig)
     Image.open(OUTPUT).convert("RGB").save(OUTPUT.with_suffix(".webp"), "WEBP", quality=92, method=6)
     AUDIT_JSON.write_text(json.dumps({
-        "ct_hepatic_targets": 8,
+        "ct_hepatic_targets": 9,
         "extrahepatic_targets": 1,
+        "extrahepatic_target_status": "Known portocaval node; no validated automatic contour available.",
         "automatic_mri_supported_hepatic_targets": supported_hepatic,
         "targets": audit_targets,
     }, indent=2) + "\n")

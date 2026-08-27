@@ -27,3 +27,7 @@
 @media(max-width:900px){.nav{gap:9px}.nav>.mode-link{margin-left:auto;white-space:nowrap}.nav>.share-report{margin-left:0}}
 @media(max-width:580px){.nav>.mode-link,.nav>.share-report{font-size:10px;padding:8px 10px}}
 .status.node{color:#d8b4fe;background:rgba(168,85,247,.16)}
+.expert-reference-panel{background:linear-gradient(145deg,rgba(15,61,71,.88),rgba(17,32,58,.94));border-color:rgba(94,234,212,.3)}
+.expert-note{margin:0 0 18px;color:#d5e7f2}.expert-measurement-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.expert-measurement{padding:14px;border-radius:14px;background:rgba(3,16,27,.58);border:1px solid var(--line)}.expert-measurement b,.expert-measurement strong,.expert-measurement small{display:block}.expert-measurement b{color:var(--teal);font-size:11px}.expert-measurement strong{font-size:18px;margin:3px 0}.expert-measurement small{color:var(--muted);font-size:10px}.expert-warning{margin:16px 0 0;color:#e9cc92;font-size:12px}
+@media(max-width:900px){.expert-measurement-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:580px){.expert-measurement-grid{grid-template-columns:repeat(2,1fr)}}

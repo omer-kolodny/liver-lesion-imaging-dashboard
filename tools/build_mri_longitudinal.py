@@ -43,17 +43,19 @@ def liver_overlap_fraction(component, liver):
 
 
 def split_hepatic_and_extrahepatic(items, liver):
-    """Keep liver foci separate from the reproducible portocaval target.
+    """Retain the dominant partly exophytic left-lobe mass as hepatic.
 
-    A lesion may replace or bulge beyond liver tissue, so this is not a generic
-    outside-mask rejection. The dominant extrahepatic target is tracked
-    separately; tiny off-liver model detections are excluded from liver burden.
+    The earlier build incorrectly called the largest low-overlap component a
+    portocaval node. Independent anatomical review showed that component is the
+    segment II/III liver mass. The true node has no validated automated mask.
     """
     hepatic = [item for item in items if liver_overlap_fraction(item, liver) >= .25]
     off_liver = [item for item in items if liver_overlap_fraction(item, liver) < .25]
-    node = max((item for item in off_liver if item.volume_ml >= 10), key=lambda item: item.volume_ml, default=None)
-    excluded = [item for item in off_liver if item is not node]
-    return hepatic, node, excluded
+    exophytic_mass = max((item for item in off_liver if item.volume_ml >= 10), key=lambda item: item.volume_ml, default=None)
+    if exophytic_mass is not None:
+        hepatic.append(exophytic_mass)
+    excluded = [item for item in off_liver if item is not exophytic_mass]
+    return hepatic, None, excluded
 
 
 def load_array(path):
@@ -169,7 +171,7 @@ def build_pdf(report):
     bg();c.setFillColor(colors.white);c.setFont('Helvetica-Bold',24);c.drawString(38,h-68,'Latest CT–MRI cross-check');c.setFillColor(colors.HexColor('#aaa2c0'));c.setFont('Helvetica',9);c.drawString(38,h-86,'23 Aug CT targets registered onto complete 26 Aug MRI · colored contours show sequence-specific automatic support')
     cross_image=ASSETS/'ct-mri-crosscheck.png'
     if cross_image.exists():c.drawImage(ImageReader(str(cross_image)),38,78,w-76,h-185,preserveAspectRatio=True,anchor='c',mask='auto')
-    c.setFillColor(colors.HexColor('#f1c9e6'));c.setFont('Helvetica-Bold',9);c.drawString(40,58,'Working inventory: 8 CT-anchored liver targets + 1 separate extrahepatic nodal target. Automatic MRI contour count is not lesion count.')
+    c.setFillColor(colors.HexColor('#f1c9e6'));c.setFont('Helvetica-Bold',9);c.drawString(40,58,'Working inventory: 9 CT-anchored liver targets. The separate portocaval node is not automatically contoured. MRI contour count is not lesion count.')
     foot(2);c.showPage();page_num=3
     for target in report.get('ct_crosscheck', {}).get('targets', []):
         bg();c.setFillColor(colors.white);c.setFont('Helvetica-Bold',22)
@@ -268,8 +270,8 @@ def main():
     registration_quality['2026-01-22__2026-08-26_direct']=0.9158872635353855
     audit_path=ASSETS/'ct_mri_audit.json';audit=json.loads(audit_path.read_text()) if audit_path.exists() else {}
     supported=audit.get('automatic_mri_supported_hepatic_targets',0)
-    crosscheck={'ct_date':'2026-08-23','mri_date':'2026-08-26','registration_liver_dice':0.853,'ct_hepatic_candidates':8,'ct_extrahepatic_targets':1,'mri_hepatic_foci':summaries[-1]['lesion_count'],'confirmed_mask_matches':supported,'automatic_mri_supported_hepatic_targets':supported,'unresolved_small_mri_foci':None,'ct_locations_without_accepted_mri_mask':8-supported,'targets':audit.get('targets',[]),'note':'Eight CT-anchored liver targets remain the working inventory. Automatic contours support only some targets on individual MRI sequences; this is a segmentation-quality result, not a lesion count. True late T1, DWI, ADC, T2 and phase-4 images are included.'}
-    report={'generated':'2026-08-27','modality':'MRI','dates':list(DATES),'studies':summaries,'summary':{'accepted_end_to_end':sum(1 for t in tracks if t.get('kind')=='hepatic' and DATES[0] in t['measurements'] and DATES[-1] in t['measurements']),'total_hepatic_tracks':sum(1 for t in tracks if t.get('kind')=='hepatic'),'extrahepatic_tracks':sum(1 for t in tracks if t.get('kind')=='node'),'registration_quality':registration_quality,'volume_change_pct':(summaries[-1]['tumor_volume_ml']/summaries[0]['tumor_volume_ml']-1)*100,'burden_change_pp':summaries[-1]['tumor_burden_pct']-summaries[0]['tumor_burden_pct']},'ct_crosscheck':crosscheck,'lesions':tracks,'limitations':['Automated research visualization; radiologist verification is required.','The working inventory is 8 CT-anchored hepatic targets plus 1 separate nodal target. Automatic MRI contour count is not lesion count.','Aggregate automatic-mask volume is quality-control information and must not be treated as total MRI disease burden.','The complete August archive was verified and includes true late T1, DWI b=800, ADC, T2 fat-sat, and all four dynamic phases.','August primary contours were generated on dynamic phase 4 and cross-checked against a separate run on true late T1; agreement tests sequence sensitivity, not clinical correctness.','MRI signal is not absolute and is normalized to background liver.','ADC and low-signal fractions are exploratory proxies, not direct tumor-viability or necrosis measurements.','Dynamic enhancement depends on acquisition timing, contrast delivery and patient hemodynamics.','Tiny lesions with weak registered overlap are not forced into longitudinal matches.']}
+    crosscheck={'ct_date':'2026-08-23','mri_date':'2026-08-26','registration_liver_dice':0.853,'ct_hepatic_candidates':9,'ct_extrahepatic_targets':1,'extrahepatic_target_status':'Known portocaval node; no validated automatic contour available.','mri_hepatic_foci':summaries[-1]['lesion_count'],'confirmed_mask_matches':supported,'automatic_mri_supported_hepatic_targets':supported,'unresolved_small_mri_foci':None,'ct_locations_without_accepted_mri_mask':9-supported,'dwi_adc_available':available('2026-08-26','adc'),'targets':audit.get('targets',[]),'note':'Nine CT-anchored liver targets remain the automatic working inventory. Automatic contours support only some targets on individual MRI sequences; this is a segmentation-quality result, not a lesion count. The separate portocaval node remains unsegmented. True late T1, DWI, ADC, T2 and phase-4 images are included.'}
+    report={'generated':'2026-08-27','modality':'MRI','dates':list(DATES),'studies':summaries,'summary':{'accepted_end_to_end':sum(1 for t in tracks if t.get('kind')=='hepatic' and DATES[0] in t['measurements'] and DATES[-1] in t['measurements']),'total_hepatic_tracks':sum(1 for t in tracks if t.get('kind')=='hepatic'),'extrahepatic_tracks':0,'registration_quality':registration_quality,'volume_change_pct':(summaries[-1]['tumor_volume_ml']/summaries[0]['tumor_volume_ml']-1)*100,'burden_change_pp':summaries[-1]['tumor_burden_pct']-summaries[0]['tumor_burden_pct']},'ct_crosscheck':crosscheck,'lesions':tracks,'limitations':['Automated research visualization; radiologist verification is required.','The working inventory is 9 CT-anchored hepatic targets. The distinct portocaval node is not automatically contoured. Automatic MRI contour count is not lesion count.','Aggregate automatic-mask volume is quality-control information and must not be treated as total MRI disease burden.','The complete August archive was verified and includes true late T1, DWI b=800, ADC, T2 fat-sat, and all four dynamic phases.','August primary contours were generated on dynamic phase 4 and cross-checked against a separate run on true late T1; agreement tests sequence sensitivity, not clinical correctness.','MRI signal is not absolute and is normalized to background liver.','ADC and low-signal fractions are exploratory proxies, not direct tumor-viability or necrosis measurements.','The August nominal arterial phase is late/mistimed and is not used for arterial-response comparison.','Dynamic enhancement depends on acquisition timing, contrast delivery and patient hemodynamics.','Tiny lesions with weak registered overlap are not forced into longitudinal matches.']}
     public=strip_arrays(report);(ASSETS/'report_data.json').write_text(json.dumps(public,indent=2))
     with (ASSETS/'lesion_metrics.csv').open('w',newline='') as stream:
         writer=csv.writer(stream);writer.writerow(['track','date','segment','automatic_mask_volume_ml','automatic_long_mm','automatic_short_mm','adc','low_adc_pct','dwi_liver','t2_liver','secondary_sequence_dice','registered_dice'])

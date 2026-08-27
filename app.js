@@ -9,6 +9,8 @@ let studyMap = {};
 let lesions = [];
 let comparisons = {};
 let validation = {};
+let expertReference = null;
+let dataOverall = {};
 let activeFilter = 'all';
 let fromDate;
 let toDate;
@@ -81,7 +83,7 @@ function renderOverview() {
   const volumeChange = change(first.tumor_volume_ml, second.tumor_volume_ml);
   const burdenChange = second.tumor_burden_pct - first.tumor_burden_pct;
   const hepatic = lesions.filter(row => row.kind !== 'node');
-  const lead = hepatic.find(row => row.lesion_id === 'L02') || hepatic[0];
+  const lead = hepatic.find(row => measurement(row, fromDate).long_mm != null && measurement(row, toDate).long_mm != null) || hepatic[0];
   const leadFirst = measurement(lead, fromDate);
   const leadSecond = measurement(lead, toDate);
   const diameterChange = change(leadFirst.long_mm, leadSecond.long_mm);
@@ -119,9 +121,7 @@ function renderOverview() {
       : 'no large automated change in liver-lesion burden.';
   document.querySelector('#overallAssessment').textContent = assessment;
 
-  const l01 = lesions.find(row => row.lesion_id === 'L01');
   const l02 = lesions.find(row => row.lesion_id === 'L02');
-  const nodeChange = change(measurement(l01, fromDate).volume_ml, measurement(l01, toDate).volume_ml);
   const leadChange = change(leadFirst.volume_ml, leadSecond.volume_ml);
   const l02Later = measurement(l02, toDate);
   const distances = l02Later.proximity_mm ? Object.values(l02Later.proximity_mm).filter(value => value != null) : [];
@@ -130,13 +130,25 @@ function renderOverview() {
     ? `${auditSummary.liver_registration_dice_pct}% liver-registration Dice · ${auditSummary.counts.supported} supported · ${auditSummary.counts.provisional} provisional · ${auditSummary.counts.review + auditSummary.counts['not-established']} review/not established.`
     : 'This selected non-consecutive pair has not undergone the independent registered-mask matching audit.';
   document.querySelector('#findingsList').innerHTML = `
-    <li><span>01</span><div><b>Liver-only segmented burden</b><p>${signed(volumeChange)} volume change and ${signed(burdenChange,' percentage points')} burden change. The extrahepatic node is excluded.</p></div></li>
-    <li><span>02</span><div><b>Dominant segment 8 liver lesion</b><p>${signed(leadChange)} automated volume change over the selected interval.</p></div></li>
-    <li><span>N</span><div><b>Separate portocaval nodal target</b><p>${signed(nodeChange)} automated volume change; not counted in liver burden.</p></div></li>
+    <li><span>01</span><div><b>Corrected liver-only segmented burden</b><p>${signed(volumeChange)} volume change and ${signed(burdenChange,' percentage points')} burden change. The segment II/III mass formerly mislabeled as a node is now included.</p></div></li>
+    <li><span>02</span><div><b>Largest comparable liver target (${lead.lesion_id})</b><p>${signed(leadChange)} automated volume change over the selected interval.</p></div></li>
+    <li><span>N</span><div><b>Separate portocaval node remains unsegmented</b><p>The previous automatic node trend was withdrawn because that contour was a liver mass. A reliable source contour for the true node is still required.</p></div></li>
+    <li><span>15</span><div><b>Expert workstation cross-check</b><p>${expertReference ? `${expertReference.target_count} manual targets totaling ${fmt(expertReference.total_volume_cc,2)} cc were visible in the supplied screenshots.` : 'Manual measurements are being reconciled.'}</p></div></li>
+    <li><span>±</span><div><b>Volume uncertainty is now explicit</b><p>The primary August pipeline estimates ${fmt(studies.at(-1).tumor_volume_ml,2)} mL; an independent pipeline estimated ${fmt(dataOverall.independent_model_tumor_volume_ml,2)} mL. Neither is treated as clinical ground truth.</p></div></li>
     <li class="quality-${quality.level}"><span>03</span><div><b>${quality.label}${quality.score_pct == null ? '' : ` · ${fmt(quality.score_pct)}% internal-reference similarity`}</b><p>${quality.explanation}</p></div></li>
     <li class="validation-finding"><span>V</span><div><b>Dual-channel match validation</b><p>${auditLine}</p></div></li>
     <li><span>04</span><div><b>Vessel proximity</b><p>${nearest == null ? 'Available on the latest segmented scan.' : `L02 is approximately ${fmt(nearest)} mm from the nearest automated major-vessel mask.`}</p></div></li>
     <li class="warning-item"><span>!</span><div><b>Viability limitation</b><p>Low attenuation and enhancement ratios are proxies; single-phase CT cannot determine whether tumor cells are alive.</p></div></li>`;
+}
+
+function renderExpertReference() {
+  const section = document.querySelector('#expert-reference');
+  if (!section || !expertReference) return;
+  document.querySelector('#expertReferenceSummary').textContent = `${expertReference.target_count} manually segmented targets · ${fmt(expertReference.total_volume_cc, 2)} cc total`;
+  document.querySelector('#expertReferenceNote').textContent = `${expertReference.study_date_confidence}. ${expertReference.mapping_status}`;
+  document.querySelector('#expertMeasurementGrid').innerHTML = expertReference.targets.map(item => `
+    <div class="expert-measurement"><b>${item.label}</b><strong>${fmt(item.volume_cc, 2)} cc</strong><small>${item.workstation_hu_display}</small></div>`).join('');
+  document.querySelector('#expertHuWarning').textContent = expertReference.hu_warning;
 }
 
 function renderCards() {
@@ -173,7 +185,7 @@ function renderCards() {
 }
 
 function renderVolumeChart() {
-  const rows = lesions.filter(row => row.kind !== 'node').slice(0, 12);
+  const rows = lesions.filter(row => row.kind !== 'node');
   const values = rows.flatMap(row => [measurement(row, fromDate).volume_ml || 0, measurement(row, toDate).volume_ml || 0]);
   const max = Math.max(...values, 1);
   const width = value => Math.max(value ? 1.5 : 0, Math.sqrt((value || 0) / max) * 100);
@@ -236,7 +248,7 @@ function openLesion(id) {
     </div>
     <div class="trend-strip">${trend}</div>
     ${validationPanel}${attenuation}${proximity}
-    <div class="dialog-note"><b>Automated trend:</b> ${row.trend}<br><b>Selected-pair assessment:</b> ${status.note}<br>${row.kind === 'node' ? '<b>Classification:</b> Extrahepatic portocaval nodal target; excluded from liver burden.<br>' : `<b>Latest segment-mask assignment:</b> ${second.segment || row.reference_segment}.<br>`}<b>Validation decision:</b> ${decisionLabel(audit.decision)}.</div>
+    <div class="dialog-note"><b>Automated trend:</b> ${row.trend}<br><b>Selected-pair assessment:</b> ${status.note}<br>${row.kind === 'node' ? '<b>Classification:</b> Extrahepatic portocaval nodal target; excluded from liver burden.<br>' : `<b>Latest segment-mask assignment:</b> ${second.segment || row.reference_segment}.<br>`}<b>Caliper method:</b> maximum axial diameter is redrawn on each examination; its screen angle is not forced to match another date. A single diameter is withheld for split/merged contours.<br><b>Validation decision:</b> ${decisionLabel(audit.decision)}.</div>
   </div>`;
   dialog.showModal();
 }
@@ -253,15 +265,18 @@ function updateComparison() {
   renderCards();
 }
 
-fetch('assets/timeline.json?v=7').then(response => response.json()).then(data => {
+fetch('assets/timeline.json?v=8').then(response => response.json()).then(data => {
   studies = data.studies;
   studyMap = Object.fromEntries(studies.map(study => [study.date, study]));
   lesions = data.lesions;
   comparisons = data.comparisons || {};
   validation = data.validation || {};
+  dataOverall = data.overall || {};
+  expertReference = data.expert_reference || null;
   toDate = studies.at(-1).date;
   fromDate = studies.at(0).date;
   renderSelectors();
+  renderExpertReference();
   updateComparison();
 });
 
@@ -277,7 +292,7 @@ grid.addEventListener('keydown', event => { if ((event.key === 'Enter' || event.
 document.querySelector('.dialog-close').addEventListener('click', () => dialog.close());
 dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
 
-const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=7', window.location.href).href;
+const reportUrl = new URL('assets/Liver_Lesion_CT_Comparison.pdf?v=8', window.location.href).href;
 const shareStatus = document.querySelector('#shareStatus');
 async function shareReport(event) {
   const button = event.currentTarget;

@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#0a0715">
   <meta name="description" content="Longitudinal liver MRI lesion visualization and comparison dashboard.">
   <title>RadioLens MRI · Noa</title>
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
   <script type="importmap">{"imports":{"three":"../vendor/three.module.js"}}</script>
-  <script type="module" src="viewer.js?v=4"></script>
-  <script defer src="app.js?v=4"></script>
+  <script type="module" src="viewer.js?v=5"></script>
+  <script defer src="app.js?v=5"></script>
 </head>
 <body>
   <div class="privacy-strip">Derived anonymized MRI data · Automated research visualization · Radiologist verification required</div>
@@ -46,7 +46,7 @@
         <article class="stat-card indigo"><span>Tracked in selected pair</span><strong id="matchCount">—</strong><p>Weak tiny-focus matches are not forced</p></article>
         <article class="stat-card blue"><span>Sequence robustness</span><strong id="repeatDice">—</strong><p>Agreement across separately processed MRI inputs</p></article>
       </div>
-      <div class="data-warning"><b>Correction notice:</b> “MRI contour count” is not the lesion count. The working inventory remains 8 CT-anchored liver targets plus 1 separate nodal target. Aggregate automatic MRI contour volume is retained only for technical quality control.</div>
+      <div class="data-warning"><b>Correction notice:</b> “MRI contour count” is not the lesion count. The corrected automatic inventory contains 9 CT-anchored liver targets. The true portocaval node remains unsegmented. Aggregate automatic MRI contour volume is retained only for technical quality control.</div>
       <div class="overview-grid">
         <article class="panel"><span class="kicker">Longitudinal summary</span><h3>What changed?</h3><ul class="findings" id="findings"></ul></article>
         <article class="panel metric-guide"><span class="kicker">MRI-specific metrics</span><h3>How to read the signals</h3>
@@ -72,14 +72,13 @@
               <button class="layer-panel-toggle" id="layerPanelToggle" type="button" aria-expanded="false"><span>Layers</span><b id="visibleLayerCount">2 on</b></button>
               <div class="layer-panel"><strong>Anatomy layers</strong><p>Latest MRI reconstruction</p>
                 <button class="layer-toggle active" data-layer="liver"><i style="--swatch:#a855f7"></i>Liver shell</button>
-                <button class="layer-toggle active" data-layer="lesions"><i style="--swatch:#f448b3"></i>8 CT-anchored liver targets</button>
-                <button class="layer-toggle" data-layer="nodes"><i style="--swatch:#d946ef"></i>Portocaval node</button>
+                <button class="layer-toggle active" data-layer="lesions"><i style="--swatch:#f448b3"></i>9 CT-anchored liver targets</button>
                 <button class="layer-toggle" data-layer="segments"><i style="--swatch:#6d78ff"></i>Couinaud segments</button>
               </div>
             </div>
             <div class="model-controls"><button id="rotateToggle">Auto-rotate</button><button id="resetCamera">Reset view</button><button id="fullscreenModel">Fullscreen</button></div>
           </div>
-          <aside class="model-info"><div class="model-number" id="latestCount">—</div><h3>Known CT-anchored liver targets</h3><p>The current 3D contains only the five regions automatically contoured on the incomplete MRI export. It is not a complete lesion inventory. The separate nodal target is excluded.</p><div class="mini-metrics"><div><span>Liver volume</span><b id="latestLiver">—</b></div><div><span>Automatically contoured volume</span><b id="latestTumor">—</b></div><div><span>Extrahepatic nodal target</span><b id="latestNode">—</b></div><div><span>Source</span><b>Dynamic post-contrast phase 4</b></div></div><a class="button ghost wide" href="assets/mri_liver_core.glb" download>Download latest MRI 3D</a></aside>
+          <aside class="model-info"><div class="model-number" id="latestCount">—</div><h3>Known CT-anchored liver targets</h3><p>The current 3D shows the nine CT-derived liver targets registered onto the complete MRI. MRI sequence contours are quality-control overlays, not the true lesion count. The separate portocaval node is not contoured.</p><div class="mini-metrics"><div><span>Liver volume</span><b id="latestLiver">—</b></div><div><span>Automatically contoured volume</span><b id="latestTumor">—</b></div><div><span>True portocaval node</span><b id="latestNode">—</b></div><div><span>Source</span><b>Complete multiparametric MRI</b></div></div><a class="button ghost wide" href="assets/mri_liver_core.glb" download>Download latest MRI 3D</a></aside>
         </div>
       </div>
     </section>
@@ -88,19 +87,19 @@
       <div class="section-heading"><div><div class="eyebrow">Cross-modality audit</div><h2>What CT finds that MRI automation misses</h2></div><p>The 23 Aug CT was registered to the 26 Aug MRI. Cyan outlines are CT reference locations; pink outlines are accepted MRI masks.</p></div>
       <div class="crosscheck-grid">
         <article class="panel crosscheck-copy"><div class="crosscheck-stats"><div><strong id="ctLiverCount">—</strong><span>Known CT-anchored targets</span></div><div><strong id="mriLiverCount">—</strong><span>Phase-4 model contours</span></div><div><strong id="confirmedCrossMatches">—</strong><span>Targets supported on ≥1 MRI sequence</span></div></div><h3>Why the numbers differ</h3><p id="crosscheckNote">Loading the multi-sequence CT–MRI audit…</p><p class="data-warning"><b>Important:</b> an MRI mask not appearing does not prove that a lesion vanished. The known CT target inventory is preserved; small MRI findings remain subject to radiologist review.</p></article>
-        <button class="crosscheck-image" id="openCrosscheck" type="button"><img src="assets/ct-mri-crosscheck.webp?v=4" alt="Latest CT lesion locations registered onto complete latest MRI"><span>Open full-resolution CT–MRI audit</span></button>
+        <button class="crosscheck-image" id="openCrosscheck" type="button"><img src="assets/ct-mri-crosscheck.webp?v=5" alt="Latest CT lesion locations registered onto complete latest MRI"><span>Open full-resolution CT–MRI audit</span></button>
       </div>
       <div class="target-grid" id="ctTargetGrid"></div>
     </section>
 
     <section id="lesions" class="section shell">
       <div class="section-heading"><div><div class="eyebrow">Automatic-contour audit</div><h2>MRI model regions requiring review</h2></div><p>These cards show model-derived regions, not a definitive lesion inventory. Known CT targets without a confident MRI contour remain documented in the cross-modality audit above.</p></div>
-      <div class="filters"><button class="filter active" data-filter="all">All tracks</button><button class="filter" data-filter="major">Major targets</button><button class="filter" data-filter="matched">Accepted matches</button><button class="filter" data-filter="node">Nodal target</button><button class="filter" data-filter="review">Review required</button><label class="search"><span>Search</span><input id="search" type="search" placeholder="ID or segment…"></label></div>
+      <div class="filters"><button class="filter active" data-filter="all">All tracks</button><button class="filter" data-filter="major">Major targets</button><button class="filter" data-filter="matched">Accepted matches</button><button class="filter" data-filter="review">Review required</button><label class="search"><span>Search</span><input id="search" type="search" placeholder="ID or segment…"></label></div>
       <div class="lesion-grid" id="lesionGrid"></div>
     </section>
 
     <section id="report" class="section report-section">
-      <div class="shell report-grid"><div><div class="eyebrow">MRI report package</div><h2>Download or share the corrected report</h2><p class="lede small">Uses the complete August MRI, preserves all eight CT-anchored liver targets, separates the nodal target, and avoids reporting an MRI measurement where the whole-lesion boundary is not confidently established.</p><div class="hero-actions"><button class="button primary" id="sharePdf">Share PDF report</button><a class="button ghost" href="assets/Noa_Liver_MRI_Comparison.pdf?v=4" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_metrics.csv?v=4" download>Download technical CSV</a></div><p class="share-status" id="shareStatus"></p></div><div class="report-preview"><img src="assets/targets/H01_2026-08-26.webp?v=4" alt="Dominant liver target across complete August MRI sequences"></div></div>
+      <div class="shell report-grid"><div><div class="eyebrow">MRI report package</div><h2>Download or share the corrected report</h2><p class="lede small">Uses the complete August MRI, preserves all nine CT-anchored liver targets, flags the unsegmented true node, and avoids reporting an MRI measurement where the whole-lesion boundary is not confidently established.</p><div class="hero-actions"><button class="button primary" id="sharePdf">Share PDF report</button><a class="button ghost" href="assets/Noa_Liver_MRI_Comparison.pdf?v=5" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_metrics.csv?v=5" download>Download technical CSV</a></div><p class="share-status" id="shareStatus"></p></div><div class="report-preview"><img src="assets/targets/H01_2026-08-26.webp?v=5" alt="Dominant liver target across complete August MRI sequences"></div></div>
     </section>
 
     <section class="section shell safety"><div class="safety-icon">!</div><div><h2>Clinical safety notice</h2><p>This is a computer-assisted research visualization, not a radiologist-signed report, formal RECIST assessment, pathology result, or treatment recommendation. Lesion matching, segment assignment, ADC findings, enhancement proxies, and small foci require review on the original DICOM images by a qualified radiologist.</p></div></section>

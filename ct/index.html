@@ -13,10 +13,10 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
   <link rel="manifest" href="site.webmanifest?v=4">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
   <script type="module" src="viewer.js?v=7"></script>
-  <script defer src="app.js?v=9"></script>
+  <script defer src="app.js?v=10"></script>
 </head>
 <body>
   <div class="privacy-strip">Derived and anonymized imaging data only · Automated analysis · Radiologist verification required</div>
@@ -24,6 +24,7 @@
     <a class="brand" href="ct/#top"><span class="brand-mark">CT</span><span>RadioLens CT</span></a>
     <nav aria-label="Main navigation">
       <a href="ct/#overview">Overview</a>
+      <a href="ct/#expert-reference">Expert check</a>
       <a href="ct/#timeline">Timeline</a>
       <a href="ct/#model">3D model</a>
       <a href="ct/#lesions">Lesions</a>
@@ -79,7 +80,7 @@
 
       <div class="overview-grid">
         <article class="panel burden-panel">
-          <div class="panel-title"><div><span class="kicker">Liver-lesion burden</span><h3>Percentage of liver volume · node excluded</h3></div></div>
+          <div class="panel-title"><div><span class="kicker">Liver-lesion burden</span><h3>Percentage of liver volume · all automatic hepatic components included</h3></div></div>
           <div class="donut-row">
             <div class="donut-card"><div class="donut" id="fromDonut"><div><strong id="fromBurden">—</strong><span id="fromLabel">Earlier</span></div></div><p id="fromBurdenDetail">—</p></div>
             <div class="donut-card"><div class="donut follow" id="toDonut"><div><strong id="toBurden">—</strong><span id="toLabel">Later</span></div></div><p id="toBurdenDetail">—</p></div>
@@ -90,6 +91,19 @@
           <div class="panel-title"><div><span class="kicker">Interpretation</span><h3>Key observations</h3></div></div>
           <ul class="findings" id="findingsList"><li><span>…</span><div><b>Loading analysis</b><p>Preparing the selected comparison.</p></div></li></ul>
         </article>
+      </div>
+    </section>
+
+    <section id="expert-reference" class="section shell">
+      <div class="section-heading">
+        <div><div class="eyebrow">Radiologist workstation cross-check</div><h2>Manual contour measurements supplied by screenshot</h2></div>
+        <p id="expertReferenceSummary">Loading manual reference…</p>
+      </div>
+      <div class="panel expert-reference-panel">
+        <p id="expertReferenceNote" class="expert-note"></p>
+        <div id="expertMeasurementGrid" class="expert-measurement-grid"></div>
+        <p id="expertHuWarning" class="expert-warning"></p>
+        <p class="expert-warning"><b>Important:</b> screenshots are useful validation evidence, but they do not contain the DICOM coordinates needed to match T1–T15 safely to the dashboard lesion IDs. The original DICOM SEG/RTSTRUCT export is still required for exact contour replacement.</p>
       </div>
     </section>
 
@@ -161,7 +175,6 @@
         <button class="filter" data-filter="major">Major lesions</button>
         <button class="filter" data-filter="stable">Decreased / stable</button>
         <button class="filter" data-filter="caution">Needs attention</button>
-        <button class="filter" data-filter="node">Separate node</button>
         <label class="search"><span>Search</span><input id="lesionSearch" type="search" placeholder="ID or segment…"></label>
       </div>
       <div id="lesionGrid" class="lesion-grid" aria-live="polite"></div>
@@ -173,7 +186,7 @@
           <div class="eyebrow">Designed clinical-style report</div>
           <h2>Share the complete validated PDF</h2>
           <p class="lede small-lede">Includes the four-date timeline, per-lesion trends, annotated comparisons, deterministic registration evidence, independent reconstruction-AI checks, attenuation proxies, vessel proximity, methodology, and safety limitations.</p>
-          <div class="hero-actions"><button class="button primary share-report" type="button">Share PDF report</button><a class="button ghost" href="assets/Liver_Lesion_CT_Comparison.pdf?v=6" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_comparison.csv?v=5" download>Download CSV</a></div>
+          <div class="hero-actions"><button class="button primary share-report" type="button">Share PDF report</button><a class="button ghost" href="assets/Liver_Lesion_CT_Comparison.pdf?v=8" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_comparison.csv?v=6" download>Download CSV</a></div>
           <p class="share-help">On iPhone, Share opens the native share sheet—send the report or choose <b>Save to Files</b>.</p>
           <p class="share-status" id="shareStatus" aria-live="polite"></p>
         </div>

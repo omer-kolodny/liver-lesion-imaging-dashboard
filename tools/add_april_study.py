@@ -14,7 +14,9 @@ import math
 import sys
 from pathlib import Path
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from scipy import ndimage
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import A4, landscape
@@ -141,7 +143,20 @@ def load_fonts():
     return ImageFont.truetype(path, 25), ImageFont.truetype(path, 18), ImageFont.truetype(path, 15)
 
 
-def source_half(lesion_id: str, date: str) -> Image.Image:
+def remove_caliper_overlay(panel: Image.Image) -> Image.Image:
+    """Remove cyan/blue baked-in calipers while preserving purple contours."""
+    array = np.asarray(panel.convert("RGB")).copy()
+    red, green, blue = array[..., 0], array[..., 1], array[..., 2]
+    cool_line = (green > 105) & (blue > 135) & (red < 155) & ((blue.astype(int) - red.astype(int)) > 20)
+    red_line = (red > 175) & (green < 145) & (blue < 175) & ((red.astype(int) - green.astype(int)) > 45)
+    caliper = cool_line | red_line
+    caliper = ndimage.binary_dilation(caliper, iterations=2)
+    nearest = ndimage.distance_transform_edt(caliper, return_distances=False, return_indices=True)
+    array[caliper] = array[tuple(nearest[:, caliper])]
+    return Image.fromarray(array)
+
+
+def source_half(lesion_id: str, date: str, measurement: dict | None = None) -> Image.Image:
     labels = {
         "2025-12-25": "25 Dec 2025",
         "2026-01-19": "19 Jan 2026",
@@ -158,10 +173,20 @@ def source_half(lesion_id: str, date: str) -> Image.Image:
         panel = Image.open(path).convert("RGB").crop((900, 0, 1800, 855))
     else:
         raise ValueError(date)
-    title_font, _, _ = load_fonts()
+    if measurement and measurement.get("caliper_status"):
+        panel = remove_caliper_overlay(panel)
+    title_font, body_font, small_font = load_fonts()
     draw = ImageDraw.Draw(panel)
     draw.rectangle((0, 0, 900, 92), fill="#0d1b2d")
     draw.text((28, 20), f"{lesion_id} · {labels[date]}", font=title_font, fill="#f4f8ff")
+    draw.rectangle((0, 92, 900, 192), fill="#07111f")
+    if measurement and measurement.get("detected"):
+        if measurement.get("caliper_status"):
+            subtitle = f"{measurement['volume_ml']:.2f} mL automatic mask · caliper withheld (split/merged contour)"
+        else:
+            subtitle = f"{measurement['long_mm']:.1f} × {measurement['short_mm']:.1f} mm · {measurement['volume_ml']:.2f} mL"
+        draw.text((250, 124), labels[date], font=body_font, fill="#f4f8ff")
+        draw.text((205, 158), subtitle, font=small_font, fill="#d5dfed")
     draw.rectangle((0, 790, 900, 855), fill="#0d1b2d")
     draw.text((28, 806), "Axial measured image overlay · automated contour", font=load_fonts()[2], fill="#b9c9dc")
     return panel
@@ -190,13 +215,16 @@ def april_panel(lesion_id: str, measurement: dict) -> Image.Image:
         155 * scale_x, 275 * scale_y, 1275 * scale_x, 1395 * scale_y,
     ))
     axial = image.crop(axial_box).resize((598, 598), Image.Resampling.LANCZOS)
+    if measurement.get("caliper_status"):
+        axial = remove_caliper_overlay(axial)
     panel.paste(axial, (151, 192))
     fragments = measurement.get("fragment_count", 1)
-    subtitle = (
-        f"{fragments} fragments · {measurement['volume_ml']:.2f} mL · {measurement['long_mm']:.1f} mm long axis"
-        if fragments > 1
-        else f"{measurement['volume_ml']:.2f} mL · {measurement['long_mm']:.1f} × {measurement['short_mm']:.1f} mm"
-    )
+    if measurement.get("caliper_status"):
+        subtitle = f"{measurement['volume_ml']:.2f} mL automatic mask · caliper withheld (split/merged contour)"
+    elif fragments > 1:
+        subtitle = f"{fragments} fragments · {measurement['volume_ml']:.2f} mL · caliper requires component-level review"
+    else:
+        subtitle = f"{measurement['volume_ml']:.2f} mL · {measurement['long_mm']:.1f} × {measurement['short_mm']:.1f} mm"
     draw.text((260, 126), "26 Apr 2026", font=body_font, fill="#f4f8ff")
     draw.text((245, 158), subtitle, font=small_font, fill="#d5dfed")
     draw.rectangle((0, 790, 900, 855), fill="#0d1b2d")
@@ -212,11 +240,13 @@ def generate_pair_images(timeline: dict):
         (APRIL_DATE, "2026-08-23"),
     ]
     out_dir = ROOT / "assets" / "timeline"
+    tracks = {row["lesion_id"]: row for row in timeline["lesions"]}
     for lesion_id, measurement in april.items():
+        track = tracks[lesion_id]
         april_image = april_panel(lesion_id, measurement)
         for first, second in pairs:
-            left = april_image if first == APRIL_DATE else source_half(lesion_id, first)
-            right = april_image if second == APRIL_DATE else source_half(lesion_id, second)
+            left = april_image if first == APRIL_DATE else source_half(lesion_id, first, track["measurements"].get(first))
+            right = april_image if second == APRIL_DATE else source_half(lesion_id, second, track["measurements"].get(second))
             combined = Image.new("RGB", (1800, 855), "#07111f")
             combined.paste(left, (0, 0))
             combined.paste(right, (900, 0))
@@ -277,14 +307,13 @@ def write_pdf(timeline: dict):
         Paragraph("Four-study image-derived lesion analysis · dual-channel validation added 25 Aug 2026", h2),
         Spacer(1, 5*mm),
     ]
-    study_rows = [["Study", "Liver volume", "Liver-lesion volume", "Liver-only burden", "Separate node"]]
+    study_rows = [["Study", "Liver volume", "Liver-lesion volume", "Liver-only burden"]]
     for study in timeline["studies"]:
         study_rows.append([
             study["label"], f"{study['liver_volume_ml']:.2f} mL",
             f"{study['tumor_volume_ml']:.2f} mL", f"{study['tumor_burden_pct']:.2f}%",
-            f"{study.get('extrahepatic_target_volume_ml', 0):.2f} mL",
         ])
-    table = Table(study_rows, colWidths=[45*mm, 40*mm, 45*mm, 38*mm, 38*mm])
+    table = Table(study_rows, colWidths=[50*mm, 48*mm, 53*mm, 48*mm])
     table.setStyle(TableStyle([
         ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#173f5f")),
         ("TEXTCOLOR", (0,0), (-1,0), colors.white),
@@ -310,9 +339,13 @@ def write_pdf(timeline: dict):
         Paragraph("April → August summary", h2),
         Paragraph(
             f"Automated liver-only segmented lesion volume changed from {april['tumor_volume_ml']:.2f} mL to {august['tumor_volume_ml']:.2f} mL ({volume_change:+.1f}%). "
-            f"Burden changed from {april['tumor_burden_pct']:.2f}% to {august['tumor_burden_pct']:.2f}%. Internal-reference comparability is high. "
-            f"The separate portocaval nodal target changed from {april.get('extrahepatic_target_volume_ml', 0):.2f} mL to {august.get('extrahepatic_target_volume_ml', 0):.2f} mL and is excluded from liver burden. "
+            f"Burden changed from {april['tumor_burden_pct']:.2f}% to {august['tumor_burden_pct']:.2f}%. April and August contrast timing is closely matched. "
+            "The former L01 nodal classification was withdrawn: L01 is a segment II/III liver mass and is included here. The true portocaval node remains a separate unsegmented specialist-review target. "
             "These outputs require radiologist confirmation and are not a diagnosis or treatment-planning measurement.", body),
+        Spacer(1, 2*mm),
+        Paragraph(
+            f"Segmentation uncertainty: the primary August pipeline estimates {august['tumor_volume_ml']:.2f} mL, while the independent audit estimated {timeline.get('overall', {}).get('independent_model_tumor_volume_ml', 0):.2f} mL. "
+            "This spread is reported explicitly; neither estimate is treated as a clinical ground-truth volume.", body),
         Spacer(1, 4*mm),
         Paragraph("Tracking safeguards", h2),
         Paragraph(
@@ -328,6 +361,33 @@ def write_pdf(timeline: dict):
             "Algorithmic agreement is not clinical ground truth; all findings require radiologist source-image confirmation.", body),
         PageBreak(),
     ]
+    expert = timeline.get("expert_reference")
+    if expert:
+        story += [
+            Paragraph("Radiologist-workstation screenshot cross-check", h2),
+            Paragraph(
+                f"The supplied screenshots display {expert['target_count']} manually segmented targets totaling {expert['total_volume_cc']:.2f} cc. "
+                f"The study is probably 26 Apr 2026, but the date is not printed in the screenshot. {expert['mapping_status']}", body),
+            Spacer(1, 4*mm),
+        ]
+        manual_rows = [["Target", "Volume", "Workstation HU display"]] + [
+            [item["label"], f"{item['volume_cc']:.2f} cc", item["workstation_hu_display"]]
+            for item in expert["targets"]
+        ] + [["Total", f"{expert['total_volume_cc']:.2f} cc", ""]]
+        manual_table = Table(manual_rows, colWidths=[42*mm, 48*mm, 82*mm])
+        manual_table.setStyle(TableStyle([
+            ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#173f5f")),
+            ("TEXTCOLOR", (0,0), (-1,0), colors.white),
+            ("BACKGROUND", (0,1), (-1,-2), colors.HexColor("#eef4f8")),
+            ("BACKGROUND", (0,-1), (-1,-1), colors.HexColor("#d8ecea")),
+            ("GRID", (0,0), (-1,-1), 0.4, colors.HexColor("#b9c9d8")),
+            ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
+            ("FONTNAME", (0,-1), (-1,-1), "Helvetica-Bold"),
+            ("FONTSIZE", (0,0), (-1,-1), 8.5),
+            ("TOPPADDING", (0,0), (-1,-1), 4),
+            ("BOTTOMPADDING", (0,0), (-1,-1), 4),
+        ]))
+        story += [manual_table, Spacer(1, 4*mm), Paragraph(expert["hu_warning"], small), PageBreak()]
     for lesion in timeline["lesions"]:
         lid = lesion["lesion_id"]
         first = lesion["measurements"][APRIL_DATE]
@@ -337,6 +397,12 @@ def write_pdf(timeline: dict):
         ai = audit.get("ai", {})
         image_path = ROOT / "assets" / "timeline" / f"{lid}_{APRIL_DATE}_2026-08-23.webp"
         target_label = lesion.get("reference_label") if lesion.get("kind") == "node" else f"reference segment {lesion['reference_segment']}"
+        def dimensions_text(item):
+            if not item.get("detected"):
+                return "—"
+            if item.get("long_mm") is None or item.get("short_mm") is None:
+                return "Withheld — split/merged contour"
+            return f"{item['long_mm']:.1f} × {item['short_mm']:.1f} × {item.get('cc_mm', 0):.1f} mm"
         story += [Paragraph(f"{lid} · {target_label}", h2)]
         if image_path.exists():
             story += [PdfImage(str(image_path), width=190*mm, height=90.25*mm), Spacer(1, 1*mm)]
@@ -344,7 +410,7 @@ def write_pdf(timeline: dict):
             ["Metric", "26 Apr 2026", "23 Aug 2026"],
             ["Detection", "Detected" if first.get("detected") else "Not separate", "Detected" if second.get("detected") else "Not separate"],
             ["Volume", f"{first.get('volume_ml', 0):.3f} mL" if first.get("detected") else "—", f"{second.get('volume_ml', 0):.3f} mL" if second.get("detected") else "—"],
-            ["Long × short × CC", f"{first.get('long_mm', 0):.1f} × {first.get('short_mm', 0):.1f} × {first.get('cc_mm', 0):.1f} mm" if first.get("detected") else "—", f"{second.get('long_mm', 0):.1f} × {second.get('short_mm', 0):.1f} × {second.get('cc_mm', 0):.1f} mm" if second.get("detected") else "—"],
+            ["Long × short × CC", dimensions_text(first), dimensions_text(second)],
             ["VNC-corrected enhancement", f"{first.get('vnc_corrected_enhancement_hu', 0):.1f} HU" if first.get("detected") else "—", f"{second.get('vnc_corrected_enhancement_hu', 0):.1f} HU" if second.get("detected") else "—"],
             ["Below 40 HU", f"{first.get('below_40hu_pct', 0):.1f}%" if first.get("detected") else "—", f"{second.get('below_40hu_pct', 0):.1f}%" if second.get("detected") else "—"],
             ["Validation decision", audit.get("decision", "not audited").replace("-", " ").title(), f"Confidence: {audit.get('confidence', 'unavailable')}"],

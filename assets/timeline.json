@@ -1,26 +1,27 @@
 {
-  "generated": "2026-08-24",
-  "method": "Automated image-only segmentation with longitudinal registration. Matching uses spatial overlap/centroid, segment, morphology and vessel topology; split/merge and ambiguous tracks are flagged for review. Attenuation uses VNC correction and internal liver/blood-pool normalization.",
+  "generated": "2026-08-27",
+  "method": "Automated image-only segmentation with longitudinal registration, independent reconstruction/model checks, corrected DICOM contrast timing, and a transcribed radiologist-workstation volume cross-check. Expert screenshots are validation evidence, not substitutes for source segmentation objects.",
   "studies": [
     {
       "date": "2025-12-25",
       "label": "25 Dec 2025",
       "liver_volume_ml": 1706.42,
-      "tumor_volume_ml": 70.456,
-      "tumor_burden_pct": 4.129,
+      "tumor_volume_ml": 166.82,
+      "tumor_burden_pct": 9.776,
       "contrast_timing_sec": null,
       "vnc_available": false,
       "attenuation_confidence": "limited",
-      "extrahepatic_target_volume_ml": 96.364,
-      "liver_lesion_groups": 8
+      "extrahepatic_target_volume_ml": null,
+      "liver_lesion_groups": 8,
+      "automatic_hepatic_component_count": 16
     },
     {
       "date": "2026-01-19",
       "label": "19 Jan 2026",
       "liver_volume_ml": 1667.05,
-      "tumor_volume_ml": 64.126,
-      "tumor_burden_pct": 3.847,
-      "contrast_timing_sec": 90.0,
+      "tumor_volume_ml": 170.34,
+      "tumor_burden_pct": 10.218,
+      "contrast_timing_sec": 174.4,
       "contrast_volume_ml": 80.0,
       "contrast_flow_ml_s": 1.7,
       "iodine_concentration_mg_ml": 300.0,
@@ -59,18 +60,19 @@
           "paired_voxels": 85132
         }
       },
-      "extrahepatic_target_volume_ml": 106.214,
-      "liver_lesion_groups": 8
+      "extrahepatic_target_volume_ml": null,
+      "liver_lesion_groups": 8,
+      "automatic_hepatic_component_count": 16
     },
     {
       "date": "2026-04-26",
       "label": "26 Apr 2026",
       "liver_volume_ml": 1504.11,
-      "tumor_volume_ml": 48.043,
-      "tumor_burden_pct": 3.194,
+      "tumor_volume_ml": 97.64,
+      "tumor_burden_pct": 6.492,
       "residual_lesion_groups": 8,
       "residual_foci": 9,
-      "contrast_timing_sec": 91.8,
+      "contrast_timing_sec": 131.8,
       "contrast_volume_ml": 80.0,
       "contrast_flow_ml_s": 1.7,
       "iodine_concentration_mg_ml": 300.0,
@@ -104,18 +106,19 @@
           "enhancement_hu": 121.8
         }
       },
-      "extrahepatic_target_volume_ml": 49.597,
-      "liver_lesion_groups": 8
+      "extrahepatic_target_volume_ml": null,
+      "liver_lesion_groups": 8,
+      "automatic_hepatic_component_count": 8
     },
     {
       "date": "2026-08-23",
       "label": "23 Aug 2026",
       "liver_volume_ml": 1467.57,
-      "tumor_volume_ml": 29.406,
-      "tumor_burden_pct": 2.004,
+      "tumor_volume_ml": 46.56,
+      "tumor_burden_pct": 3.173,
       "residual_lesion_groups": 9,
       "residual_foci": 12,
-      "contrast_timing_sec": 90.0,
+      "contrast_timing_sec": 131.9,
       "contrast_volume_ml": 80.0,
       "contrast_flow_ml_s": 1.7,
       "iodine_concentration_mg_ml": 300.0,
@@ -154,16 +157,17 @@
           "paired_voxels": 94069
         }
       },
-      "extrahepatic_target_volume_ml": 17.154,
-      "liver_lesion_groups": 8
+      "extrahepatic_target_volume_ml": null,
+      "liver_lesion_groups": 8,
+      "automatic_hepatic_component_count": 9
     }
   ],
   "comparisons": {
     "2025-12-25__2026-01-19": {
-      "level": "limited",
+      "level": "moderate",
       "score_pct": null,
-      "label": "Limited attenuation comparability",
-      "explanation": "The December PET-CT is contrast enhanced, but its exact contrast-start timestamp and matched VNC series are unavailable. Size and volume remain comparable with the stated segmentation limitations; attenuation trends are less reliable.",
+      "label": "Timing-adjusted comparison",
+      "explanation": "January was acquired 174.4 seconds after contrast start versus about 132 seconds for April/August. Size is comparable; attenuation trends require extra caution and internal-reference normalization.",
       "contrast_protocol_match": false
     },
     "2025-12-25__2026-04-26": {
@@ -181,7 +185,7 @@
       "contrast_protocol_match": false
     },
     "2026-01-19__2026-04-26": {
-      "level": "high",
+      "level": "moderate",
       "score_pct": 95.0,
       "median_reference_difference_pct": 5.0,
       "maximum_reference_difference_pct": 12.0,
@@ -193,12 +197,12 @@
         "inferior_vena_cava": 12.0
       },
       "basis": "VNC-corrected enhancement of normal liver, portal vein, aorta, spleen, and IVC.",
-      "label": "High hemodynamic comparability",
-      "explanation": "Both scans used matched 90-second timing and the same 80 mL iodine injection at 1.7 mL/s; VNC-corrected internal references are similar.",
-      "contrast_protocol_match": true
+      "label": "Timing-adjusted comparison",
+      "explanation": "January was acquired 174.4 seconds after contrast start versus about 132 seconds for April/August. Size is comparable; attenuation trends require extra caution and internal-reference normalization.",
+      "contrast_protocol_match": false
     },
     "2026-01-19__2026-08-23": {
-      "level": "high",
+      "level": "moderate",
       "score_pct": 91.6,
       "median_reference_difference_pct": 8.4,
       "maximum_reference_difference_pct": 11.9,
@@ -210,9 +214,9 @@
         "inferior_vena_cava": 10.5
       },
       "basis": "VNC-corrected enhancement of normal liver, portal vein, aorta, spleen, and IVC.",
-      "label": "High hemodynamic comparability",
-      "explanation": "Both scans were acquired 90 seconds after an identical 80 mL iodine injection at 1.7 mL/s. VNC-corrected internal liver and blood-pool references are also similar.",
-      "contrast_protocol_match": true
+      "label": "Timing-adjusted comparison",
+      "explanation": "January was acquired 174.4 seconds after contrast start versus about 132 seconds for April/August. Size is comparable; attenuation trends require extra caution and internal-reference normalization.",
+      "contrast_protocol_match": false
     },
     "2026-04-26__2026-08-23": {
       "level": "high",
@@ -228,19 +232,21 @@
       },
       "basis": "VNC-corrected enhancement of normal liver, portal vein, aorta, spleen, and IVC.",
       "label": "High hemodynamic comparability",
-      "explanation": "Both scans used matched 90-second timing and the same 80 mL iodine injection at 1.7 mL/s; VNC-corrected internal references are similar.",
+      "explanation": "April and August portal-venous acquisitions were timed 131.8 and 131.9 seconds after contrast start. Internal-reference normalization still reduces residual hemodynamic differences.",
       "contrast_protocol_match": true
     }
   },
   "overall": {
-    "jan_to_aug_tumor_volume_change_pct": -54.1,
-    "jan_to_aug_burden_change_points": -1.84,
-    "independent_model_tumor_volume_ml": 49.05,
-    "bottom_line": "Liver-only segmented lesion volume is lower in August than January and April. The portocaval nodal target also decreased markedly but is reported separately and is not included in liver burden.",
+    "jan_to_aug_tumor_volume_change_pct": -72.7,
+    "jan_to_aug_burden_change_points": -7.04,
+    "independent_model_tumor_volume_ml": 55.54,
+    "bottom_line": "All automatic liver components, including the left-lobe segment II/III mass formerly mislabeled as a node, are included in liver burden. Automated volume is substantially lower in August, compatible with response, but exact lesion count and whole-tumor burden remain under expert reconciliation.",
     "viability_note": "CT attenuation and low-attenuation fractions are imaging proxies only. VNC correction and internal-reference normalization reduce contrast-delivery and hemodynamic bias, but portal-venous CT still cannot determine whether tumor cells are alive or establish true necrosis.",
-    "april_to_aug_tumor_volume_change_pct": -38.8,
-    "april_to_aug_burden_change_points": -1.19,
-    "best_working_inventory": "8 hepatic lesion groups plus 1 separate portocaval nodal target"
+    "april_to_aug_tumor_volume_change_pct": -52.3,
+    "april_to_aug_burden_change_points": -3.32,
+    "best_working_inventory": "Nine automatic hepatic components on the latest CT. Expert workstation screenshots show 15 manually segmented targets on a likely April study; exact target mapping requires the original DICOM SEG/RTSTRUCT export.",
+    "volume_uncertainty_note": "Independent automatic pipelines differ materially. Reported volumes are model estimates, not a clinical ground-truth contour.",
+    "portocaval_node_status": "A separate portocaval node is visible and described by the radiologist, but no reliable automated contour is included in the dashboard."
   },
   "components": [
     {
@@ -346,7 +352,7 @@
   "lesions": [
     {
       "lesion_id": "L01",
-      "reference_segment": null,
+      "reference_segment": "3/2",
       "measurements": {
         "2025-12-25": {
           "detected": true,
@@ -468,7 +474,7 @@
           "diameter_change_from_jan_pct": -48.8
         }
       },
-      "trend": "Marked automated decrease in the separate portocaval nodal target since January.",
+      "trend": "Marked automated decrease in the left-lobe hepatic mass since January. It was previously misclassified as a portocaval node; that label has been withdrawn.",
       "match_validation": {
         "2025-12-25__2026-01-19": {
           "decision": "provisional",
@@ -480,7 +486,7 @@
             "registered_dice_pct": 78.9,
             "smaller_mask_overlap_pct": 82.9,
             "centroid_distance_mm": 7.9,
-            "anatomy_consistency": "reference segment retained",
+            "anatomy_consistency": "overlapping segment assignment",
             "note": "Registered location and mask overlap support this correspondence."
           },
           "ai": {
@@ -502,7 +508,7 @@
             "registered_dice_pct": 62.5,
             "smaller_mask_overlap_pct": 98.2,
             "centroid_distance_mm": 7.0,
-            "anatomy_consistency": "reference segment retained",
+            "anatomy_consistency": "overlapping segment assignment",
             "note": "Registered location and mask overlap support this correspondence."
           },
           "ai": {
@@ -524,7 +530,7 @@
             "registered_dice_pct": 48.5,
             "smaller_mask_overlap_pct": 94.3,
             "centroid_distance_mm": 7.9,
-            "anatomy_consistency": "reference segment retained",
+            "anatomy_consistency": "overlapping segment assignment",
             "note": "Registered location and mask overlap support this correspondence."
           },
           "ai": {
@@ -542,8 +548,8 @@
           "clinical_ground_truth": false
         }
       },
-      "kind": "node",
-      "reference_label": "Portocaval nodal target"
+      "kind": "hepatic",
+      "reference_label": "Left-lobe hepatic mass (segments II/III)"
     },
     {
       "lesion_id": "L02",
@@ -591,8 +597,8 @@
           "segment": "8",
           "fragment_count": 1,
           "volume_ml": 37.621,
-          "long_mm": 47.5,
-          "short_mm": 12.1,
+          "long_mm": null,
+          "short_mm": null,
           "cc_mm": 54.0,
           "max3d_mm": 60.3,
           "pca_axes_mm": [
@@ -621,15 +627,18 @@
             "portal_vein": 9.0
           },
           "confidence": "moderate",
-          "match_basis": "registered liver-relative position, segment, morphology, and vessel topology"
+          "match_basis": "registered liver-relative position, segment, morphology, and vessel topology",
+          "original_automatic_long_mm": 47.5,
+          "original_automatic_short_mm": 12.1,
+          "caliper_status": "withheld: split/merged axial contour cannot support one lesion diameter"
         },
         "2026-08-23": {
           "detected": true,
           "segment": "8",
           "fragment_count": 2,
           "volume_ml": 25.08,
-          "long_mm": 36.0,
-          "short_mm": 27.6,
+          "long_mm": null,
+          "short_mm": null,
           "cc_mm": 42.0,
           "max3d_mm": 43.1,
           "pca_axes_mm": [
@@ -666,7 +675,10 @@
           },
           "confidence": "high",
           "volume_change_from_jan_pct": -40.0,
-          "diameter_change_from_jan_pct": -20.0
+          "diameter_change_from_jan_pct": -20.0,
+          "original_automatic_long_mm": 36.0,
+          "original_automatic_short_mm": 27.6,
+          "caliper_status": "withheld: split/merged axial contour cannot support one lesion diameter"
         }
       },
       "trend": "Automated volume decrease since January. The residual mask is split into 2 foci.",
@@ -991,8 +1003,8 @@
           "segment": "4/8",
           "fragment_count": 2,
           "volume_ml": 5.051,
-          "long_mm": 20.4,
-          "short_mm": 15.4,
+          "long_mm": null,
+          "short_mm": null,
           "cc_mm": 28.5,
           "max3d_mm": 29.0,
           "pca_axes_mm": [
@@ -1022,15 +1034,18 @@
           },
           "confidence": "moderate",
           "match_basis": "registered liver-relative position, segment, morphology, and vessel topology",
-          "tracking_note": "Two adjacent April components are treated as one historical lesion group (split/merge event)."
+          "tracking_note": "Two adjacent April components are treated as one historical lesion group (split/merge event).",
+          "original_automatic_long_mm": 20.4,
+          "original_automatic_short_mm": 15.4,
+          "caliper_status": "withheld: split/merged axial contour cannot support one lesion diameter"
         },
         "2026-08-23": {
           "detected": true,
           "segment": "4/5",
           "fragment_count": 2,
           "volume_ml": 1.956,
-          "long_mm": 16.0,
-          "short_mm": 12.3,
+          "long_mm": null,
+          "short_mm": null,
           "cc_mm": 15.0,
           "max3d_mm": 17.6,
           "pca_axes_mm": [
@@ -1067,7 +1082,10 @@
           },
           "confidence": "moderate",
           "volume_change_from_jan_pct": -17.6,
-          "diameter_change_from_jan_pct": -30.1
+          "diameter_change_from_jan_pct": -30.1,
+          "original_automatic_long_mm": 16.0,
+          "original_automatic_short_mm": 12.3,
+          "caliper_status": "withheld: split/merged axial contour cannot support one lesion diameter"
         }
       },
       "trend": "No large automated volume change. The residual mask is split into 2 foci.",
@@ -2158,7 +2176,7 @@
           "detected": false,
           "segment": "7",
           "fragment_count": 0,
-          "volume_ml": 0.0,
+          "volume_ml": null,
           "long_mm": null,
           "short_mm": null,
           "cc_mm": null,
@@ -2272,7 +2290,7 @@
           "detected": false,
           "segment": "6",
           "fragment_count": 0,
-          "volume_ml": 0.0,
+          "volume_ml": null,
           "long_mm": null,
           "short_mm": null,
           "cc_mm": null,
@@ -2386,7 +2404,7 @@
           "detected": false,
           "segment": "8",
           "fragment_count": 0,
-          "volume_ml": 0.0,
+          "volume_ml": null,
           "long_mm": null,
           "short_mm": null,
           "cc_mm": null,
@@ -2500,7 +2518,7 @@
           "detected": false,
           "segment": "4/5",
           "fragment_count": 0,
-          "volume_ml": 0.0,
+          "volume_ml": null,
           "long_mm": null,
           "short_mm": null,
           "cc_mm": null,
@@ -2614,7 +2632,7 @@
           "detected": false,
           "segment": "6",
           "fragment_count": 0,
-          "volume_ml": 0.0,
+          "volume_ml": null,
           "long_mm": null,
           "short_mm": null,
           "cc_mm": null,
@@ -2728,7 +2746,7 @@
           "detected": false,
           "segment": "2",
           "fragment_count": 0,
-          "volume_ml": 0.0,
+          "volume_ml": null,
           "long_mm": null,
           "short_mm": null,
           "cc_mm": null,
@@ -2842,7 +2860,7 @@
           "detected": false,
           "segment": "7",
           "fragment_count": 0,
-          "volume_ml": 0.0,
+          "volume_ml": null,
           "long_mm": null,
           "short_mm": null,
           "cc_mm": null,
@@ -2951,7 +2969,7 @@
         "reported_tumor_volume_ml": 166.82,
         "tracked_volume_ml": 166.57,
         "untracked_or_rounding_volume_ml": 0.25,
-        "reported_burden_pct": 9.78,
+        "reported_burden_pct": 9.776,
         "recomputed_burden_pct": 9.776,
         "arithmetic_check": "pass"
       },
@@ -2960,7 +2978,7 @@
         "reported_tumor_volume_ml": 170.34,
         "tracked_volume_ml": 170.328,
         "untracked_or_rounding_volume_ml": 0.012,
-        "reported_burden_pct": 10.22,
+        "reported_burden_pct": 10.218,
         "recomputed_burden_pct": 10.218,
         "arithmetic_check": "pass"
       },
@@ -2969,7 +2987,7 @@
         "reported_tumor_volume_ml": 97.64,
         "tracked_volume_ml": 97.638,
         "untracked_or_rounding_volume_ml": 0.002,
-        "reported_burden_pct": 6.49,
+        "reported_burden_pct": 6.492,
         "recomputed_burden_pct": 6.492,
         "arithmetic_check": "pass"
       },
@@ -2978,7 +2996,7 @@
         "reported_tumor_volume_ml": 46.56,
         "tracked_volume_ml": 46.478,
         "untracked_or_rounding_volume_ml": 0.082,
-        "reported_burden_pct": 3.17,
+        "reported_burden_pct": 3.173,
         "recomputed_burden_pct": 3.173,
         "arithmetic_check": "pass"
       }
@@ -2991,5 +3009,92 @@
     },
     "gate_policy": "Supported requires deterministic high-confidence correspondence plus an independent AI/reconstruction pass. Missing AI evidence is shown as provisional, never silently treated as passed.",
     "limitations": "Agreement between algorithms or reconstructions is not clinical ground truth. Every match, measurement and trend remains subject to radiologist source-image review."
+  },
+  "expert_reference": {
+    "source": "Two radiologist-workstation screenshots supplied 27 Aug 2026; identifiers and screenshots are not published.",
+    "study_date": "2026-04-26",
+    "study_date_confidence": "probable, not printed in the screenshot",
+    "date_basis": "The 37.17 cc dominant contour closely matches the 37.621 mL April segment VIII automatic contour, and the 105.77 cc total is closest to the independent April estimate.",
+    "target_count": 15,
+    "total_volume_cc": 105.77,
+    "targets": [
+      {
+        "label": "T1",
+        "volume_cc": 37.17,
+        "workstation_hu_display": "77.93 \u00b1 77.93 HU"
+      },
+      {
+        "label": "T2",
+        "volume_cc": 0.38,
+        "workstation_hu_display": "75.6 \u00b1 75.6 HU"
+      },
+      {
+        "label": "T3",
+        "volume_cc": 0.1,
+        "workstation_hu_display": "50.8 \u00b1 50.8 HU"
+      },
+      {
+        "label": "T4",
+        "volume_cc": 23.8,
+        "workstation_hu_display": "72.56 \u00b1 72.56 HU"
+      },
+      {
+        "label": "T5",
+        "volume_cc": 0.24,
+        "workstation_hu_display": "79.63 \u00b1 79.63 HU"
+      },
+      {
+        "label": "T6",
+        "volume_cc": 1.25,
+        "workstation_hu_display": "89.29 \u00b1 89.29 HU"
+      },
+      {
+        "label": "T7",
+        "volume_cc": 21.26,
+        "workstation_hu_display": "55.82 \u00b1 55.82 HU"
+      },
+      {
+        "label": "T8",
+        "volume_cc": 1.63,
+        "workstation_hu_display": "70.19 \u00b1 70.19 HU"
+      },
+      {
+        "label": "T9",
+        "volume_cc": 0.19,
+        "workstation_hu_display": "63 \u00b1 63 HU"
+      },
+      {
+        "label": "T10",
+        "volume_cc": 0.07,
+        "workstation_hu_display": "59.17 \u00b1 59.17 HU"
+      },
+      {
+        "label": "T11",
+        "volume_cc": 0.93,
+        "workstation_hu_display": "101.48 \u00b1 101.48 HU"
+      },
+      {
+        "label": "T12",
+        "volume_cc": 2.34,
+        "workstation_hu_display": "95.65 \u00b1 95.65 HU"
+      },
+      {
+        "label": "T13",
+        "volume_cc": 15.33,
+        "workstation_hu_display": "73.71 \u00b1 73.71 HU"
+      },
+      {
+        "label": "T14",
+        "volume_cc": 0.21,
+        "workstation_hu_display": "87.01 \u00b1 87.01 HU"
+      },
+      {
+        "label": "T15",
+        "volume_cc": 0.87,
+        "workstation_hu_display": "81.84 \u00b1 81.84 HU"
+      }
+    ],
+    "mapping_status": "The screenshots do not contain target names, DICOM coordinates, or an exported segmentation object. Individual T1\u2013T15 contours cannot be safely assigned to longitudinal lesion IDs from screenshots alone.",
+    "hu_warning": "Every displayed SD exactly repeats the mean, which is unlikely to be a valid standard deviation. These HU entries are transcribed for audit only and are not used for viability calculations."
   }
 }

@@ -58,9 +58,6 @@ function renderOverview() {
   const latest = data.studies.at(-1);
   const volumeChange = (second.tumor_volume_ml / first.tumor_volume_ml - 1) * 100;
   const burdenChange = second.tumor_burden_pct - first.tumor_burden_pct;
-  const node = data.lesions.find(row => row.kind === 'node');
-  const nodeFirst = node && measurement(node, fromDate);
-  const nodeSecond = node && measurement(node, toDate);
 
   document.querySelector('#heroBurden').textContent = data.ct_crosscheck.ct_hepatic_candidates;
   document.querySelector('#volumeDelta').textContent = 'QC only';
@@ -72,14 +69,14 @@ function renderOverview() {
   document.querySelector('#latestCount').textContent = data.ct_crosscheck.ct_hepatic_candidates;
   document.querySelector('#latestLiver').textContent = `${fmt(latest.liver_volume_ml, 1)} mL`;
   document.querySelector('#latestTumor').textContent = `${fmt(latest.tumor_volume_ml, 1)} mL`;
-  document.querySelector('#latestNode').textContent = latest.extrahepatic_target_volume_ml == null ? '—' : `${fmt(latest.extrahepatic_target_volume_ml, 1)} mL`;
+  document.querySelector('#latestNode').textContent = 'Not contoured';
 
   document.querySelector('#findings').innerHTML = `
-    <li><b>Known working inventory: 8 liver targets</b><p>This inventory is anchored to the near-date CT. The MRI model contours only some targets on each sequence; targets without a contour are not called absent.</p></li>
+    <li><b>Known automatic inventory: 9 liver targets</b><p>This inventory is anchored to the near-date CT. The MRI model contours only some targets on each sequence; targets without a contour are not called absent.</p></li>
     <li><b>Aggregate MRI “burden” withdrawn</b><p>The model outlined different portions of lesions on different dates, so ${fmt(first.tumor_volume_ml, 1)} to ${fmt(second.tumor_volume_ml, 1)} mL must not be interpreted as total disease-volume change.</p></li>
     <li><b>${matched} automatic contour tracks are present on both dates</b><p>Small or weakly overlapping regions are left unmatched rather than assigned to the wrong lesion.</p></li>
     <li><b>August contour agreement is only ${fmt(latest.repeat_dice, 3)}</b><p>The phase-4 and true-late MRI model outputs differ substantially. This is why automatic contour volume is now treated as quality-control data, not total tumor burden.</p></li>
-    <li><b>The nodal target is reported separately</b><p>${nodeFirst && nodeSecond ? `${fmt(nodeFirst.volume_ml, 1)} to ${fmt(nodeSecond.volume_ml, 1)} mL (${signed(change(nodeFirst, nodeSecond))}).` : 'It is not included in liver tumor burden.'}</p></li>`;
+    <li><b>The true portocaval node is not automatically contoured</b><p>The former automatic “node” was actually a partly exophytic left-lobe liver mass. The real node remains a separate specialist-review target.</p></li>`;
 
   const january = data.studies.find(item => item.date === '2026-01-22');
   const major = data.lesions.filter(row => row.kind !== 'node').slice(0, 2);
@@ -90,9 +87,9 @@ function renderOverview() {
   }).filter(Boolean).join(' · ');
   document.querySelector('#clinicalInterpretation').innerHTML = `
     <div><b>The direction is favorable, but the old MRI percentage was not defensible</b><p>The two dominant tracked regions are smaller (${trend}), but the aggregate automatic-mask decrease cannot be treated as the percentage of disease eliminated.</p></div>
-    <div><b>The extrahepatic nodal target also became much smaller</b><p>${node ? `Its automated volume changed from ${fmt(measurement(node, '2026-01-22')?.volume_ml, 1)} to ${fmt(measurement(node, '2026-08-26')?.volume_ml, 1)} mL.` : 'It is tracked outside the liver totals.'}</p></div>
+    <div><b>The old automatic node trend was withdrawn</b><p>That contour belongs to the segment II/III liver mass. The actual portocaval node does not yet have a reliable automatic contour in this dashboard.</p></div>
     <div><b>“Alive versus dead” cannot be reduced to one trustworthy percentage</b><p>The complete August DWI and ADC are now included. They add evidence about diffusion restriction, but size, enhancement, DWI, and ADC must be interpreted together and still do not directly measure living cells.</p></div>
-    <div class="caution"><b>Best working inventory: 8 liver targets, not 5</b><p>The near-date CT identifies 8 hepatic targets plus 1 separate nodal target. The number 5 describes automatic MRI contours only—not the number of lesions present.</p></div>`;
+    <div class="caution"><b>Best automatic CT inventory: 9 liver targets</b><p>The number of MRI contours is a model-output count, not the number of lesions present. Expert screenshots show additional manually separated targets that still require source segmentation export for exact mapping.</p></div>`;
 
   const cross = data.ct_crosscheck;
   document.querySelector('#ctLiverCount').textContent = cross.ct_hepatic_candidates;
@@ -193,11 +190,11 @@ document.querySelectorAll('.filter').forEach(button => button.addEventListener('
 document.querySelector('#search').addEventListener('input', render);
 document.querySelector('#fromStudy').addEventListener('change', updateDates);
 document.querySelector('#toStudy').addEventListener('change', updateDates);
-document.querySelector('#openCrosscheck').addEventListener('click', () => window.open('assets/ct-mri-crosscheck.png?v=4', '_blank', 'noopener'));
+document.querySelector('#openCrosscheck').addEventListener('click', () => window.open('assets/ct-mri-crosscheck.png?v=5', '_blank', 'noopener'));
 document.querySelector('#sharePdf').addEventListener('click', async () => {
   const status = document.querySelector('#shareStatus');
   try {
-    const response = await fetch('assets/Noa_Liver_MRI_Comparison.pdf?v=4');
+    const response = await fetch('assets/Noa_Liver_MRI_Comparison.pdf?v=5');
     const blob = await response.blob();
     const file = new File([blob], 'Noa_Liver_MRI_Comparison.pdf', {type: 'application/pdf'});
     if (navigator.canShare?.({files: [file]})) {
@@ -216,7 +213,7 @@ document.querySelector('#sharePdf').addEventListener('click', async () => {
   }
 });
 
-fetch('assets/report_data.json?v=4').then(response => response.json()).then(json => {
+fetch('assets/report_data.json?v=5').then(response => response.json()).then(json => {
   data = json;
   fromDate = data.studies[0].date;
   toDate = data.studies.at(-1).date;
