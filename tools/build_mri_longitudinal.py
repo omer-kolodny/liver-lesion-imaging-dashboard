@@ -149,7 +149,7 @@ def make_panel(track,date,studies,path):
         ax.set_title(title,color='white',fontsize=10);ax.set_xticks([]);ax.set_yticks([])
         for spine in ax.spines.values(): spine.set_edgecolor('#46305e')
     fig.suptitle(f'{track["id"]} · {LABELS[date]}',color='white',fontsize=16,fontweight='bold')
-    if item: fig.text(.5,.015,f'Locked axis {item["long_mm"]:.1f} mm × perpendicular {item["short_mm"]:.1f} mm · {item["volume_ml"]:.2f} mL · {track["segment_label"]}',ha='center',color='#c4b9d6',fontsize=9)
+    if item: fig.text(.5,.015,f'Automatic contour: axial diameter {item["long_mm"]:.1f} mm × perpendicular {item["short_mm"]:.1f} mm · {item["volume_ml"]:.2f} mL · {track["segment_label"]}',ha='center',color='#c4b9d6',fontsize=9)
     else: fig.text(.5,.015,'No accepted corresponding component on this examination',ha='center',color='#d8b6cd',fontsize=9)
     plt.subplots_adjust(left=.02,right=.98,top=.91,bottom=.06,wspace=.04,hspace=.12);fig.savefig(path,facecolor=fig.get_facecolor(),bbox_inches='tight');plt.close(fig)
     Image.open(path).convert('RGB').save(path.with_suffix('.webp'),'WEBP',quality=88,method=4)
@@ -163,26 +163,25 @@ def build_pdf(report):
     c.drawImage(ImageReader(str(ASSETS/'mri-hero.png')),w-380,85,330,330,preserveAspectRatio=True,mask='auto')
     y=h-205
     for study in report['studies']:
-        c.setFillColor(colors.HexColor('#241a3d'));c.roundRect(48,y-46,390,55,10,fill=1,stroke=0);c.setFillColor(colors.HexColor('#f35cc7'));c.setFont('Helvetica-Bold',10);c.drawString(62,y-10,study['label']);c.setFillColor(colors.white);c.setFont('Helvetica-Bold',12);c.drawString(62,y-29,f"{study['tumor_volume_ml']:.1f} mL · {study['tumor_burden_pct']:.2f}% burden · {study['lesion_count']} foci");y-=65
-    c.setFillColor(colors.HexColor('#f1c9e6'));c.setFont('Helvetica-Bold',9);c.drawString(48,62,'August DICOM completeness warning');c.setFillColor(colors.HexColor('#bdb5cf'));c.setFont('Helvetica',8);c.drawString(48,48,'The August file has a broken ZIP structure. Dynamic phases and T2 were recovered; DWI/ADC and the separate axial late series are absent from the exported bytes.')
+        c.setFillColor(colors.HexColor('#241a3d'));c.roundRect(48,y-46,390,55,10,fill=1,stroke=0);c.setFillColor(colors.HexColor('#f35cc7'));c.setFont('Helvetica-Bold',10);c.drawString(62,y-10,study['label']);c.setFillColor(colors.white);c.setFont('Helvetica-Bold',12);c.drawString(62,y-29,f"{study['tumor_volume_ml']:.1f} mL automatic mask · {study['lesion_count']} contours (QC only)");y-=65
+    c.setFillColor(colors.HexColor('#bff4dd'));c.setFont('Helvetica-Bold',9);c.drawString(48,62,'August DICOM source verified');c.setFillColor(colors.HexColor('#bdb5cf'));c.setFont('Helvetica',8);c.drawString(48,48,'The replacement archive passed ZIP integrity checks and includes late T1, DWI b=800, ADC, T2 fat-sat, and all four dynamic phases.')
     foot(1);c.showPage()
-    bg();c.setFillColor(colors.white);c.setFont('Helvetica-Bold',24);c.drawString(38,h-68,'Latest CT–MRI cross-check');c.setFillColor(colors.HexColor('#aaa2c0'));c.setFont('Helvetica',9);c.drawString(38,h-86,'23 Aug CT targets registered onto 26 Aug MRI · cyan = CT reference · pink = accepted MRI mask')
+    bg();c.setFillColor(colors.white);c.setFont('Helvetica-Bold',24);c.drawString(38,h-68,'Latest CT–MRI cross-check');c.setFillColor(colors.HexColor('#aaa2c0'));c.setFont('Helvetica',9);c.drawString(38,h-86,'23 Aug CT targets registered onto complete 26 Aug MRI · colored contours show sequence-specific automatic support')
     cross_image=ASSETS/'ct-mri-crosscheck.png'
     if cross_image.exists():c.drawImage(ImageReader(str(cross_image)),38,78,w-76,h-185,preserveAspectRatio=True,anchor='c',mask='auto')
-    c.setFillColor(colors.HexColor('#f1c9e6'));c.setFont('Helvetica-Bold',9);c.drawString(40,58,'Working inventory: 8 CT liver candidates + 1 separate extrahepatic nodal target. MRI automatically outlines 5 liver foci; non-detection is not disappearance.')
+    c.setFillColor(colors.HexColor('#f1c9e6'));c.setFont('Helvetica-Bold',9);c.drawString(40,58,'Working inventory: 8 CT-anchored liver targets + 1 separate extrahepatic nodal target. Automatic MRI contour count is not lesion count.')
     foot(2);c.showPage();page_num=3
-    for track in report['lesions']:
-        bg();c.setFillColor(colors.white);c.setFont('Helvetica-Bold',22);c.drawString(35,h-66,f"{track['id']} · {track['segment_label']}");c.setFillColor(colors.HexColor('#aaa2c0'));c.setFont('Helvetica',8);c.drawString(35,h-83,'Matched conservatively through sequential rigid registration; weak tiny-focus associations are not forced.')
-        c.drawImage(ImageReader(str(PANELS/f"{track['id']}_{DATES[0]}.png")),32,125,375,350,preserveAspectRatio=True,anchor='c',mask='auto');c.drawImage(ImageReader(str(PANELS/f"{track['id']}_{DATES[-1]}.png")),430,125,375,350,preserveAspectRatio=True,anchor='c',mask='auto')
-        y=110;c.setFillColor(colors.HexColor('#f35cc7'));c.setFont('Helvetica-Bold',9);c.drawString(42,y,'DATE');c.drawString(155,y,'VOLUME');c.drawString(240,y,'LOCKED AXES');c.drawString(365,y,'ADC');c.drawString(465,y,'DWI/LIVER');c.drawString(560,y,'REPEAT DICE');c.drawString(670,y,'MATCH')
-        y-=15
-        for date in DATES:
-            item=track['measurements'].get(date);validation=track['validation'].get(date,{});pair=track['pair_evidence'].get(date,{})
-            c.setFillColor(colors.HexColor('#d8d1e4'));c.setFont('Helvetica',8);c.drawString(42,y,LABELS[date]);
-            if item:
-                c.drawString(155,y,f"{item['volume_ml']:.2f} mL");c.drawString(240,y,f"{item['long_mm']:.1f} × {item['short_mm']:.1f} mm");c.drawString(365,y,safe(item['features']['adc_median'],2));c.drawString(465,y,safe(item['features']['dwi_b800']['ratio'],2));c.drawString(560,y,safe(validation.get('dice'),3));c.drawString(670,y,safe(pair.get('registered_dice'),3))
-            else:c.drawString(155,y,'No accepted component')
-            y-=14
+    for target in report.get('ct_crosscheck', {}).get('targets', []):
+        bg();c.setFillColor(colors.white);c.setFont('Helvetica-Bold',22)
+        target_label = 'Portocaval nodal target' if target['kind'] == 'node' else f"Liver target · segment {target['ct_segment']}"
+        c.drawString(35,h-66,f"{target['id']} · {target_label}")
+        c.setFillColor(colors.HexColor('#aaa2c0'));c.setFont('Helvetica',9)
+        c.drawString(35,h-84,'Cyan is the near-date CT target projected into MRI space. It preserves lesion identity but is not an MRI-derived boundary.')
+        panel_path=ASSETS/'targets'/f"{target['id']}_2026-08-26.png"
+        if panel_path.exists():c.drawImage(ImageReader(str(panel_path)),32,112,w-64,h-220,preserveAspectRatio=True,anchor='c',mask='auto')
+        c.setFillColor(colors.HexColor('#f35cc7'));c.setFont('Helvetica-Bold',10);c.drawString(42,92,f"Automatic MRI support: {', '.join(target['supported_by_sequences']) or 'none confidently established'}")
+        c.setFillColor(colors.HexColor('#d8d1e4'));c.setFont('Helvetica',9);c.drawString(42,75,f"Near-date CT anchor volume: {target['ct_volume_ml']:.2f} mL · Status: {target['status']}")
+        c.setFillColor(colors.HexColor('#f1c9e6'));c.setFont('Helvetica',8);c.drawString(42,59,'No MRI caliper is reported where the whole-lesion boundary is not confidently established. This prevents a partial core from being mislabeled as total lesion size.')
         foot(page_num);c.showPage();page_num+=1
     c.save()
 
@@ -206,7 +205,6 @@ def main():
     tracks=[];mapping={}
     for i,comp in enumerate(component_sets[DATES[0]]):
         track={'id':'','kind':'hepatic','measurements':{},'component_indices':{DATES[0]:i},'pair_evidence':{},'validation':{},'display_centers':{}}
-        track['locked_direction']=json_measurement(comp,studies[DATES[0]]['image'],studies[DATES[0]]['segments'],studies[DATES[0]]['volumes'],studies[DATES[0]]['liver'])['extent']['direction']
         tracks.append(track);mapping[i]=len(tracks)-1
     for first,second in zip(DATES,DATES[1:]):
         accepted,evidence,registered=match_components(component_sets[first],component_sets[second],transforms[(first,second)],first,second,studies);next_mapping={};used=set()
@@ -216,7 +214,6 @@ def main():
         for new_i,comp in enumerate(component_sets[second]):
             if new_i in used: continue
             track={'id':'','kind':'hepatic','measurements':{},'component_indices':{second:new_i},'pair_evidence':{},'validation':{},'display_centers':{}}
-            track['locked_direction']=json_measurement(comp,studies[second]['image'],studies[second]['segments'],studies[second]['volumes'],studies[second]['liver'])['extent']['direction']
             tracks.append(track);next_mapping[new_i]=len(tracks)-1
         mapping=next_mapping
     # A lesion can fall below the separate-component threshold at an intervening
@@ -242,7 +239,7 @@ def main():
     for number,track in enumerate(tracks,1):
         track['id']=f'M{number:02d}';segments_seen=[]
         for date,index in track['component_indices'].items():
-            comp=component_sets[date][index];measurement=json_measurement(comp,studies[date]['image'],studies[date]['segments'],studies[date]['volumes'],studies[date]['liver'],np.asarray(track['locked_direction']));track['measurements'][date]=measurement;track['validation'][date]=repeat_validation(comp,repeat_sets[date]);track['display_centers'][date]=measurement['centroid_index'];
+            comp=component_sets[date][index];measurement=json_measurement(comp,studies[date]['image'],studies[date]['segments'],studies[date]['volumes'],studies[date]['liver']);track['measurements'][date]=measurement;track['validation'][date]=repeat_validation(comp,repeat_sets[date]);track['display_centers'][date]=measurement['centroid_index'];
             if measurement['segment']:segments_seen.append(measurement['segment'])
         track['segment_label']=' / '.join(f'S{x}' for x in dict.fromkeys(segments_seen)) if segments_seen else 'Unassigned'
         # For missing dates, use the nearest observed normalized anatomical position for a consistent placeholder crop.
@@ -256,9 +253,8 @@ def main():
     if all(node_sets.get(date) is not None for date in DATES):
         first_node=node_sets[DATES[0]]
         node_track={'id':'N01','kind':'node','measurements':{},'component_indices':{},'pair_evidence':{},'validation':{},'display_centers':{},'segment_label':'Extrahepatic nodal target'}
-        node_track['locked_direction']=json_measurement(first_node,studies[DATES[0]]['image'],studies[DATES[0]]['segments'],studies[DATES[0]]['volumes'],studies[DATES[0]]['liver'])['extent']['direction']
         for date in DATES:
-            comp=node_sets[date];measurement=json_measurement(comp,studies[date]['image'],studies[date]['segments'],studies[date]['volumes'],studies[date]['liver'],np.asarray(node_track['locked_direction']))
+            comp=node_sets[date];measurement=json_measurement(comp,studies[date]['image'],studies[date]['segments'],studies[date]['volumes'],studies[date]['liver'])
             measurement['segment']=None;node_track['measurements'][date]=measurement;node_track['display_centers'][date]=measurement['centroid_index'];node_track['validation'][date]=repeat_validation(comp,node_repeat_sets[date])
         for first,second in zip(DATES,DATES[1:]):
             registered=resample_component(node_sets[first],first,second,transforms[(first,second)],studies)
@@ -270,11 +266,13 @@ def main():
     latest_map={index:track['id'] for track in tracks if track.get('kind')=='hepatic' for date,index in track['component_indices'].items() if date==DATES[-1]}
     build_3d(studies[DATES[-1]],component_sets[DATES[-1]],latest_map);render_hero(studies[DATES[-1]],component_sets[DATES[-1]],ASSETS/'mri-hero.png')
     registration_quality['2026-01-22__2026-08-26_direct']=0.9158872635353855
-    crosscheck={'ct_date':'2026-08-23','mri_date':'2026-08-26','registration_liver_dice':0.853,'ct_hepatic_candidates':8,'ct_extrahepatic_targets':1,'mri_hepatic_foci':summaries[-1]['lesion_count'],'confirmed_mask_matches':3,'unresolved_small_mri_foci':2,'ct_locations_without_accepted_mri_mask':5,'note':'The CT-defined count is the more defensible working lesion inventory. MRI non-detection does not establish disappearance; the August MRI export lacks DWI/ADC and some small targets are difficult to separate.'}
-    report={'generated':'2026-08-27','modality':'MRI','dates':list(DATES),'studies':summaries,'summary':{'accepted_end_to_end':sum(1 for t in tracks if t.get('kind')=='hepatic' and DATES[0] in t['measurements'] and DATES[-1] in t['measurements']),'total_hepatic_tracks':sum(1 for t in tracks if t.get('kind')=='hepatic'),'extrahepatic_tracks':sum(1 for t in tracks if t.get('kind')=='node'),'registration_quality':registration_quality,'volume_change_pct':(summaries[-1]['tumor_volume_ml']/summaries[0]['tumor_volume_ml']-1)*100,'burden_change_pp':summaries[-1]['tumor_burden_pct']-summaries[0]['tumor_burden_pct']},'ct_crosscheck':crosscheck,'lesions':tracks,'limitations':['Automated research visualization; radiologist verification is required.','Liver-only counts and burden exclude the separately tracked extrahepatic nodal target and tiny off-liver model detections.','The August portal ZIP is structurally truncated. Dynamic phases and T2 are available; DWI/ADC and the separate axial late series are absent from the export. Dynamic phase 4 is used for August morphology.','MRI signal is not absolute and is normalized to background liver.','ADC and low-signal fractions are exploratory proxies, not direct tumor-viability or necrosis measurements.','Dynamic enhancement depends on acquisition timing, contrast delivery and patient hemodynamics.','Tiny lesions with weak registered overlap are not forced into longitudinal matches.']}
+    audit_path=ASSETS/'ct_mri_audit.json';audit=json.loads(audit_path.read_text()) if audit_path.exists() else {}
+    supported=audit.get('automatic_mri_supported_hepatic_targets',0)
+    crosscheck={'ct_date':'2026-08-23','mri_date':'2026-08-26','registration_liver_dice':0.853,'ct_hepatic_candidates':8,'ct_extrahepatic_targets':1,'mri_hepatic_foci':summaries[-1]['lesion_count'],'confirmed_mask_matches':supported,'automatic_mri_supported_hepatic_targets':supported,'unresolved_small_mri_foci':None,'ct_locations_without_accepted_mri_mask':8-supported,'targets':audit.get('targets',[]),'note':'Eight CT-anchored liver targets remain the working inventory. Automatic contours support only some targets on individual MRI sequences; this is a segmentation-quality result, not a lesion count. True late T1, DWI, ADC, T2 and phase-4 images are included.'}
+    report={'generated':'2026-08-27','modality':'MRI','dates':list(DATES),'studies':summaries,'summary':{'accepted_end_to_end':sum(1 for t in tracks if t.get('kind')=='hepatic' and DATES[0] in t['measurements'] and DATES[-1] in t['measurements']),'total_hepatic_tracks':sum(1 for t in tracks if t.get('kind')=='hepatic'),'extrahepatic_tracks':sum(1 for t in tracks if t.get('kind')=='node'),'registration_quality':registration_quality,'volume_change_pct':(summaries[-1]['tumor_volume_ml']/summaries[0]['tumor_volume_ml']-1)*100,'burden_change_pp':summaries[-1]['tumor_burden_pct']-summaries[0]['tumor_burden_pct']},'ct_crosscheck':crosscheck,'lesions':tracks,'limitations':['Automated research visualization; radiologist verification is required.','The working inventory is 8 CT-anchored hepatic targets plus 1 separate nodal target. Automatic MRI contour count is not lesion count.','Aggregate automatic-mask volume is quality-control information and must not be treated as total MRI disease burden.','The complete August archive was verified and includes true late T1, DWI b=800, ADC, T2 fat-sat, and all four dynamic phases.','August primary contours were generated on dynamic phase 4 and cross-checked against a separate run on true late T1; agreement tests sequence sensitivity, not clinical correctness.','MRI signal is not absolute and is normalized to background liver.','ADC and low-signal fractions are exploratory proxies, not direct tumor-viability or necrosis measurements.','Dynamic enhancement depends on acquisition timing, contrast delivery and patient hemodynamics.','Tiny lesions with weak registered overlap are not forced into longitudinal matches.']}
     public=strip_arrays(report);(ASSETS/'report_data.json').write_text(json.dumps(public,indent=2))
     with (ASSETS/'lesion_metrics.csv').open('w',newline='') as stream:
-        writer=csv.writer(stream);writer.writerow(['track','date','segment','volume_ml','long_mm','short_mm','adc','low_adc_pct','dwi_liver','t2_liver','repeat_dice','registered_dice'])
+        writer=csv.writer(stream);writer.writerow(['track','date','segment','automatic_mask_volume_ml','automatic_long_mm','automatic_short_mm','adc','low_adc_pct','dwi_liver','t2_liver','secondary_sequence_dice','registered_dice'])
         for track in tracks:
             for date,item in track['measurements'].items():writer.writerow([track['id'],date,item['segment'],item['volume_ml'],item['long_mm'],item['short_mm'],item['features']['adc_median'],item['features']['low_adc_fraction_pct'],item['features']['dwi_b800']['ratio'],item['features']['t2_fatsat']['ratio'],track['validation'][date]['dice'],track['pair_evidence'].get(date,{}).get('registered_dice')])
     build_pdf(public);print(json.dumps({'studies':summaries,'tracks':len(tracks),'registration':registration_quality},indent=2))

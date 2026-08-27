@@ -46,7 +46,7 @@ function renderTimeline() {
   to.value = toDate;
   document.querySelector('#timelineTrack').innerHTML = data.studies.map((study, index) => `
     <div class="timeline-point ${[fromDate, toDate].includes(study.date) ? 'selected' : ''} ${index === data.studies.length - 1 ? 'latest' : ''}">
-      <span>${index + 1}</span><b>${study.label}</b><small>${fmt(study.tumor_burden_pct, 2)}% liver-only burden</small>
+      <span>${index + 1}</span><b>${study.label}</b><small>${study.lesion_count} automatic contours</small>
     </div>`).join('');
 }
 
@@ -62,22 +62,23 @@ function renderOverview() {
   const nodeFirst = node && measurement(node, fromDate);
   const nodeSecond = node && measurement(node, toDate);
 
-  document.querySelector('#heroBurden').textContent = `${fmt(latest.tumor_burden_pct, 2)}%`;
-  document.querySelector('#volumeDelta').textContent = signed(volumeChange);
-  document.querySelector('#volumeValues').textContent = `${fmt(first.tumor_volume_ml, 2)} → ${fmt(second.tumor_volume_ml, 2)} mL`;
-  document.querySelector('#burdenDelta').textContent = signed(burdenChange, ' pp');
-  document.querySelector('#burdenValues').textContent = `${fmt(first.tumor_burden_pct, 2)}% → ${fmt(second.tumor_burden_pct, 2)}%`;
+  document.querySelector('#heroBurden').textContent = data.ct_crosscheck.ct_hepatic_candidates;
+  document.querySelector('#volumeDelta').textContent = 'QC only';
+  document.querySelector('#volumeValues').textContent = `${fmt(first.tumor_volume_ml, 2)} → ${fmt(second.tumor_volume_ml, 2)} mL automatically contoured`;
+  document.querySelector('#burdenDelta').textContent = 'Not valid';
+  document.querySelector('#burdenValues').textContent = 'MRI contour fraction is not total disease burden';
   document.querySelector('#matchCount').textContent = `${matched} / ${hepaticRows.length}`;
   document.querySelector('#repeatDice').textContent = `${fmt(first.repeat_dice, 3)} / ${fmt(second.repeat_dice, 3)}`;
-  document.querySelector('#latestCount').textContent = latest.lesion_count;
+  document.querySelector('#latestCount').textContent = data.ct_crosscheck.ct_hepatic_candidates;
   document.querySelector('#latestLiver').textContent = `${fmt(latest.liver_volume_ml, 1)} mL`;
   document.querySelector('#latestTumor').textContent = `${fmt(latest.tumor_volume_ml, 1)} mL`;
   document.querySelector('#latestNode').textContent = latest.extrahepatic_target_volume_ml == null ? '—' : `${fmt(latest.extrahepatic_target_volume_ml, 1)} mL`;
 
   document.querySelector('#findings').innerHTML = `
-    <li><b>Liver-focus volume changed ${signed(volumeChange)}</b><p>${fmt(first.tumor_volume_ml, 1)} to ${fmt(second.tumor_volume_ml, 1)} mL. The nodal target and off-liver false detections are excluded.</p></li>
-    <li><b>Liver-only burden changed ${signed(burdenChange, ' percentage points')}</b><p>${fmt(first.tumor_burden_pct, 2)}% to ${fmt(second.tumor_burden_pct, 2)}% of automated liver volume.</p></li>
-    <li><b>${matched} liver-focus tracks are present on both dates</b><p>Small or weakly overlapping foci are left unmatched rather than assigned to the wrong lesion.</p></li>
+    <li><b>Known working inventory: 8 liver targets</b><p>This inventory is anchored to the near-date CT. The MRI model contours only some targets on each sequence; targets without a contour are not called absent.</p></li>
+    <li><b>Aggregate MRI “burden” withdrawn</b><p>The model outlined different portions of lesions on different dates, so ${fmt(first.tumor_volume_ml, 1)} to ${fmt(second.tumor_volume_ml, 1)} mL must not be interpreted as total disease-volume change.</p></li>
+    <li><b>${matched} automatic contour tracks are present on both dates</b><p>Small or weakly overlapping regions are left unmatched rather than assigned to the wrong lesion.</p></li>
+    <li><b>August contour agreement is only ${fmt(latest.repeat_dice, 3)}</b><p>The phase-4 and true-late MRI model outputs differ substantially. This is why automatic contour volume is now treated as quality-control data, not total tumor burden.</p></li>
     <li><b>The nodal target is reported separately</b><p>${nodeFirst && nodeSecond ? `${fmt(nodeFirst.volume_ml, 1)} to ${fmt(nodeSecond.volume_ml, 1)} mL (${signed(change(nodeFirst, nodeSecond))}).` : 'It is not included in liver tumor burden.'}</p></li>`;
 
   const january = data.studies.find(item => item.date === '2026-01-22');
@@ -88,16 +89,23 @@ function renderOverview() {
     return jan && aug ? `${row.id}: ${signed(change(jan, aug))}` : null;
   }).filter(Boolean).join(' · ');
   document.querySelector('#clinicalInterpretation').innerHTML = `
-    <div><b>Much less visible disease, but not zero</b><p>From the January peak to August, MRI-visible liver-focus volume fell ${Math.abs((latest.tumor_volume_ml / january.tumor_volume_ml - 1) * 100).toFixed(1)}%. The two dominant tracked liver foci changed ${trend}.</p></div>
+    <div><b>The direction is favorable, but the old MRI percentage was not defensible</b><p>The two dominant tracked regions are smaller (${trend}), but the aggregate automatic-mask decrease cannot be treated as the percentage of disease eliminated.</p></div>
     <div><b>The extrahepatic nodal target also became much smaller</b><p>${node ? `Its automated volume changed from ${fmt(measurement(node, '2026-01-22')?.volume_ml, 1)} to ${fmt(measurement(node, '2026-08-26')?.volume_ml, 1)} mL.` : 'It is tracked outside the liver totals.'}</p></div>
-    <div><b>Latest “alive versus dead” cannot be calculated reliably</b><p>The August export is missing DWI and ADC. Size reduction and lower late-phase signal support treatment effect, but they cannot provide a trustworthy live-tumor or necrosis percentage.</p></div>
-    <div class="caution"><b>Best working inventory: 8 liver lesions, not 5</b><p>The latest CT identifies 8 hepatic candidates plus 1 separate nodal target. MRI automation outlines 5 liver foci; several small CT lesions are not automatically outlined on MRI and must not be called disappeared.</p></div>`;
+    <div><b>“Alive versus dead” cannot be reduced to one trustworthy percentage</b><p>The complete August DWI and ADC are now included. They add evidence about diffusion restriction, but size, enhancement, DWI, and ADC must be interpreted together and still do not directly measure living cells.</p></div>
+    <div class="caution"><b>Best working inventory: 8 liver targets, not 5</b><p>The near-date CT identifies 8 hepatic targets plus 1 separate nodal target. The number 5 describes automatic MRI contours only—not the number of lesions present.</p></div>`;
 
   const cross = data.ct_crosscheck;
   document.querySelector('#ctLiverCount').textContent = cross.ct_hepatic_candidates;
   document.querySelector('#mriLiverCount').textContent = cross.mri_hepatic_foci;
-  document.querySelector('#confirmedCrossMatches').textContent = cross.confirmed_mask_matches;
+  document.querySelector('#confirmedCrossMatches').textContent = cross.automatic_mri_supported_hepatic_targets ?? cross.confirmed_mask_matches;
   document.querySelector('#crosscheckNote').textContent = cross.note;
+  const targetGrid = document.querySelector('#ctTargetGrid');
+  if (targetGrid) targetGrid.innerHTML = (cross.targets || []).map(target => `
+    <button class="target-card" type="button" data-panel="${target.panel}">
+      <img loading="lazy" src="${target.panel}" alt="${target.id} complete August multiparametric MRI review">
+      <span><b>${target.id} · ${target.kind === 'node' ? 'Portocaval node' : `Segment ${target.ct_segment}`}</b><em>${target.status}</em><small>CT anchor ${fmt(target.ct_volume_ml, 2)} mL · MRI support: ${target.supported_by_sequences.join(', ') || 'no confident automatic contour'}</small></span>
+    </button>`).join('');
+  targetGrid?.querySelectorAll('.target-card').forEach(button => button.addEventListener('click', () => window.open(button.dataset.panel.replace('.webp', '.png'), '_blank', 'noopener')));
 }
 
 function panel(row, date) {
@@ -111,7 +119,7 @@ function card(row) {
   return `<article class="lesion-card" data-id="${row.id}">
     <div class="card-pair"><img loading="lazy" src="${panel(row, fromDate)}" alt="${row.id} ${dateLabel(fromDate)}"><img loading="lazy" src="${panel(row, toDate)}" alt="${row.id} ${dateLabel(toDate)}"></div>
     <div class="lesion-body"><div class="lesion-top"><h3>${row.id} · ${row.segment_label}</h3><span class="status ${state.cls}">${state.label}</span></div>
-    <div class="lesion-metrics"><div><span>Volume</span><b>${metric(first, 'volume')} → ${metric(second, 'volume')}</b></div><div><span>Locked axes</span><b>${metric(first, 'size')} → ${metric(second, 'size')}</b></div><div><span>ADC median</span><b>${metric(first, 'adc')} → ${metric(second, 'adc')}</b></div><div><span>Volume change</span><b>${signed(change(first, second))}</b></div></div></div>
+    <div class="lesion-metrics"><div><span>Auto-mask volume</span><b>${metric(first, 'volume')} → ${metric(second, 'volume')}</b></div><div><span>Auto-mask axes</span><b>${metric(first, 'size')} → ${metric(second, 'size')}</b></div><div><span>ADC median</span><b>${metric(first, 'adc')} → ${metric(second, 'adc')}</b></div><div><span>Mask-volume change</span><b>${signed(change(first, second))}</b></div></div></div>
   </article>`;
 }
 
@@ -129,7 +137,7 @@ function render() {
 function metricRows(item) {
   if (!item) return '<div><span>Status</span><b>No accepted corresponding focus</b></div>';
   const features = item.features;
-  return `<div><span>Locked axis × perpendicular</span><b>${fmt(item.long_mm)} × ${fmt(item.short_mm)} mm</b></div>
+  return `<div><span>Longest axial × perpendicular</span><b>${fmt(item.long_mm)} × ${fmt(item.short_mm)} mm</b></div>
     <div><span>3D dimensions</span><b>${item.dimensions_3d_mm.map(value => fmt(value)).join(' × ')} mm</b></div>
     <div><span>Volume</span><b>${fmt(item.volume_ml, 2)} mL</b></div>
     <div><span>ADC median</span><b>${features.adc_median == null ? 'Not available' : fmt(features.adc_median, 2) + ' ×10⁻³ mm²/s'}</b></div>
@@ -147,12 +155,12 @@ function openLesion(row) {
   const timeline = data.studies.map(study => {
     const item = measurement(row, study.date);
     const validation = row.validation[study.date] || {};
-    return `<div><span>${study.label}</span><b>${item ? fmt(item.volume_ml, 2) + ' mL' : 'No accepted match'}</b><small>${item ? fmt(item.long_mm) + ' × ' + fmt(item.short_mm) + ' mm · repeat Dice ' + fmt(validation.dice, 3) : '—'}</small></div>`;
+    return `<div><span>${study.label}</span><b>${item ? fmt(item.volume_ml, 2) + ' mL automatic mask' : 'No accepted match'}</b><small>${item ? fmt(item.long_mm) + ' × ' + fmt(item.short_mm) + ' mm · secondary-input Dice ' + fmt(validation.dice, 3) : '—'}</small></div>`;
   }).join('');
   content.innerHTML = `<div class="dialog-inner"><div class="dialog-header"><div><div class="eyebrow">${row.kind === 'node' ? 'Registered extrahepatic target' : 'Registered MRI liver-focus track'}</div><h2>${row.id} · ${row.segment_label}</h2></div><span class="status ${classification(row).cls}">${classification(row).label}</span></div>
     <div class="full-pair"><img src="${panel(row, fromDate)}" alt="${row.id} ${dateLabel(fromDate)}"><img src="${panel(row, toDate)}" alt="${row.id} ${dateLabel(toDate)}"></div>
     <div class="validation-grid"><div class="validation-box"><h3>${dateLabel(fromDate)}</h3><div class="dialog-stats">${metricRows(first)}</div></div><div class="validation-box"><h3>${dateLabel(toDate)}</h3><div class="dialog-stats">${metricRows(second)}</div></div></div>
-    <div class="trend-grid">${timeline}</div><p class="dialog-note">The pink and blue calipers use the same locked physical directions across examinations and terminate at the segmented boundary. ADC, DWI/T2 ratios, and low late-signal fractions are imaging clues—not direct percentages of live tumor or necrosis. August DWI/ADC are absent from the exported ZIP.</p></div>`;
+    <div class="trend-grid">${timeline}</div><p class="dialog-note">The pink line is the longest axial boundary-to-boundary diameter on that examination; the blue line is perpendicular. Its angle may change as lesion shape or patient position changes. ADC, DWI/T2 ratios, and low late-signal fractions are imaging clues—not direct percentages of live tumor or necrosis. The complete August DWI/ADC series are included.</p></div>`;
   dialog.showModal();
 }
 
@@ -185,11 +193,11 @@ document.querySelectorAll('.filter').forEach(button => button.addEventListener('
 document.querySelector('#search').addEventListener('input', render);
 document.querySelector('#fromStudy').addEventListener('change', updateDates);
 document.querySelector('#toStudy').addEventListener('change', updateDates);
-document.querySelector('#openCrosscheck').addEventListener('click', () => window.open('assets/ct-mri-crosscheck.png', '_blank', 'noopener'));
+document.querySelector('#openCrosscheck').addEventListener('click', () => window.open('assets/ct-mri-crosscheck.png?v=4', '_blank', 'noopener'));
 document.querySelector('#sharePdf').addEventListener('click', async () => {
   const status = document.querySelector('#shareStatus');
   try {
-    const response = await fetch('assets/Noa_Liver_MRI_Comparison.pdf?v=2');
+    const response = await fetch('assets/Noa_Liver_MRI_Comparison.pdf?v=4');
     const blob = await response.blob();
     const file = new File([blob], 'Noa_Liver_MRI_Comparison.pdf', {type: 'application/pdf'});
     if (navigator.canShare?.({files: [file]})) {
@@ -208,7 +216,7 @@ document.querySelector('#sharePdf').addEventListener('click', async () => {
   }
 });
 
-fetch('assets/report_data.json?v=2').then(response => response.json()).then(json => {
+fetch('assets/report_data.json?v=4').then(response => response.json()).then(json => {
   data = json;
   fromDate = data.studies[0].date;
   toDate = data.studies.at(-1).date;

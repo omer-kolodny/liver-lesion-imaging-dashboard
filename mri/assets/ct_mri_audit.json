@@ -1,0 +1,101 @@
+{
+  "ct_hepatic_targets": 8,
+  "extrahepatic_targets": 1,
+  "automatic_mri_supported_hepatic_targets": 4,
+  "targets": [
+    {
+      "id": "H01",
+      "kind": "hepatic",
+      "ct_segment": "8",
+      "ct_volume_ml": 23.826,
+      "supported_by_sequences": [
+        "P4"
+      ],
+      "status": "single-sequence support",
+      "panel": "assets/targets/H01_2026-08-26.webp"
+    },
+    {
+      "id": "N01",
+      "kind": "node",
+      "ct_segment": "3/2",
+      "ct_volume_ml": 16.361,
+      "supported_by_sequences": [
+        "P4",
+        "Late"
+      ],
+      "status": "multi-sequence supported",
+      "panel": "assets/targets/N01_2026-08-26.webp"
+    },
+    {
+      "id": "H02",
+      "kind": "hepatic",
+      "ct_segment": "5/8",
+      "ct_volume_ml": 2.058,
+      "supported_by_sequences": [
+        "Late"
+      ],
+      "status": "single-sequence support",
+      "panel": "assets/targets/H02_2026-08-26.webp"
+    },
+    {
+      "id": "H03",
+      "kind": "hepatic",
+      "ct_segment": "7",
+      "ct_volume_ml": 1.588,
+      "supported_by_sequences": [
+        "P4",
+        "Late",
+        "T2"
+      ],
+      "status": "multi-sequence supported",
+      "panel": "assets/targets/H03_2026-08-26.webp"
+    },
+    {
+      "id": "H04",
+      "kind": "hepatic",
+      "ct_segment": "1",
+      "ct_volume_ml": 1.182,
+      "supported_by_sequences": [
+        "P4"
+      ],
+      "status": "single-sequence support",
+      "panel": "assets/targets/H04_2026-08-26.webp"
+    },
+    {
+      "id": "H05",
+      "kind": "hepatic",
+      "ct_segment": "6",
+      "ct_volume_ml": 0.347,
+      "supported_by_sequences": [],
+      "status": "not confidently contoured",
+      "panel": "assets/targets/H05_2026-08-26.webp"
+    },
+    {
+      "id": "H06",
+      "kind": "hepatic",
+      "ct_segment": "5",
+      "ct_volume_ml": 0.207,
+      "supported_by_sequences": [],
+      "status": "not confidently contoured",
+      "panel": "assets/targets/H06_2026-08-26.webp"
+    },
+    {
+      "id": "H07",
+      "kind": "hepatic",
+      "ct_segment": "8",
+      "ct_volume_ml": 0.123,
+      "supported_by_sequences": [],
+      "status": "not confidently contoured",
+      "panel": "assets/targets/H07_2026-08-26.webp"
+    },
+    {
+      "id": "H08",
+      "kind": "hepatic",
+      "ct_segment": "5",
+      "ct_volume_ml": 0.079,
+      "supported_by_sequences": [],
+      "status": "not confidently contoured",
+      "panel": "assets/targets/H08_2026-08-26.webp"
+    }
+  ]
+}

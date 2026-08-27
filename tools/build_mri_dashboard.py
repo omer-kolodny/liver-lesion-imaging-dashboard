@@ -97,31 +97,43 @@ def world_distance(first: Component, second: Component) -> float:
 
 
 def mask_extent(mask: np.ndarray, spacing: np.ndarray, direction_xy: np.ndarray | None = None) -> dict:
-    """Measure an axial lesion using reproducible, boundary-anchored axes.
+    """Measure the longest boundary-to-boundary axial diameter.
 
-    The baseline direction is the maximum Feret diameter of the largest axial
-    component. Follow-up examinations reuse that physical direction. Both
-    displayed lines are sampled through the lesion so their endpoints remain
-    on the segmented boundary instead of floating outside an irregular mask.
+    Every axial slice is searched. The displayed long axis is the maximum
+    in-plane Feret diameter on that examination, and the short axis is the
+    perpendicular chord through its midpoint. A caller-supplied direction is
+    retained only for backward compatibility; longitudinal measurements should
+    normally determine the longest axis independently on each examination.
     """
-    z_counts = mask.sum(axis=(0, 1))
-    z = int(np.argmax(z_counts))
-    coords = np.argwhere(mask[:, :, z])[:, :2].astype(float)
+    best = None
+    for candidate_z in np.flatnonzero(mask.sum(axis=(0, 1))):
+        plane = mask[:, :, candidate_z]
+        plane_labels, plane_count = ndimage.label(plane)
+        for plane_label in range(1, plane_count + 1):
+            coords_here = np.argwhere(plane_labels == plane_label)[:, :2].astype(float)
+            if not len(coords_here):
+                continue
+            physical_here = coords_here * spacing[:2]
+            if len(coords_here) < 3:
+                first_here, second_here = physical_here[0], physical_here[-1]
+            else:
+                hull = physical_here[ConvexHull(physical_here).vertices]
+                pair = np.unravel_index(np.argmax(distance_matrix(hull, hull)), (len(hull), len(hull)))
+                first_here, second_here = hull[pair[0]], hull[pair[1]]
+            length_here = float(np.linalg.norm(second_here - first_here))
+            if best is None or length_here > best[0]:
+                best = (length_here, int(candidate_z), coords_here, physical_here, first_here, second_here)
+
+    if best is None:
+        z = 0
+        coords = np.empty((0, 2), dtype=float)
+    else:
+        _, z, coords, physical, first, second = best
     if not len(coords):
         zero = np.asarray([0.0, 0.0])
         return {"slice": z, "direction": np.asarray([1.0, 0.0]), "center_px": zero,
                 "long_mm": 0.0, "short_mm": 0.0,
                 "long_endpoints_px": [zero, zero], "short_endpoints_px": [zero, zero]}
-
-    physical = coords * spacing[:2]
-    if len(coords) < 3:
-        first, second = physical[0], physical[-1]
-    elif direction_xy is None:
-        hull = physical[ConvexHull(physical).vertices]
-        pair = np.unravel_index(np.argmax(distance_matrix(hull, hull)), (len(hull), len(hull)))
-        first, second = hull[pair[0]], hull[pair[1]]
-    else:
-        first = second = None
 
     if direction_xy is None:
         vector = second - first
@@ -317,7 +329,13 @@ def draw_calipers(ax, extent: dict, bounds, color="#ff69d4") -> None:
     x0, _, y0, _ = bounds
     for endpoints, line_color, width in ((extent["long_endpoints_px"], color, 2.4), (extent["short_endpoints_px"], "#91d7ff", 1.8)):
         points = np.asarray(endpoints)
-        ax.plot(points[:, 0] - x0, points[:, 1] - y0, color=line_color, lw=width, marker="|", markersize=10)
+        display = np.column_stack((points[:, 0] - x0, points[:, 1] - y0))
+        ax.plot(display[:, 0], display[:, 1], color=line_color, lw=width)
+        vector = display[1] - display[0]
+        norm = np.linalg.norm(vector)
+        cap = np.asarray([-vector[1], vector[0]]) / norm * 4 if norm else np.asarray([0.0, 4.0])
+        for point in display:
+            ax.plot([point[0] - cap[0], point[0] + cap[0]], [point[1] - cap[1], point[1] + cap[1]], color=line_color, lw=width)
 
 
 def make_comparison_image(track: dict, studies: dict, output: Path) -> None:

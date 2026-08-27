@@ -57,8 +57,8 @@
       "raw_detector_count": 7,
       "excluded_off_liver_count": 1,
       "extrahepatic_target_volume_ml": 16.6845703125,
-      "repeat_dice": 0.9738095238095238,
-      "dwi_adc_available": false
+      "repeat_dice": 0.17569733889067007,
+      "dwi_adc_available": true
     }
   ],
   "summary": {
@@ -81,10 +81,107 @@
     "ct_hepatic_candidates": 8,
     "ct_extrahepatic_targets": 1,
     "mri_hepatic_foci": 5,
-    "confirmed_mask_matches": 3,
-    "unresolved_small_mri_foci": 2,
-    "ct_locations_without_accepted_mri_mask": 5,
-    "note": "The CT-defined count is the more defensible working lesion inventory. MRI non-detection does not establish disappearance; the August MRI export lacks DWI/ADC and some small targets are difficult to separate."
+    "confirmed_mask_matches": 4,
+    "automatic_mri_supported_hepatic_targets": 4,
+    "unresolved_small_mri_foci": null,
+    "ct_locations_without_accepted_mri_mask": 4,
+    "targets": [
+      {
+        "id": "H01",
+        "kind": "hepatic",
+        "ct_segment": "8",
+        "ct_volume_ml": 23.826,
+        "supported_by_sequences": [
+          "P4"
+        ],
+        "status": "single-sequence support",
+        "panel": "assets/targets/H01_2026-08-26.webp"
+      },
+      {
+        "id": "N01",
+        "kind": "node",
+        "ct_segment": "3/2",
+        "ct_volume_ml": 16.361,
+        "supported_by_sequences": [
+          "P4",
+          "Late"
+        ],
+        "status": "multi-sequence supported",
+        "panel": "assets/targets/N01_2026-08-26.webp"
+      },
+      {
+        "id": "H02",
+        "kind": "hepatic",
+        "ct_segment": "5/8",
+        "ct_volume_ml": 2.058,
+        "supported_by_sequences": [
+          "Late"
+        ],
+        "status": "single-sequence support",
+        "panel": "assets/targets/H02_2026-08-26.webp"
+      },
+      {
+        "id": "H03",
+        "kind": "hepatic",
+        "ct_segment": "7",
+        "ct_volume_ml": 1.588,
+        "supported_by_sequences": [
+          "P4",
+          "Late",
+          "T2"
+        ],
+        "status": "multi-sequence supported",
+        "panel": "assets/targets/H03_2026-08-26.webp"
+      },
+      {
+        "id": "H04",
+        "kind": "hepatic",
+        "ct_segment": "1",
+        "ct_volume_ml": 1.182,
+        "supported_by_sequences": [
+          "P4"
+        ],
+        "status": "single-sequence support",
+        "panel": "assets/targets/H04_2026-08-26.webp"
+      },
+      {
+        "id": "H05",
+        "kind": "hepatic",
+        "ct_segment": "6",
+        "ct_volume_ml": 0.347,
+        "supported_by_sequences": [],
+        "status": "not confidently contoured",
+        "panel": "assets/targets/H05_2026-08-26.webp"
+      },
+      {
+        "id": "H06",
+        "kind": "hepatic",
+        "ct_segment": "5",
+        "ct_volume_ml": 0.207,
+        "supported_by_sequences": [],
+        "status": "not confidently contoured",
+        "panel": "assets/targets/H06_2026-08-26.webp"
+      },
+      {
+        "id": "H07",
+        "kind": "hepatic",
+        "ct_segment": "8",
+        "ct_volume_ml": 0.123,
+        "supported_by_sequences": [],
+        "status": "not confidently contoured",
+        "panel": "assets/targets/H07_2026-08-26.webp"
+      },
+      {
+        "id": "H08",
+        "kind": "hepatic",
+        "ct_segment": "5",
+        "ct_volume_ml": 0.079,
+        "supported_by_sequences": [],
+        "status": "not confidently contoured",
+        "panel": "assets/targets/H08_2026-08-26.webp"
+      }
+    ],
+    "note": "Eight CT-anchored liver targets remain the working inventory. Automatic contours support only some targets on individual MRI sequences; this is a segmentation-quality result, not a lesion count. True late T1, DWI, ADC, T2 and phase-4 images are included."
   },
   "lesions": [
     {
@@ -104,8 +201,8 @@
             -37.594908873148256,
             132.67696950263326
           ],
-          "long_mm": 36.0,
-          "short_mm": 29.625,
+          "long_mm": 37.259227045122664,
+          "short_mm": 30.28125,
           "dimensions_3d_mm": [
             38.112132284295896,
             36.212182228327904,
@@ -180,8 +277,8 @@
             -31.623830694229895,
             182.91629732657978
           ],
-          "long_mm": 35.25390625,
-          "short_mm": 33.0078125,
+          "long_mm": 38.2174212769844,
+          "short_mm": 33.30078125,
           "dimensions_3d_mm": [
             38.67160395827278,
             36.806363061127556,
@@ -256,8 +353,8 @@
             -37.94759094462148,
             24.89466512918409
           ],
-          "long_mm": 20.8984375,
-          "short_mm": 16.40625,
+          "long_mm": 22.22103539582483,
+          "short_mm": 17.3828125,
           "dimensions_3d_mm": [
             29.31941504914797,
             20.86164606430701,
@@ -266,24 +363,24 @@
           "segment": 8,
           "features": {
             "t2_fatsat": {
-              "median": 1349.92529296875,
-              "liver_median": 247.5892333984375,
-              "ratio": 5.452277849240552
+              "median": 822.7281494140625,
+              "liver_median": 197.76168823242188,
+              "ratio": 4.160199868678007
             },
             "dwi_b800": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 263.3652038574219,
+              "liver_median": 56.886329650878906,
+              "ratio": 4.629674747408367
             },
             "adc": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 2.1734845638275146,
+              "liver_median": 1.5473922491073608,
+              "ratio": 1.4046112516598979
             },
             "late": {
-              "median": 765.1194458007812,
-              "liver_median": 997.4593505859375,
-              "ratio": 0.7670682974211702
+              "median": 722.832763671875,
+              "liver_median": 735.0427856445312,
+              "ratio": 0.9833886921807555
             },
             "dynamic_1": {
               "median": 448.65643310546875,
@@ -305,9 +402,9 @@
               "liver_median": 997.4593505859375,
               "ratio": 0.7670682974211702
             },
-            "adc_median": null,
-            "low_adc_fraction_pct": null,
-            "low_late_signal_fraction_pct": 80.06287660466334,
+            "adc_median": 2.1734845638275146,
+            "low_adc_fraction_pct": 3.903589206182866,
+            "low_late_signal_fraction_pct": 39.45506942625098,
             "dynamic_liver_normalized": [
               0.7352297897217879,
               0.5369532160589846,
@@ -352,10 +449,10 @@
           "status": "supported"
         },
         "2026-08-26": {
-          "dice": 0.9882879326227135,
-          "centroid_distance_mm": 0.047653654062191554,
-          "volume_delta_pct": -0.9169504846738286,
-          "status": "supported"
+          "dice": 0.0,
+          "centroid_distance_mm": null,
+          "volume_delta_pct": null,
+          "status": "review"
         }
       },
       "display_centers": {
@@ -380,10 +477,6 @@
           95.27086163653465
         ]
       },
-      "locked_direction": [
-        0.7071067811865476,
-        0.7071067811865476
-      ],
       "segment_label": "S8",
       "volume_change_pct": -78.23017046284129
     },
@@ -404,8 +497,8 @@
             -107.71326621695886,
             108.73920915706694
           ],
-          "long_mm": 22.5,
-          "short_mm": 18.375,
+          "long_mm": 22.562413434736985,
+          "short_mm": 18.0,
           "dimensions_3d_mm": [
             29.845973606970382,
             22.95171143885724,
@@ -480,7 +573,7 @@
             -100.67631654494926,
             161.17682503923646
           ],
-          "long_mm": 24.70703125,
+          "long_mm": 24.23134753011066,
           "short_mm": 19.140625,
           "dimensions_3d_mm": [
             30.330107753434426,
@@ -556,8 +649,8 @@
             -106.39114097018913,
             2.1743924887082926
           ],
-          "long_mm": 25.9765625,
-          "short_mm": 20.8984375,
+          "long_mm": 26.573986487023358,
+          "short_mm": 21.38671875,
           "dimensions_3d_mm": [
             29.073907646435977,
             23.40358017248686,
@@ -632,8 +725,8 @@
             -111.2969294076014,
             0.48259049232561324
           ],
-          "long_mm": 12.5,
-          "short_mm": 11.5234375,
+          "long_mm": 12.597277731716483,
+          "short_mm": 11.03515625,
           "dimensions_3d_mm": [
             14.924988418583695,
             12.453330004484258,
@@ -642,24 +735,24 @@
           "segment": 7,
           "features": {
             "t2_fatsat": {
-              "median": 718.97509765625,
-              "liver_median": 248.51394653320312,
-              "ratio": 2.89309758138741
+              "median": 644.665283203125,
+              "liver_median": 198.53366088867188,
+              "ratio": 3.2471334096066573
             },
             "dwi_b800": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 229.6112518310547,
+              "liver_median": 57.10306167602539,
+              "ratio": 4.020997212614548
             },
             "adc": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 2.145740509033203,
+              "liver_median": 1.5441101789474487,
+              "ratio": 1.3896291458267953
             },
             "late": {
-              "median": 823.2044677734375,
-              "liver_median": 998.794677734375,
-              "ratio": 0.8241978918437579
+              "median": 770.4517822265625,
+              "liver_median": 736.2637939453125,
+              "ratio": 1.046434428206841
             },
             "dynamic_1": {
               "median": 417.94482421875,
@@ -681,9 +774,9 @@
               "liver_median": 998.794677734375,
               "ratio": 0.8241978918437579
             },
-            "adc_median": null,
-            "low_adc_fraction_pct": null,
-            "low_late_signal_fraction_pct": 68.43434343434343,
+            "adc_median": 2.145740509033203,
+            "low_adc_fraction_pct": 0.0,
+            "low_late_signal_fraction_pct": 22.727272727272727,
             "dynamic_liver_normalized": [
               0.686403500858254,
               0.5611782597287818,
@@ -739,10 +832,10 @@
           "status": "supported"
         },
         "2026-08-26": {
-          "dice": 0.9854338188727042,
-          "centroid_distance_mm": 0.08658381248274717,
-          "volume_delta_pct": -0.631313131313127,
-          "status": "supported"
+          "dice": 0.7745583038869258,
+          "centroid_distance_mm": 0.6716988571105346,
+          "volume_delta_pct": -21.338383838383834,
+          "status": "review"
         }
       },
       "display_centers": {
@@ -767,10 +860,6 @@
           79.73737373737374
         ]
       },
-      "locked_direction": [
-        -0.9307514934403471,
-        0.3656523724229935
-      ],
       "direct_evidence": {
         "2026-01-22__2026-08-26": {
           "distance_mm": 3.7684012836083256,
@@ -799,8 +888,8 @@
             -14.83145614584663,
             7.388657219739997
           ],
-          "long_mm": 13.76953125,
-          "short_mm": 12.890625,
+          "long_mm": 14.084184669781209,
+          "short_mm": 12.3046875,
           "dimensions_3d_mm": [
             15.547113276450732,
             13.822458145276197,
@@ -897,10 +986,6 @@
           85.96818572656922
         ]
       },
-      "locked_direction": [
-        0.9593655015712707,
-        0.28216632399155017
-      ],
       "segment_label": "S8",
       "volume_change_pct": null
     },
@@ -921,8 +1006,8 @@
             -16.156275988312217,
             70.81315766700062
           ],
-          "long_mm": 7.78125,
-          "short_mm": 9.5625,
+          "long_mm": 8.74642784226795,
+          "short_mm": 9.1875,
           "dimensions_3d_mm": [
             9.8246731355273,
             8.983527009019564,
@@ -997,8 +1082,8 @@
             -10.447698896023354,
             119.97737841954046
           ],
-          "long_mm": 9.9609375,
-          "short_mm": 9.08203125,
+          "long_mm": 9.407495764681482,
+          "short_mm": 9.375,
           "dimensions_3d_mm": [
             12.743571760711985,
             8.680746653459135,
@@ -1073,8 +1158,8 @@
             -12.830837632643693,
             -35.179684493621494
           ],
-          "long_mm": 7.2265625,
-          "short_mm": 7.8125,
+          "long_mm": 7.733980419227864,
+          "short_mm": 7.6171875,
           "dimensions_3d_mm": [
             10.669202534056335,
             7.088389761615027,
@@ -1196,10 +1281,6 @@
           64.68401486988847
         ]
       },
-      "locked_direction": [
-        0.8574929257125442,
-        -0.5144957554275266
-      ],
       "segment_label": "S4",
       "volume_change_pct": null
     },
@@ -1220,7 +1301,7 @@
             -88.00138386017684,
             29.993570170271283
           ],
-          "long_mm": 10.9375,
+          "long_mm": 10.004881620988826,
           "short_mm": 8.88671875,
           "dimensions_3d_mm": [
             11.878979022575782,
@@ -1318,10 +1399,6 @@
           97.27064220183486
         ]
       },
-      "locked_direction": [
-        -0.7808688094430304,
-        -0.6246950475544243
-      ],
       "segment_label": "S7",
       "volume_change_pct": null
     },
@@ -1342,8 +1419,8 @@
             -30.87144212837677,
             62.580492134553836
           ],
-          "long_mm": 8.71875,
-          "short_mm": 7.3125,
+          "long_mm": 8.112490369793976,
+          "short_mm": 7.96875,
           "dimensions_3d_mm": [
             8.787063487877692,
             8.178683933913582,
@@ -1418,8 +1495,8 @@
             -23.80158591757018,
             108.8769141995177
           ],
-          "long_mm": 8.30078125,
-          "short_mm": 8.30078125,
+          "long_mm": 8.450510801868726,
+          "short_mm": 6.93359375,
           "dimensions_3d_mm": [
             10.128674218471513,
             8.419979123532343,
@@ -1529,10 +1606,6 @@
           62.21756559766764
         ]
       },
-      "locked_direction": [
-        0.8320502943378437,
-        0.5547001962252293
-      ],
       "segment_label": "S5",
       "volume_change_pct": null
     },
@@ -1553,7 +1626,7 @@
             -38.45682301240811,
             155.32133196662454
           ],
-          "long_mm": 8.7890625,
+          "long_mm": 8.907620508587016,
           "short_mm": 6.8359375,
           "dimensions_3d_mm": [
             8.7903401573008,
@@ -1629,8 +1702,8 @@
             -44.042223723038376,
             -6.062391096134263
           ],
-          "long_mm": 8.7890625,
-          "short_mm": 7.8125,
+          "long_mm": 9.882117688026186,
+          "short_mm": 7.2265625,
           "dimensions_3d_mm": [
             9.898817399281448,
             8.618542973365166,
@@ -1639,24 +1712,24 @@
           "segment": 8,
           "features": {
             "t2_fatsat": {
-              "median": 794.10595703125,
-              "liver_median": 248.42324829101562,
-              "ratio": 3.1965847097409896
+              "median": 521.1390380859375,
+              "liver_median": 198.53558349609375,
+              "ratio": 2.6249150349221457
             },
             "dwi_b800": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 499.058349609375,
+              "liver_median": 57.15079879760742,
+              "ratio": 8.732307511164091
             },
             "adc": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 0.7056005001068115,
+              "liver_median": 1.5472474098205566,
+              "ratio": 0.4560359872818557
             },
             "late": {
-              "median": 933.3656005859375,
-              "liver_median": 998.794677734375,
-              "ratio": 0.9344919645578668
+              "median": 741.1477661132812,
+              "liver_median": 736.2637939453125,
+              "ratio": 1.0066334542159106
             },
             "dynamic_1": {
               "median": 538.1206665039062,
@@ -1678,9 +1751,9 @@
               "liver_median": 998.794677734375,
               "ratio": 0.9344919645578668
             },
-            "adc_median": null,
-            "low_adc_fraction_pct": null,
-            "low_late_signal_fraction_pct": 32.441471571906355,
+            "adc_median": 0.7056005001068115,
+            "low_adc_fraction_pct": 87.95986622073578,
+            "low_late_signal_fraction_pct": 13.377926421404682,
             "dynamic_liver_normalized": [
               0.8837719430140212,
               1.30664650481951,
@@ -1713,10 +1786,10 @@
           "status": "supported"
         },
         "2026-08-26": {
-          "dice": 0.9675324675324676,
-          "centroid_distance_mm": 0.10761317356373029,
-          "volume_delta_pct": 6.020066889632103,
-          "status": "supported"
+          "dice": 0.0,
+          "centroid_distance_mm": null,
+          "volume_delta_pct": null,
+          "status": "review"
         }
       },
       "display_centers": {
@@ -1741,10 +1814,6 @@
           82.9516806722689
         ]
       },
-      "locked_direction": [
-        0.6139406135149205,
-        0.7893522173763263
-      ],
       "segment_label": "S8",
       "volume_change_pct": null
     },
@@ -1765,7 +1834,7 @@
             -80.88643518610957,
             105.48500236879937
           ],
-          "long_mm": 8.25,
+          "long_mm": 8.38525491562421,
           "short_mm": 6.75,
           "dimensions_3d_mm": [
             9.45476239069786,
@@ -1841,8 +1910,8 @@
             -71.26442736858354,
             153.92881124699647
           ],
-          "long_mm": 7.8125,
-          "short_mm": 7.8125,
+          "long_mm": 8.043461047646094,
+          "short_mm": 7.91015625,
           "dimensions_3d_mm": [
             8.572811992753659,
             7.92145482032419,
@@ -1952,10 +2021,6 @@
           82.33001963672066
         ]
       },
-      "locked_direction": [
-        0.9838699100999075,
-        0.17888543819998318
-      ],
       "segment_label": "S7",
       "volume_change_pct": null
     },
@@ -1976,7 +2041,7 @@
             -13.614824106995485,
             132.40225807154124
           ],
-          "long_mm": 7.6875,
+          "long_mm": 7.721722605740251,
           "short_mm": 6.75,
           "dimensions_3d_mm": [
             7.556943925499159,
@@ -2052,8 +2117,8 @@
             -5.339554218608981,
             181.10523513077828
           ],
-          "long_mm": 8.88671875,
-          "short_mm": 7.03125,
+          "long_mm": 9.110862335695781,
+          "short_mm": 8.10546875,
           "dimensions_3d_mm": [
             9.413486577377371,
             8.44201034641716,
@@ -2163,10 +2228,6 @@
           94.46235172769468
         ]
       },
-      "locked_direction": [
-        0.8741572761215378,
-        -0.4856429311786321
-      ],
       "segment_label": "S8",
       "volume_change_pct": null
     },
@@ -2187,7 +2248,7 @@
             -91.41059875488281,
             139.9128214518229
           ],
-          "long_mm": 7.3125,
+          "long_mm": 6.45174395028197,
           "short_mm": 4.5,
           "dimensions_3d_mm": [
             7.2125160780356055,
@@ -2263,8 +2324,8 @@
             -81.51048034894865,
             188.92220666594665
           ],
-          "long_mm": 8.49609375,
-          "short_mm": 8.88671875,
+          "long_mm": 8.734640537108554,
+          "short_mm": 7.8125,
           "dimensions_3d_mm": [
             8.96067085164776,
             8.662097191224305,
@@ -2374,10 +2435,6 @@
           97.95207116303771
         ]
       },
-      "locked_direction": [
-        -0.5812381937190965,
-        -0.813733471206735
-      ],
       "segment_label": "S7",
       "volume_change_pct": null
     },
@@ -2398,8 +2455,8 @@
             2.7502848307291856,
             127.23443498560991
           ],
-          "long_mm": 8.3984375,
-          "short_mm": 5.76171875,
+          "long_mm": 7.694420157653207,
+          "short_mm": 5.859375,
           "dimensions_3d_mm": [
             8.452167139550989,
             7.77969081155379,
@@ -2496,10 +2553,6 @@
           70.41288737717309
         ]
       },
-      "locked_direction": [
-        -0.9138115486202572,
-        0.4061384660534476
-      ],
       "segment_label": "S4",
       "volume_change_pct": null
     },
@@ -2520,8 +2573,8 @@
             -21.498364712329618,
             117.113176061752
           ],
-          "long_mm": 9.0,
-          "short_mm": 4.6875,
+          "long_mm": 9.276987657639737,
+          "short_mm": 3.0,
           "dimensions_3d_mm": [
             10.322709660865357,
             6.77843559498584,
@@ -2618,10 +2671,6 @@
           85.30851063829788
         ]
       },
-      "locked_direction": [
-        -0.41380294430118403,
-        -0.9103664774626048
-      ],
       "segment_label": "S8",
       "volume_change_pct": null
     },
@@ -2642,7 +2691,7 @@
             -27.346294258214243,
             -43.699612967575646
           ],
-          "long_mm": 7.71484375,
+          "long_mm": 7.370297759419222,
           "short_mm": 6.34765625,
           "dimensions_3d_mm": [
             7.262333012344279,
@@ -2740,10 +2789,6 @@
           60.424050632911396
         ]
       },
-      "locked_direction": [
-        -0.847998304005088,
-        0.52999894000318
-      ],
       "segment_label": "S5",
       "volume_change_pct": null
     },
@@ -2764,8 +2809,8 @@
             -20.223200017755687,
             73.45502180619674
           ],
-          "long_mm": 6.54296875,
-          "short_mm": 5.46875,
+          "long_mm": 6.101757559302074,
+          "short_mm": 6.0546875,
           "dimensions_3d_mm": [
             5.777646134774625,
             5.683334257224569,
@@ -2862,10 +2907,6 @@
           46.40422077922078
         ]
       },
-      "locked_direction": [
-        -0.6401843996644798,
-        0.7682212795973759
-      ],
       "segment_label": "S5",
       "volume_change_pct": null
     },
@@ -2886,8 +2927,8 @@
             -56.09526666320198,
             17.403882621538514
           ],
-          "long_mm": 6.4453125,
-          "short_mm": 5.6640625,
+          "long_mm": 5.687585851000405,
+          "short_mm": 4.78515625,
           "dimensions_3d_mm": [
             8.02637631758932,
             5.19590321575347,
@@ -2896,24 +2937,24 @@
           "segment": 7,
           "features": {
             "t2_fatsat": {
-              "median": 110.8736801147461,
-              "liver_median": 248.62301635742188,
-              "ratio": 0.44595098932977895
+              "median": 37.55135726928711,
+              "liver_median": 198.76385498046875,
+              "ratio": 0.18892447660052197
             },
             "dwi_b800": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 24.717538833618164,
+              "liver_median": 57.237003326416016,
+              "ratio": 0.4318454390887115
             },
             "adc": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 2.758573293685913,
+              "liver_median": 1.546026587486267,
+              "ratio": 1.7842987410528066
             },
             "late": {
-              "median": 1621.038330078125,
-              "liver_median": 998.794677734375,
-              "ratio": 1.6229945615601618
+              "median": 1070.818115234375,
+              "liver_median": 737.4847412109375,
+              "ratio": 1.4519868078573528
             },
             "dynamic_1": {
               "median": 368.5392150878906,
@@ -2935,8 +2976,8 @@
               "liver_median": 998.794677734375,
               "ratio": 1.6229945615601618
             },
-            "adc_median": null,
-            "low_adc_fraction_pct": null,
+            "adc_median": 2.758573293685913,
+            "low_adc_fraction_pct": 0.0,
             "low_late_signal_fraction_pct": 0.0,
             "dynamic_liver_normalized": [
               0.6039387594150598,
@@ -2984,10 +3025,6 @@
           88.1980198019802
         ]
       },
-      "locked_direction": [
-        -0.27472112789737807,
-        -0.9615239476408232
-      ],
       "segment_label": "S7",
       "volume_change_pct": null
     },
@@ -3008,7 +3045,7 @@
             -52.44713120233445,
             -60.70644269670758
           ],
-          "long_mm": 6.34765625,
+          "long_mm": 5.687585851000405,
           "short_mm": 4.00390625,
           "dimensions_3d_mm": [
             6.8588175063392125,
@@ -3018,24 +3055,24 @@
           "segment": 5,
           "features": {
             "t2_fatsat": {
-              "median": 321.55926513671875,
-              "liver_median": 248.6045684814453,
-              "ratio": 1.2934567819927993
+              "median": 286.01202392578125,
+              "liver_median": 198.61444091796875,
+              "ratio": 1.4400363971716903
             },
             "dwi_b800": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 80.47250366210938,
+              "liver_median": 57.18637466430664,
+              "ratio": 1.407197153771263
             },
             "adc": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 2.3877720832824707,
+              "liver_median": 1.5454603433609009,
+              "ratio": 1.5450231987770071
             },
             "late": {
-              "median": 1363.99560546875,
-              "liver_median": 1000.1299438476562,
-              "ratio": 1.363818385660213
+              "median": 867.5213623046875,
+              "liver_median": 737.4847412109375,
+              "ratio": 1.1763244902941747
             },
             "dynamic_1": {
               "median": 439.97705078125,
@@ -3057,9 +3094,9 @@
               "liver_median": 1000.1299438476562,
               "ratio": 1.363818385660213
             },
-            "adc_median": null,
-            "low_adc_fraction_pct": null,
-            "low_late_signal_fraction_pct": 0.0,
+            "adc_median": 2.3877720832824707,
+            "low_adc_fraction_pct": 0.0,
+            "low_late_signal_fraction_pct": 4.761904761904762,
             "dynamic_liver_normalized": [
               0.7210065668494876,
               0.8663142486259563,
@@ -3078,9 +3115,9 @@
       "pair_evidence": {},
       "validation": {
         "2026-08-26": {
-          "dice": 0.8324324324324325,
-          "centroid_distance_mm": 0.9250854699397327,
-          "volume_delta_pct": 20.238095238095234,
+          "dice": 0.0,
+          "centroid_distance_mm": null,
+          "volume_delta_pct": null,
           "status": "review"
         }
       },
@@ -3106,10 +3143,6 @@
           49.142857142857146
         ]
       },
-      "locked_direction": [
-        0.9615239476408232,
-        -0.27472112789737807
-      ],
       "segment_label": "S5",
       "volume_change_pct": null
     },
@@ -3130,7 +3163,7 @@
             -22.706023906839306,
             28.210906456256737
           ],
-          "long_mm": 4.1015625,
+          "long_mm": 4.207160005573831,
           "short_mm": 4.1015625,
           "dimensions_3d_mm": [
             6.339154548012255,
@@ -3228,10 +3261,6 @@
           96.37931034482759
         ]
       },
-      "locked_direction": [
-        0.9284766908852593,
-        -0.3713906763541037
-      ],
       "segment_label": "S8",
       "volume_change_pct": null
     },
@@ -3252,8 +3281,8 @@
             -53.531288410055225,
             -4.331431421740305
           ],
-          "long_mm": 3.75,
-          "short_mm": 2.90625,
+          "long_mm": 3.824264635194589,
+          "short_mm": 2.15625,
           "dimensions_3d_mm": [
             3.804633554454275,
             3.5187527386525095,
@@ -3350,10 +3379,6 @@
           24.586206896551722
         ]
       },
-      "locked_direction": [
-        0.9805806756909202,
-        -0.19611613513818404
-      ],
       "segment_label": "S6",
       "volume_change_pct": null
     },
@@ -3374,8 +3399,8 @@
             -7.0685527409911515,
             69.97855319545286
           ],
-          "long_mm": 56.25,
-          "short_mm": 39.46875,
+          "long_mm": 56.34991126878551,
+          "short_mm": 39.5625,
           "dimensions_3d_mm": [
             55.137797260762724,
             53.63417141269214,
@@ -3450,8 +3475,8 @@
             -5.683455639734888,
             125.45035093591883
           ],
-          "long_mm": 57.8125,
-          "short_mm": 45.1171875,
+          "long_mm": 61.36667777079838,
+          "short_mm": 40.234375,
           "dimensions_3d_mm": [
             69.88900359052265,
             58.30098047183591,
@@ -3526,8 +3551,8 @@
             -1.4505178548463817,
             -36.401859039274626
           ],
-          "long_mm": 44.3359375,
-          "short_mm": 31.640625,
+          "long_mm": 45.72148402624853,
+          "short_mm": 37.5,
           "dimensions_3d_mm": [
             46.7402849901475,
             40.58666431919086,
@@ -3602,8 +3627,8 @@
             1.4488138361286929,
             -28.641703368140355
           ],
-          "long_mm": 32.421875,
-          "short_mm": 24.51171875,
+          "long_mm": 32.63531027219597,
+          "short_mm": 24.609375,
           "dimensions_3d_mm": [
             38.13154445480433,
             32.29885236523092,
@@ -3612,24 +3637,24 @@
           "segment": null,
           "features": {
             "t2_fatsat": {
-              "median": 359.8502197265625,
-              "liver_median": 248.2058563232422,
-              "ratio": 1.449805516506122
+              "median": 410.54864501953125,
+              "liver_median": 198.09153747558594,
+              "ratio": 2.072519857493306
             },
             "dwi_b800": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 67.80387115478516,
+              "liver_median": 57.15932083129883,
+              "ratio": 1.1862259762480885
             },
             "adc": {
-              "median": 0.0,
-              "liver_median": null,
-              "ratio": null
+              "median": 1.7645609378814697,
+              "liver_median": 1.5437288284301758,
+              "ratio": 1.1430511015823026
             },
             "late": {
-              "median": 790.4898681640625,
-              "liver_median": 998.794677734375,
-              "ratio": 0.7914438130138792
+              "median": 705.7387084960938,
+              "liver_median": 736.2637939453125,
+              "ratio": 0.9585405588319802
             },
             "dynamic_1": {
               "median": 610.2261352539062,
@@ -3651,9 +3676,9 @@
               "liver_median": 998.794677734375,
               "ratio": 0.7914438130138792
             },
-            "adc_median": null,
-            "low_adc_fraction_pct": null,
-            "low_late_signal_fraction_pct": 63.4401521802751,
+            "adc_median": 1.7645609378814697,
+            "low_adc_fraction_pct": 5.53116769095698,
+            "low_late_signal_fraction_pct": 45.86625695054141,
             "dynamic_liver_normalized": [
               1.002192948163545,
               0.8066465738669318,
@@ -3701,9 +3726,9 @@
           "status": "supported"
         },
         "2026-08-26": {
-          "dice": 0.9904580152671756,
-          "centroid_distance_mm": 0.07830070316167846,
-          "volume_delta_pct": -0.6438396254023981,
+          "dice": 0.8852882024816909,
+          "centroid_distance_mm": 2.576418779456439,
+          "volume_delta_pct": -7.191981270119985,
           "status": "supported"
         }
       },
@@ -3730,17 +3755,15 @@
         ]
       },
       "segment_label": "Extrahepatic nodal target",
-      "locked_direction": [
-        -0.9849172563070866,
-        -0.1730260044863801
-      ],
       "volume_change_pct": -72.96277474948194
     }
   ],
   "limitations": [
     "Automated research visualization; radiologist verification is required.",
-    "Liver-only counts and burden exclude the separately tracked extrahepatic nodal target and tiny off-liver model detections.",
-    "The August portal ZIP is structurally truncated. Dynamic phases and T2 are available; DWI/ADC and the separate axial late series are absent from the export. Dynamic phase 4 is used for August morphology.",
+    "The working inventory is 8 CT-anchored hepatic targets plus 1 separate nodal target. Automatic MRI contour count is not lesion count.",
+    "Aggregate automatic-mask volume is quality-control information and must not be treated as total MRI disease burden.",
+    "The complete August archive was verified and includes true late T1, DWI b=800, ADC, T2 fat-sat, and all four dynamic phases.",
+    "August primary contours were generated on dynamic phase 4 and cross-checked against a separate run on true late T1; agreement tests sequence sensitivity, not clinical correctness.",
     "MRI signal is not absolute and is normalized to background liver.",
     "ADC and low-signal fractions are exploratory proxies, not direct tumor-viability or necrosis measurements.",
     "Dynamic enhancement depends on acquisition timing, contrast delivery and patient hemodynamics.",
