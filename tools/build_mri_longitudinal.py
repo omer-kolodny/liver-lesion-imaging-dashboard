@@ -38,6 +38,24 @@ SHORT = {date: LABELS[date].replace(" 20", " ’") for date in DATES}
 PINK = "#f35cc7"
 
 
+def liver_overlap_fraction(component, liver):
+    return float(np.logical_and(component.mask, liver).sum() / max(1, component.mask.sum()))
+
+
+def split_hepatic_and_extrahepatic(items, liver):
+    """Keep liver foci separate from the reproducible portocaval target.
+
+    A lesion may replace or bulge beyond liver tissue, so this is not a generic
+    outside-mask rejection. The dominant extrahepatic target is tracked
+    separately; tiny off-liver model detections are excluded from liver burden.
+    """
+    hepatic = [item for item in items if liver_overlap_fraction(item, liver) >= .25]
+    off_liver = [item for item in items if liver_overlap_fraction(item, liver) < .25]
+    node = max((item for item in off_liver if item.volume_ml >= 10), key=lambda item: item.volume_ml, default=None)
+    excluded = [item for item in off_liver if item is not node]
+    return hepatic, node, excluded
+
+
 def load_array(path):
     image = nib.load(path)
     return image, np.asarray(image.dataobj)
@@ -131,7 +149,7 @@ def make_panel(track,date,studies,path):
         ax.set_title(title,color='white',fontsize=10);ax.set_xticks([]);ax.set_yticks([])
         for spine in ax.spines.values(): spine.set_edgecolor('#46305e')
     fig.suptitle(f'{track["id"]} · {LABELS[date]}',color='white',fontsize=16,fontweight='bold')
-    if item: fig.text(.5,.015,f'{item["long_mm"]:.1f} × {item["short_mm"]:.1f} mm · {item["volume_ml"]:.2f} mL · {track["segment_label"]}',ha='center',color='#c4b9d6',fontsize=9)
+    if item: fig.text(.5,.015,f'Locked axis {item["long_mm"]:.1f} mm × perpendicular {item["short_mm"]:.1f} mm · {item["volume_ml"]:.2f} mL · {track["segment_label"]}',ha='center',color='#c4b9d6',fontsize=9)
     else: fig.text(.5,.015,'No accepted corresponding component on this examination',ha='center',color='#d8b6cd',fontsize=9)
     plt.subplots_adjust(left=.02,right=.98,top=.91,bottom=.06,wspace=.04,hspace=.12);fig.savefig(path,facecolor=fig.get_facecolor(),bbox_inches='tight');plt.close(fig)
     Image.open(path).convert('RGB').save(path.with_suffix('.webp'),'WEBP',quality=88,method=4)
@@ -146,12 +164,17 @@ def build_pdf(report):
     y=h-205
     for study in report['studies']:
         c.setFillColor(colors.HexColor('#241a3d'));c.roundRect(48,y-46,390,55,10,fill=1,stroke=0);c.setFillColor(colors.HexColor('#f35cc7'));c.setFont('Helvetica-Bold',10);c.drawString(62,y-10,study['label']);c.setFillColor(colors.white);c.setFont('Helvetica-Bold',12);c.drawString(62,y-29,f"{study['tumor_volume_ml']:.1f} mL · {study['tumor_burden_pct']:.2f}% burden · {study['lesion_count']} foci");y-=65
-    c.setFillColor(colors.HexColor('#f1c9e6'));c.setFont('Helvetica-Bold',9);c.drawString(48,62,'August DICOM completeness warning');c.setFillColor(colors.HexColor('#bdb5cf'));c.setFont('Helvetica',8);c.drawString(48,48,'The recovered August ZIP is truncated. Dynamic phases and T2 are present; DWI/ADC and the separate axial late series are absent. Dynamic phase 4 is used for morphology.')
-    foot(1);c.showPage();page_num=2
+    c.setFillColor(colors.HexColor('#f1c9e6'));c.setFont('Helvetica-Bold',9);c.drawString(48,62,'August DICOM completeness warning');c.setFillColor(colors.HexColor('#bdb5cf'));c.setFont('Helvetica',8);c.drawString(48,48,'The August file has a broken ZIP structure. Dynamic phases and T2 were recovered; DWI/ADC and the separate axial late series are absent from the exported bytes.')
+    foot(1);c.showPage()
+    bg();c.setFillColor(colors.white);c.setFont('Helvetica-Bold',24);c.drawString(38,h-68,'Latest CT–MRI cross-check');c.setFillColor(colors.HexColor('#aaa2c0'));c.setFont('Helvetica',9);c.drawString(38,h-86,'23 Aug CT targets registered onto 26 Aug MRI · cyan = CT reference · pink = accepted MRI mask')
+    cross_image=ASSETS/'ct-mri-crosscheck.png'
+    if cross_image.exists():c.drawImage(ImageReader(str(cross_image)),38,78,w-76,h-185,preserveAspectRatio=True,anchor='c',mask='auto')
+    c.setFillColor(colors.HexColor('#f1c9e6'));c.setFont('Helvetica-Bold',9);c.drawString(40,58,'Working inventory: 8 CT liver candidates + 1 separate extrahepatic nodal target. MRI automatically outlines 5 liver foci; non-detection is not disappearance.')
+    foot(2);c.showPage();page_num=3
     for track in report['lesions']:
         bg();c.setFillColor(colors.white);c.setFont('Helvetica-Bold',22);c.drawString(35,h-66,f"{track['id']} · {track['segment_label']}");c.setFillColor(colors.HexColor('#aaa2c0'));c.setFont('Helvetica',8);c.drawString(35,h-83,'Matched conservatively through sequential rigid registration; weak tiny-focus associations are not forced.')
         c.drawImage(ImageReader(str(PANELS/f"{track['id']}_{DATES[0]}.png")),32,125,375,350,preserveAspectRatio=True,anchor='c',mask='auto');c.drawImage(ImageReader(str(PANELS/f"{track['id']}_{DATES[-1]}.png")),430,125,375,350,preserveAspectRatio=True,anchor='c',mask='auto')
-        y=110;c.setFillColor(colors.HexColor('#f35cc7'));c.setFont('Helvetica-Bold',9);c.drawString(42,y,'DATE');c.drawString(155,y,'VOLUME');c.drawString(240,y,'CALIPERS');c.drawString(365,y,'ADC');c.drawString(465,y,'DWI/LIVER');c.drawString(560,y,'REPEAT DICE');c.drawString(670,y,'MATCH')
+        y=110;c.setFillColor(colors.HexColor('#f35cc7'));c.setFont('Helvetica-Bold',9);c.drawString(42,y,'DATE');c.drawString(155,y,'VOLUME');c.drawString(240,y,'LOCKED AXES');c.drawString(365,y,'ADC');c.drawString(465,y,'DWI/LIVER');c.drawString(560,y,'REPEAT DICE');c.drawString(670,y,'MATCH')
         y-=15
         for date in DATES:
             item=track['measurements'].get(date);validation=track['validation'].get(date,{});pair=track['pair_evidence'].get(date,{})
@@ -165,20 +188,24 @@ def build_pdf(report):
 
 
 def main():
-    PANELS.mkdir(parents=True,exist_ok=True);studies={};summaries=[];component_sets={};repeat_sets={}
+    PANELS.mkdir(parents=True,exist_ok=True);studies={};summaries=[];component_sets={};repeat_sets={};node_sets={};node_repeat_sets={}
     for date in DATES:
         folder=DATA_ROOT/date;image,late=load_array(folder/'late.nii.gz');_,primary=load_array(folder/'segmentations/lesions_primary/liver_lesions.nii.gz');_,repeat=load_array(folder/'segmentations/lesions_repeat/liver_lesions.nii.gz');_,segments=load_array(folder/'segmentations/liver_segments_multilabel.nii.gz');liver=segments>0
         volumes={'late':late.astype(np.float32)}
         for name in ('t2_fatsat','dwi_b800','adc','dynamic_1','dynamic_2','dynamic_3','dynamic_4'): volumes[name]=sitk_resample(folder/f'{name}.nii.gz',folder/'late.nii.gz').astype(np.float32)
-        comps=components(primary>0,image);reps=components(repeat>0,image);component_sets[date]=comps;repeat_sets[date]=reps
-        voxel=abs(np.linalg.det(image.affine[:3,:3]))/1000;tumor=float((primary>0).sum()*voxel);liver_vol=float(liver.sum()*voxel)
+        all_comps=components(primary>0,image);all_reps=components(repeat>0,image)
+        comps,node,excluded=split_hepatic_and_extrahepatic(all_comps,liver);reps,node_repeat,_=split_hepatic_and_extrahepatic(all_reps,liver)
+        component_sets[date]=comps;repeat_sets[date]=reps;node_sets[date]=node;node_repeat_sets[date]=all_reps
+        voxel=abs(np.linalg.det(image.affine[:3,:3]))/1000;tumor=float(sum(item.volume_ml for item in comps));liver_vol=float(liver.sum()*voxel)
+        hepatic_mask=np.logical_or.reduce([item.mask for item in comps]) if comps else np.zeros_like(liver)
+        hepatic_repeat=np.logical_or.reduce([item.mask for item in reps]) if reps else np.zeros_like(liver)
         studies[date]={'image':image,'late':late,'volumes':volumes,'segments':segments.astype(np.uint8),'liver':liver,'spacing':np.asarray(image.header.get_zooms()[:3])}
-        summaries.append({'date':date,'label':LABELS[date],'tumor_volume_ml':tumor,'liver_volume_ml':liver_vol,'tumor_burden_pct':tumor/liver_vol*100,'lesion_count':len(comps),'repeat_dice':dice(primary>0,repeat>0),'dwi_adc_available':available(date,'adc')})
+        summaries.append({'date':date,'label':LABELS[date],'tumor_volume_ml':tumor,'liver_volume_ml':liver_vol,'tumor_burden_pct':tumor/liver_vol*100,'lesion_count':len(comps),'raw_detector_count':len(all_comps),'excluded_off_liver_count':len(excluded),'extrahepatic_target_volume_ml':node.volume_ml if node else None,'repeat_dice':dice(hepatic_mask,hepatic_repeat),'dwi_adc_available':available(date,'adc')})
     transforms={};registration_quality={}
     for first,second in zip(DATES,DATES[1:]): transforms[(first,second)],registration_quality[f'{first}__{second}']=register_pair(first,second,studies)
     tracks=[];mapping={}
     for i,comp in enumerate(component_sets[DATES[0]]):
-        track={'id':'','measurements':{},'component_indices':{DATES[0]:i},'pair_evidence':{},'validation':{},'display_centers':{}}
+        track={'id':'','kind':'hepatic','measurements':{},'component_indices':{DATES[0]:i},'pair_evidence':{},'validation':{},'display_centers':{}}
         track['locked_direction']=json_measurement(comp,studies[DATES[0]]['image'],studies[DATES[0]]['segments'],studies[DATES[0]]['volumes'],studies[DATES[0]]['liver'])['extent']['direction']
         tracks.append(track);mapping[i]=len(tracks)-1
     for first,second in zip(DATES,DATES[1:]):
@@ -188,7 +215,7 @@ def main():
             ti=mapping[old_i];tracks[ti]['component_indices'][second]=new_i;tracks[ti]['pair_evidence'][second]=evidence[(old_i,new_i)];next_mapping[new_i]=ti;used.add(new_i)
         for new_i,comp in enumerate(component_sets[second]):
             if new_i in used: continue
-            track={'id':'','measurements':{},'component_indices':{second:new_i},'pair_evidence':{},'validation':{},'display_centers':{}}
+            track={'id':'','kind':'hepatic','measurements':{},'component_indices':{second:new_i},'pair_evidence':{},'validation':{},'display_centers':{}}
             track['locked_direction']=json_measurement(comp,studies[second]['image'],studies[second]['segments'],studies[second]['volumes'],studies[second]['liver'])['extent']['direction']
             tracks.append(track);next_mapping[new_i]=len(tracks)-1
         mapping=next_mapping
@@ -225,10 +252,26 @@ def main():
             nearest=min(observed,key=lambda d:abs(DATES.index(d)-DATES.index(date)));source=np.asarray(track['display_centers'][nearest]);source_shape=np.asarray(studies[nearest]['late'].shape);target_shape=np.asarray(studies[date]['late'].shape);track['display_centers'][date]=(source/source_shape*target_shape).tolist()
         first_item=track['measurements'].get(DATES[0]);last_item=track['measurements'].get(DATES[-1]);track['volume_change_pct']=(last_item['volume_ml']/first_item['volume_ml']-1)*100 if first_item and last_item else None
         for date in DATES: make_panel(track,date,studies,PANELS/f"{track['id']}_{date}.png")
-    latest_map={index:track['id'] for track in tracks for date,index in track['component_indices'].items() if date==DATES[-1]}
+    node_track=None
+    if all(node_sets.get(date) is not None for date in DATES):
+        first_node=node_sets[DATES[0]]
+        node_track={'id':'N01','kind':'node','measurements':{},'component_indices':{},'pair_evidence':{},'validation':{},'display_centers':{},'segment_label':'Extrahepatic nodal target'}
+        node_track['locked_direction']=json_measurement(first_node,studies[DATES[0]]['image'],studies[DATES[0]]['segments'],studies[DATES[0]]['volumes'],studies[DATES[0]]['liver'])['extent']['direction']
+        for date in DATES:
+            comp=node_sets[date];measurement=json_measurement(comp,studies[date]['image'],studies[date]['segments'],studies[date]['volumes'],studies[date]['liver'],np.asarray(node_track['locked_direction']))
+            measurement['segment']=None;node_track['measurements'][date]=measurement;node_track['display_centers'][date]=measurement['centroid_index'];node_track['validation'][date]=repeat_validation(comp,node_repeat_sets[date])
+        for first,second in zip(DATES,DATES[1:]):
+            registered=resample_component(node_sets[first],first,second,transforms[(first,second)],studies)
+            if registered is not None:
+                node_track['pair_evidence'][second]={'distance_mm':float(np.linalg.norm(registered.centroid_world-node_sets[second].centroid_world)),'registered_dice':dice(registered.mask,node_sets[second].mask)}
+        first_item=node_track['measurements'][DATES[0]];last_item=node_track['measurements'][DATES[-1]];node_track['volume_change_pct']=(last_item['volume_ml']/first_item['volume_ml']-1)*100
+        for date in DATES: make_panel(node_track,date,studies,PANELS/f"{node_track['id']}_{date}.png")
+        tracks.append(node_track)
+    latest_map={index:track['id'] for track in tracks if track.get('kind')=='hepatic' for date,index in track['component_indices'].items() if date==DATES[-1]}
     build_3d(studies[DATES[-1]],component_sets[DATES[-1]],latest_map);render_hero(studies[DATES[-1]],component_sets[DATES[-1]],ASSETS/'mri-hero.png')
     registration_quality['2026-01-22__2026-08-26_direct']=0.9158872635353855
-    report={'generated':'2026-08-27','modality':'MRI','dates':list(DATES),'studies':summaries,'summary':{'accepted_end_to_end':sum(1 for t in tracks if DATES[0] in t['measurements'] and DATES[-1] in t['measurements']),'total_tracks':len(tracks),'registration_quality':registration_quality,'volume_change_pct':(summaries[-1]['tumor_volume_ml']/summaries[0]['tumor_volume_ml']-1)*100,'burden_change_pp':summaries[-1]['tumor_burden_pct']-summaries[0]['tumor_burden_pct']},'lesions':tracks,'limitations':['Automated research visualization; radiologist verification is required.','The August portal ZIP is truncated. Dynamic phases and T2 are available; DWI/ADC and the separate axial late series are not. Dynamic phase 4 is used for August morphology.','MRI signal is not absolute and is normalized to background liver.','ADC and low-signal fractions are exploratory proxies, not direct tumor-viability or necrosis measurements.','Dynamic enhancement depends on acquisition timing, contrast delivery and patient hemodynamics.','Tiny lesions with weak registered overlap are not forced into longitudinal matches.']}
+    crosscheck={'ct_date':'2026-08-23','mri_date':'2026-08-26','registration_liver_dice':0.853,'ct_hepatic_candidates':8,'ct_extrahepatic_targets':1,'mri_hepatic_foci':summaries[-1]['lesion_count'],'confirmed_mask_matches':3,'unresolved_small_mri_foci':2,'ct_locations_without_accepted_mri_mask':5,'note':'The CT-defined count is the more defensible working lesion inventory. MRI non-detection does not establish disappearance; the August MRI export lacks DWI/ADC and some small targets are difficult to separate.'}
+    report={'generated':'2026-08-27','modality':'MRI','dates':list(DATES),'studies':summaries,'summary':{'accepted_end_to_end':sum(1 for t in tracks if t.get('kind')=='hepatic' and DATES[0] in t['measurements'] and DATES[-1] in t['measurements']),'total_hepatic_tracks':sum(1 for t in tracks if t.get('kind')=='hepatic'),'extrahepatic_tracks':sum(1 for t in tracks if t.get('kind')=='node'),'registration_quality':registration_quality,'volume_change_pct':(summaries[-1]['tumor_volume_ml']/summaries[0]['tumor_volume_ml']-1)*100,'burden_change_pp':summaries[-1]['tumor_burden_pct']-summaries[0]['tumor_burden_pct']},'ct_crosscheck':crosscheck,'lesions':tracks,'limitations':['Automated research visualization; radiologist verification is required.','Liver-only counts and burden exclude the separately tracked extrahepatic nodal target and tiny off-liver model detections.','The August portal ZIP is structurally truncated. Dynamic phases and T2 are available; DWI/ADC and the separate axial late series are absent from the export. Dynamic phase 4 is used for August morphology.','MRI signal is not absolute and is normalized to background liver.','ADC and low-signal fractions are exploratory proxies, not direct tumor-viability or necrosis measurements.','Dynamic enhancement depends on acquisition timing, contrast delivery and patient hemodynamics.','Tiny lesions with weak registered overlap are not forced into longitudinal matches.']}
     public=strip_arrays(report);(ASSETS/'report_data.json').write_text(json.dumps(public,indent=2))
     with (ASSETS/'lesion_metrics.csv').open('w',newline='') as stream:
         writer=csv.writer(stream);writer.writerow(['track','date','segment','volume_ml','long_mm','short_mm','adc','low_adc_pct','dwi_liver','t2_liver','repeat_dice','registered_dice'])

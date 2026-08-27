@@ -6,18 +6,20 @@
       "date": "2025-12-25",
       "label": "25 Dec 2025",
       "liver_volume_ml": 1706.42,
-      "tumor_volume_ml": 166.82,
-      "tumor_burden_pct": 9.78,
+      "tumor_volume_ml": 70.456,
+      "tumor_burden_pct": 4.129,
       "contrast_timing_sec": null,
       "vnc_available": false,
-      "attenuation_confidence": "limited"
+      "attenuation_confidence": "limited",
+      "extrahepatic_target_volume_ml": 96.364,
+      "liver_lesion_groups": 8
     },
     {
       "date": "2026-01-19",
       "label": "19 Jan 2026",
       "liver_volume_ml": 1667.05,
-      "tumor_volume_ml": 170.34,
-      "tumor_burden_pct": 10.22,
+      "tumor_volume_ml": 64.126,
+      "tumor_burden_pct": 3.847,
       "contrast_timing_sec": 90.0,
       "contrast_volume_ml": 80.0,
       "contrast_flow_ml_s": 1.7,
@@ -56,14 +58,16 @@
           "enhancement_hu": 108.0,
           "paired_voxels": 85132
         }
-      }
+      },
+      "extrahepatic_target_volume_ml": 106.214,
+      "liver_lesion_groups": 8
     },
     {
       "date": "2026-04-26",
       "label": "26 Apr 2026",
       "liver_volume_ml": 1504.11,
-      "tumor_volume_ml": 97.64,
-      "tumor_burden_pct": 6.49,
+      "tumor_volume_ml": 48.043,
+      "tumor_burden_pct": 3.194,
       "residual_lesion_groups": 8,
       "residual_foci": 9,
       "contrast_timing_sec": 91.8,
@@ -99,14 +103,16 @@
           "vnc_median_hu": 33.2,
           "enhancement_hu": 121.8
         }
-      }
+      },
+      "extrahepatic_target_volume_ml": 49.597,
+      "liver_lesion_groups": 8
     },
     {
       "date": "2026-08-23",
       "label": "23 Aug 2026",
       "liver_volume_ml": 1467.57,
-      "tumor_volume_ml": 46.56,
-      "tumor_burden_pct": 3.17,
+      "tumor_volume_ml": 29.406,
+      "tumor_burden_pct": 2.004,
       "residual_lesion_groups": 9,
       "residual_foci": 12,
       "contrast_timing_sec": 90.0,
@@ -147,7 +153,9 @@
           "enhancement_hu": 120.0,
           "paired_voxels": 94069
         }
-      }
+      },
+      "extrahepatic_target_volume_ml": 17.154,
+      "liver_lesion_groups": 8
     }
   ],
   "comparisons": {
@@ -225,13 +233,14 @@
     }
   },
   "overall": {
-    "jan_to_aug_tumor_volume_change_pct": -72.7,
-    "jan_to_aug_burden_change_points": -7.05,
+    "jan_to_aug_tumor_volume_change_pct": -54.1,
+    "jan_to_aug_burden_change_points": -1.84,
     "independent_model_tumor_volume_ml": 49.05,
-    "bottom_line": "The automated models show lower segmented liver tumor volume in August than April, with the largest residual groups remaining L01 and L02. This is compatible with interval treatment response, but registration, segmentation, and protocol uncertainty require radiologist confirmation.",
+    "bottom_line": "Liver-only segmented lesion volume is lower in August than January and April. The portocaval nodal target also decreased markedly but is reported separately and is not included in liver burden.",
     "viability_note": "CT attenuation and low-attenuation fractions are imaging proxies only. VNC correction and internal-reference normalization reduce contrast-delivery and hemodynamic bias, but portal-venous CT still cannot determine whether tumor cells are alive or establish true necrosis.",
-    "april_to_aug_tumor_volume_change_pct": -52.3,
-    "april_to_aug_burden_change_points": -3.32
+    "april_to_aug_tumor_volume_change_pct": -38.8,
+    "april_to_aug_burden_change_points": -1.19,
+    "best_working_inventory": "8 hepatic lesion groups plus 1 separate portocaval nodal target"
   },
   "components": [
     {
@@ -337,7 +346,7 @@
   "lesions": [
     {
       "lesion_id": "L01",
-      "reference_segment": "3",
+      "reference_segment": null,
       "measurements": {
         "2025-12-25": {
           "detected": true,
@@ -459,7 +468,7 @@
           "diameter_change_from_jan_pct": -48.8
         }
       },
-      "trend": "Marked automated volume decrease since January.",
+      "trend": "Marked automated decrease in the separate portocaval nodal target since January.",
       "match_validation": {
         "2025-12-25__2026-01-19": {
           "decision": "provisional",
@@ -532,7 +541,9 @@
           "requires_radiologist_review": false,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "node",
+      "reference_label": "Portocaval nodal target"
     },
     {
       "lesion_id": "L02",
@@ -731,7 +742,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L03",
@@ -930,7 +942,8 @@
           "requires_radiologist_review": false,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L04",
@@ -1130,7 +1143,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L05",
@@ -1329,7 +1343,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L06",
@@ -1490,7 +1505,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L07",
@@ -1689,7 +1705,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L08",
@@ -1888,7 +1905,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L09",
@@ -2087,7 +2105,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L10",
@@ -2200,7 +2219,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L11",
@@ -2313,7 +2333,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L12",
@@ -2426,7 +2447,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L13",
@@ -2539,7 +2561,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L14",
@@ -2652,7 +2675,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L15",
@@ -2765,7 +2789,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     },
     {
       "lesion_id": "L16",
@@ -2878,7 +2903,8 @@
           "requires_radiologist_review": true,
           "clinical_ground_truth": false
         }
-      }
+      },
+      "kind": "hepatic"
     }
   ],
   "validation": {

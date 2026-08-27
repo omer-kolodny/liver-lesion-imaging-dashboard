@@ -28,6 +28,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfgen import canvas
 from scipy import ndimage
 from scipy.optimize import linear_sum_assignment
+from scipy.spatial import ConvexHull, distance_matrix
 from skimage import measure
 import SimpleITK as sitk
 import trimesh
@@ -96,40 +97,84 @@ def world_distance(first: Component, second: Component) -> float:
 
 
 def mask_extent(mask: np.ndarray, spacing: np.ndarray, direction_xy: np.ndarray | None = None) -> dict:
+    """Measure an axial lesion using reproducible, boundary-anchored axes.
+
+    The baseline direction is the maximum Feret diameter of the largest axial
+    component. Follow-up examinations reuse that physical direction. Both
+    displayed lines are sampled through the lesion so their endpoints remain
+    on the segmented boundary instead of floating outside an irregular mask.
+    """
     z_counts = mask.sum(axis=(0, 1))
     z = int(np.argmax(z_counts))
     coords = np.argwhere(mask[:, :, z])[:, :2].astype(float)
-    if len(coords) < 2:
-        direction = np.asarray([1.0, 0.0])
+    if not len(coords):
+        zero = np.asarray([0.0, 0.0])
+        return {"slice": z, "direction": np.asarray([1.0, 0.0]), "center_px": zero,
+                "long_mm": 0.0, "short_mm": 0.0,
+                "long_endpoints_px": [zero, zero], "short_endpoints_px": [zero, zero]}
+
+    physical = coords * spacing[:2]
+    if len(coords) < 3:
+        first, second = physical[0], physical[-1]
     elif direction_xy is None:
-        centered = (coords - coords.mean(axis=0)) * spacing[:2]
-        _, _, vh = np.linalg.svd(centered, full_matrices=False)
-        direction = vh[0] / np.linalg.norm(vh[0])
+        hull = physical[ConvexHull(physical).vertices]
+        pair = np.unravel_index(np.argmax(distance_matrix(hull, hull)), (len(hull), len(hull)))
+        first, second = hull[pair[0]], hull[pair[1]]
+    else:
+        first = second = None
+
+    if direction_xy is None:
+        vector = second - first
+        direction = vector / np.linalg.norm(vector) if np.linalg.norm(vector) else np.asarray([1.0, 0.0])
+        center_mm = (first + second) / 2
+        long_endpoints = np.vstack((first, second)) / spacing[:2]
     else:
         direction = np.asarray(direction_xy, dtype=float)
         direction /= np.linalg.norm(direction)
+        mean_mm = physical.mean(axis=0)
+        nearest = physical[np.argmin(np.linalg.norm(physical - mean_mm, axis=1))]
+        center_mm = nearest
+        long_endpoints = None
+
     perpendicular = np.asarray([-direction[1], direction[0]])
-    physical = coords * spacing[:2]
-    center_mm = physical.mean(axis=0)
-    along = (physical - center_mm) @ direction
-    across = (physical - center_mm) @ perpendicular
-    long_mm = float(along.max() - along.min()) if len(along) else 0.0
-    short_mm = float(across.max() - across.min()) if len(across) else 0.0
-    center_px = coords.mean(axis=0)
+
+    def chord(axis: np.ndarray) -> tuple[np.ndarray, float]:
+        span = float(np.linalg.norm(np.ptp(physical, axis=0))) + 2 * float(max(spacing[:2]))
+        step = max(0.08, float(min(spacing[:2])) / 8)
+        offsets = np.arange(-span, span + step, step)
+        points_mm = center_mm[None, :] + offsets[:, None] * axis[None, :]
+        points_px = np.rint(points_mm / spacing[:2]).astype(int)
+        valid = ((points_px[:, 0] >= 0) & (points_px[:, 0] < mask.shape[0]) &
+                 (points_px[:, 1] >= 0) & (points_px[:, 1] < mask.shape[1]))
+        inside = np.zeros(len(offsets), dtype=bool)
+        inside[valid] = mask[points_px[valid, 0], points_px[valid, 1], z]
+        labels, count = ndimage.label(inside)
+        if not count:
+            return np.vstack((center_mm, center_mm)) / spacing[:2], 0.0
+        zero_index = int(np.argmin(np.abs(offsets)))
+        chosen = int(labels[zero_index])
+        if not chosen:
+            sizes = ndimage.sum(inside, labels, range(1, count + 1))
+            chosen = int(np.argmax(sizes)) + 1
+        indices = np.flatnonzero(labels == chosen)
+        lo, hi = offsets[indices[0]], offsets[indices[-1]]
+        endpoints_mm = np.vstack((center_mm + lo * axis, center_mm + hi * axis))
+        return endpoints_mm / spacing[:2], float(hi - lo)
+
+    if long_endpoints is None:
+        long_endpoints, long_mm = chord(direction)
+    else:
+        long_mm = float(np.linalg.norm(second - first))
+    short_endpoints, short_mm = chord(perpendicular)
+    center_px = center_mm / spacing[:2]
     return {
         "slice": z,
         "direction": direction,
         "center_px": center_px,
         "long_mm": long_mm,
         "short_mm": short_mm,
-        "long_endpoints_px": [
-            center_px + direction * (along.min() / spacing[:2]),
-            center_px + direction * (along.max() / spacing[:2]),
-        ],
-        "short_endpoints_px": [
-            center_px + perpendicular * (across.min() / spacing[:2]),
-            center_px + perpendicular * (across.max() / spacing[:2]),
-        ],
+        "long_endpoints_px": long_endpoints,
+        "short_endpoints_px": short_endpoints,
     }
 
 

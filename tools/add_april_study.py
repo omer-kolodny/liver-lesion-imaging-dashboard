@@ -225,7 +225,7 @@ def generate_pair_images(timeline: dict):
 
 def write_csv(timeline: dict):
     fields = [
-        "lesion_id", "reference_segment", "study_date", "detected", "segment", "fragment_count",
+        "lesion_id", "kind", "reference_label", "reference_segment", "study_date", "detected", "segment", "fragment_count",
         "volume_ml", "long_mm", "short_mm", "cc_mm", "max3d_mm", "median_hu",
         "below_40hu_pct", "vnc_median_hu", "vnc_corrected_enhancement_hu",
         "enhancement_vs_liver_pct", "enhancement_vs_portal_pct", "minimal_enhancement_pct",
@@ -239,6 +239,8 @@ def write_csv(timeline: dict):
                 measurement = lesion["measurements"].get(study["date"], {"detected": False})
                 writer.writerow({
                     "lesion_id": lesion["lesion_id"],
+                    "kind": lesion.get("kind", "hepatic"),
+                    "reference_label": lesion.get("reference_label"),
                     "reference_segment": lesion["reference_segment"],
                     "study_date": study["date"],
                     "detected": measurement.get("detected", False),
@@ -275,13 +277,14 @@ def write_pdf(timeline: dict):
         Paragraph("Four-study image-derived lesion analysis · dual-channel validation added 25 Aug 2026", h2),
         Spacer(1, 5*mm),
     ]
-    study_rows = [["Study", "Liver volume", "Segmented lesion volume", "Burden"]]
+    study_rows = [["Study", "Liver volume", "Liver-lesion volume", "Liver-only burden", "Separate node"]]
     for study in timeline["studies"]:
         study_rows.append([
             study["label"], f"{study['liver_volume_ml']:.2f} mL",
             f"{study['tumor_volume_ml']:.2f} mL", f"{study['tumor_burden_pct']:.2f}%",
+            f"{study.get('extrahepatic_target_volume_ml', 0):.2f} mL",
         ])
-    table = Table(study_rows, colWidths=[55*mm, 45*mm, 55*mm, 35*mm])
+    table = Table(study_rows, colWidths=[45*mm, 40*mm, 45*mm, 38*mm, 38*mm])
     table.setStyle(TableStyle([
         ("BACKGROUND", (0,0), (-1,0), colors.HexColor("#173f5f")),
         ("TEXTCOLOR", (0,0), (-1,0), colors.white),
@@ -306,8 +309,9 @@ def write_pdf(timeline: dict):
     story += [
         Paragraph("April → August summary", h2),
         Paragraph(
-            f"Automated segmented lesion volume changed from {april['tumor_volume_ml']:.2f} mL to {august['tumor_volume_ml']:.2f} mL ({volume_change:+.1f}%). "
+            f"Automated liver-only segmented lesion volume changed from {april['tumor_volume_ml']:.2f} mL to {august['tumor_volume_ml']:.2f} mL ({volume_change:+.1f}%). "
             f"Burden changed from {april['tumor_burden_pct']:.2f}% to {august['tumor_burden_pct']:.2f}%. Internal-reference comparability is high. "
+            f"The separate portocaval nodal target changed from {april.get('extrahepatic_target_volume_ml', 0):.2f} mL to {august.get('extrahepatic_target_volume_ml', 0):.2f} mL and is excluded from liver burden. "
             "These outputs require radiologist confirmation and are not a diagnosis or treatment-planning measurement.", body),
         Spacer(1, 4*mm),
         Paragraph("Tracking safeguards", h2),
@@ -332,7 +336,8 @@ def write_pdf(timeline: dict):
         deterministic = audit.get("deterministic", {})
         ai = audit.get("ai", {})
         image_path = ROOT / "assets" / "timeline" / f"{lid}_{APRIL_DATE}_2026-08-23.webp"
-        story += [Paragraph(f"{lid} · reference segment {lesion['reference_segment']}", h2)]
+        target_label = lesion.get("reference_label") if lesion.get("kind") == "node" else f"reference segment {lesion['reference_segment']}"
+        story += [Paragraph(f"{lid} · {target_label}", h2)]
         if image_path.exists():
             story += [PdfImage(str(image_path), width=190*mm, height=90.25*mm), Spacer(1, 1*mm)]
         rows = [

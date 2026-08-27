@@ -13,10 +13,10 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
   <link rel="manifest" href="site.webmanifest?v=4">
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles.css?v=9">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
   <script type="module" src="viewer.js?v=7"></script>
-  <script defer src="app.js?v=8"></script>
+  <script defer src="app.js?v=9"></script>
 </head>
 <body>
   <div class="privacy-strip">Derived and anonymized imaging data only · Automated analysis · Radiologist verification required</div>
@@ -30,6 +30,7 @@
       <a href="ct/#report">Report</a>
       <a href="mri/">MRI dashboard</a>
     </nav>
+    <a class="button small mode-link" href="mri/">MRI view</a>
     <button class="button small share-report" type="button">Share report</button>
   </header>
 
@@ -47,7 +48,7 @@
       </div>
       <div class="hero-visual glass">
         <img src="assets/liver-3d.webp" alt="Three-dimensional liver model with highlighted lesions">
-        <div class="floating-stat"><span>Latest tumor burden</span><strong id="latestBurden">—</strong></div>
+        <div class="floating-stat"><span>Latest liver-only burden</span><strong id="latestBurden">—</strong></div>
       </div>
     </section>
 
@@ -70,15 +71,15 @@
         <p>Measurements are generated from automated 3D masks and should be treated as preliminary.</p>
       </div>
       <div class="stat-grid">
-        <article class="stat-card cyan"><span>Tumor volume</span><strong id="volumeDelta">—</strong><p id="volumeValues">Loading…</p></article>
-        <article class="stat-card teal"><span>Tumor burden</span><strong id="burdenDelta">—</strong><p id="burdenValues">Loading…</p></article>
+        <article class="stat-card cyan"><span>Liver-lesion volume</span><strong id="volumeDelta">—</strong><p id="volumeValues">Loading…</p></article>
+        <article class="stat-card teal"><span>Liver-only burden</span><strong id="burdenDelta">—</strong><p id="burdenValues">Loading…</p></article>
         <article class="stat-card amber"><span>Largest diameter</span><strong id="diameterDelta">—</strong><p id="diameterValues">Loading…</p></article>
         <article class="stat-card purple"><span>Matched lesion groups</span><strong id="trackedCount">—</strong><p>Matched / present in either selected CT</p></article>
       </div>
 
       <div class="overview-grid">
         <article class="panel burden-panel">
-          <div class="panel-title"><div><span class="kicker">Tumor burden</span><h3>Percentage of liver volume</h3></div></div>
+          <div class="panel-title"><div><span class="kicker">Liver-lesion burden</span><h3>Percentage of liver volume · node excluded</h3></div></div>
           <div class="donut-row">
             <div class="donut-card"><div class="donut" id="fromDonut"><div><strong id="fromBurden">—</strong><span id="fromLabel">Earlier</span></div></div><p id="fromBurdenDetail">—</p></div>
             <div class="donut-card"><div class="donut follow" id="toDonut"><div><strong id="toBurden">—</strong><span id="toLabel">Later</span></div></div><p id="toBurdenDetail">—</p></div>
@@ -160,6 +161,7 @@
         <button class="filter" data-filter="major">Major lesions</button>
         <button class="filter" data-filter="stable">Decreased / stable</button>
         <button class="filter" data-filter="caution">Needs attention</button>
+        <button class="filter" data-filter="node">Separate node</button>
         <label class="search"><span>Search</span><input id="lesionSearch" type="search" placeholder="ID or segment…"></label>
       </div>
       <div id="lesionGrid" class="lesion-grid" aria-live="polite"></div>
@@ -175,7 +177,7 @@
           <p class="share-help">On iPhone, Share opens the native share sheet—send the report or choose <b>Save to Files</b>.</p>
           <p class="share-status" id="shareStatus" aria-live="polite"></p>
         </div>
-        <div class="report-preview"><img src="assets/timeline/L01_2026-01-19_2026-08-23.webp" alt="Annotated January and August CT comparison for lesion L01"></div>
+        <div class="report-preview"><img src="assets/timeline/L02_2026-01-19_2026-08-23.webp" alt="Annotated January and August CT comparison for dominant segment 8 liver lesion L02"></div>
       </div>
     </section>
 

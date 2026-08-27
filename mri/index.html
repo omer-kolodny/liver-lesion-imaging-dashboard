@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#0a0715">
   <meta name="description" content="Longitudinal liver MRI lesion visualization and comparison dashboard.">
   <title>RadioLens MRI · Noa</title>
-  <link rel="stylesheet" href="styles.css?v=1">
+  <link rel="stylesheet" href="styles.css?v=2">
   <script type="importmap">{"imports":{"three":"../vendor/three.module.js"}}</script>
-  <script type="module" src="viewer.js?v=1"></script>
-  <script defer src="app.js?v=1"></script>
+  <script type="module" src="viewer.js?v=2"></script>
+  <script defer src="app.js?v=2"></script>
 </head>
 <body>
   <div class="privacy-strip">Derived anonymized MRI data · Automated research visualization · Radiologist verification required</div>
@@ -35,14 +35,14 @@
       <div class="section-heading"><div><div class="eyebrow">MRI timeline</div><h2>Choose any two MRI dates</h2></div><p>The default comparison uses the first and latest available MRI.</p></div>
       <div class="timeline-picker panel"><label><span>Earlier MRI</span><select id="fromStudy"></select></label><div>→</div><label><span>Later MRI</span><select id="toStudy"></select></label></div>
       <div class="timeline-track" id="timelineTrack"></div>
-      <div class="data-warning"><b>Sequence provenance:</b> the 26 Aug ZIP is truncated. Four complete dynamic phases and T2 are included; DWI/ADC and the separate axial late series are missing, so dynamic phase 4 is used for morphology and 3D. The 28 Apr ADC map was derived from the available b=0 and b=800 images rather than supplied as a scanner-generated ADC series.</div>
+      <div class="data-warning"><b>Sequence provenance:</b> the 26 Aug file has a broken ZIP structure even though the browser marked the download complete. Four complete dynamic phases and T2 were recoverable; DWI/ADC and the separate axial late series are absent from the exported bytes, so dynamic phase 4 is used for morphology and 3D. The 28 Apr ADC map was calculated from the available b=0 and b=800 images.</div>
     </section>
 
     <section id="overview" class="section shell">
       <div class="section-heading"><div><div class="eyebrow">At a glance</div><h2>MRI disease-burden dashboard</h2></div><p>All measurements come from automated 3D masks and require specialist verification.</p></div>
       <div class="stat-grid">
-        <article class="stat-card violet"><span>Segmented tumor volume</span><strong id="volumeDelta">—</strong><p id="volumeValues">—</p></article>
-        <article class="stat-card pink"><span>Tumor burden</span><strong id="burdenDelta">—</strong><p id="burdenValues">—</p></article>
+        <article class="stat-card violet"><span>MRI-visible liver-focus volume</span><strong id="volumeDelta">—</strong><p id="volumeValues">—</p></article>
+        <article class="stat-card pink"><span>Liver-only burden</span><strong id="burdenDelta">—</strong><p id="burdenValues">—</p></article>
         <article class="stat-card indigo"><span>Tracked in selected pair</span><strong id="matchCount">—</strong><p>Weak tiny-focus matches are not forced</p></article>
         <article class="stat-card blue"><span>Repeat-AI agreement</span><strong id="repeatDice">—</strong><p>Whole-mask Dice, December / January</p></article>
       </div>
@@ -51,7 +51,7 @@
         <article class="panel metric-guide"><span class="kicker">MRI-specific metrics</span><h3>How to read the signals</h3>
           <div><b>ADC</b><p>Quantitative diffusion map in 10⁻³ mm²/s. Lower values can reflect restriction but are not specific for viable tumor.</p></div>
           <div><b>DWI / liver & T2 / liver</b><p>Lesion signal divided by background liver to reduce—but not eliminate—scanner and sequence dependence.</p></div>
-          <div><b>Low late-signal fraction</b><p>An exploratory low-enhancement proxy. It must not be interpreted as a measured necrotic percentage.</p></div>
+          <div><b>Low late-signal fraction</b><p>An exploratory low-enhancement proxy. It is not a measured necrotic percentage and cannot by itself say how much tumor is alive.</p></div>
         </article>
       </div>
       <article class="panel interpretation-panel">
@@ -77,19 +77,27 @@
             </div>
             <div class="model-controls"><button id="rotateToggle">Auto-rotate</button><button id="resetCamera">Reset view</button><button id="fullscreenModel">Fullscreen</button></div>
           </div>
-          <aside class="model-info"><div class="model-number" id="latestCount">—</div><h3>Latest segmented foci</h3><p>Colored lesion surfaces are separate objects. The translucent shell represents the latest MRI-derived liver segmentation.</p><div class="mini-metrics"><div><span>Liver volume</span><b id="latestLiver">—</b></div><div><span>Lesion volume</span><b id="latestTumor">—</b></div><div><span>Source</span><b>Dynamic post-contrast phase 4</b></div></div><a class="button ghost wide" href="assets/mri_liver_core.glb" download>Download latest MRI 3D</a></aside>
+          <aside class="model-info"><div class="model-number" id="latestCount">—</div><h3>Latest MRI-visible liver foci</h3><p>Colored surfaces represent liver foci only. The separately tracked extrahepatic nodal target is excluded from the liver count and burden.</p><div class="mini-metrics"><div><span>Liver volume</span><b id="latestLiver">—</b></div><div><span>MRI-visible liver-focus volume</span><b id="latestTumor">—</b></div><div><span>Extrahepatic nodal target</span><b id="latestNode">—</b></div><div><span>Source</span><b>Dynamic post-contrast phase 4</b></div></div><a class="button ghost wide" href="assets/mri_liver_core.glb" download>Download latest MRI 3D</a></aside>
         </div>
       </div>
     </section>
 
+    <section id="crosscheck" class="section shell">
+      <div class="section-heading"><div><div class="eyebrow">Cross-modality audit</div><h2>What CT finds that MRI automation misses</h2></div><p>The 23 Aug CT was registered to the 26 Aug MRI. Cyan outlines are CT reference locations; pink outlines are accepted MRI masks.</p></div>
+      <div class="crosscheck-grid">
+        <article class="panel crosscheck-copy"><div class="crosscheck-stats"><div><strong id="ctLiverCount">—</strong><span>CT liver candidates</span></div><div><strong id="mriLiverCount">—</strong><span>MRI-visible foci</span></div><div><strong id="confirmedCrossMatches">—</strong><span>Direct mask matches</span></div></div><h3>Why the numbers differ</h3><p id="crosscheckNote">Loading the independent CT–MRI audit…</p><p class="data-warning"><b>Important:</b> an MRI mask not appearing does not prove that a lesion vanished. The latest CT is used as the working lesion inventory; small MRI findings remain subject to radiologist review.</p></article>
+        <button class="crosscheck-image" id="openCrosscheck" type="button"><img src="assets/ct-mri-crosscheck.webp" alt="Latest CT lesion locations registered onto latest MRI"><span>Open full-resolution CT–MRI audit</span></button>
+      </div>
+    </section>
+
     <section id="lesions" class="section shell">
-      <div class="section-heading"><div><div class="eyebrow">Lesion explorer</div><h2>Multiparametric analysis per lesion</h2></div><p>Cards update to the two selected dates. Open one for high-resolution panels and its full four-date trend.</p></div>
-      <div class="filters"><button class="filter active" data-filter="all">All tracks</button><button class="filter" data-filter="major">Major lesions</button><button class="filter" data-filter="matched">Accepted matches</button><button class="filter" data-filter="review">Review required</button><label class="search"><span>Search</span><input id="search" type="search" placeholder="ID or segment…"></label></div>
+      <div class="section-heading"><div><div class="eyebrow">Target explorer</div><h2>MRI-visible liver foci and nodal target</h2></div><p>Cards update to the two selected dates. Open one for high-resolution panels and its full four-date trend.</p></div>
+      <div class="filters"><button class="filter active" data-filter="all">All tracks</button><button class="filter" data-filter="major">Major targets</button><button class="filter" data-filter="matched">Accepted matches</button><button class="filter" data-filter="node">Nodal target</button><button class="filter" data-filter="review">Review required</button><label class="search"><span>Search</span><input id="search" type="search" placeholder="ID or segment…"></label></div>
       <div class="lesion-grid" id="lesionGrid"></div>
     </section>
 
     <section id="report" class="section report-section">
-      <div class="shell report-grid"><div><div class="eyebrow">MRI report package</div><h2>Download or share the full report</h2><p class="lede small">Includes methodology, validation, registered lesion matching, high-resolution multiparametric comparisons, morphology, ADC/DWI/T2 features, dynamic signal ratios, and explicit limitations.</p><div class="hero-actions"><button class="button primary" id="sharePdf">Share PDF report</button><a class="button ghost" href="assets/Noa_Liver_MRI_Comparison.pdf" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_metrics.csv" download>Download CSV</a></div><p class="share-status" id="shareStatus"></p></div><div class="report-preview"><img src="assets/panels/M01_2026-08-26.webp" alt="Latest MRI multiparametric lesion panel"></div></div>
+      <div class="shell report-grid"><div><div class="eyebrow">MRI report package</div><h2>Download or share the full report</h2><p class="lede small">Includes methodology, validation, registered lesion matching, high-resolution multiparametric comparisons, morphology, ADC/DWI/T2 features, dynamic signal ratios, and explicit limitations.</p><div class="hero-actions"><button class="button primary" id="sharePdf">Share PDF report</button><a class="button ghost" href="assets/Noa_Liver_MRI_Comparison.pdf?v=2" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_metrics.csv?v=2" download>Download CSV</a></div><p class="share-status" id="shareStatus"></p></div><div class="report-preview"><img src="assets/panels/M01_2026-08-26.webp?v=2" alt="Latest MRI multiparametric lesion panel"></div></div>
     </section>
 
     <section class="section shell safety"><div class="safety-icon">!</div><div><h2>Clinical safety notice</h2><p>This is a computer-assisted research visualization, not a radiologist-signed report, formal RECIST assessment, pathology result, or treatment recommendation. Lesion matching, segment assignment, ADC findings, enhancement proxies, and small foci require review on the original DICOM images by a qualified radiologist.</p></div></section>
