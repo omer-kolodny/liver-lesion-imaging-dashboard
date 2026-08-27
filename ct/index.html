@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <base href="../">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="Interactive liver lesion visualization and CT comparison dashboard.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="RadioLens">
+  <title>RadioLens · Liver Imaging Dashboard</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
+  <link rel="manifest" href="site.webmanifest?v=4">
+  <link rel="stylesheet" href="styles.css?v=8">
+  <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+  <script type="module" src="viewer.js?v=7"></script>
+  <script defer src="app.js?v=8"></script>
+</head>
+<body>
+  <div class="privacy-strip">Derived and anonymized imaging data only · Automated analysis · Radiologist verification required</div>
+  <header class="nav shell">
+    <a class="brand" href="ct/#top"><span class="brand-mark">CT</span><span>RadioLens CT</span></a>
+    <nav aria-label="Main navigation">
+      <a href="ct/#overview">Overview</a>
+      <a href="ct/#timeline">Timeline</a>
+      <a href="ct/#model">3D model</a>
+      <a href="ct/#lesions">Lesions</a>
+      <a href="ct/#report">Report</a>
+      <a href="mri/">MRI dashboard</a>
+    </nav>
+    <button class="button small share-report" type="button">Share report</button>
+  </header>
+
+  <main id="top">
+    <section class="hero shell">
+      <div class="hero-copy">
+        <div class="eyebrow" id="comparisonLabel">CT comparison timeline</div>
+        <h1>A clearer view of every liver lesion.</h1>
+        <p class="lede">Explore a touch-enabled 3D liver reconstruction, lesion-level measurements, interval comparisons, and annotated source images in one responsive dashboard.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="ct/#model">Explore 3D model</a>
+          <a class="button ghost" href="ct/#lesions">Review lesions</a>
+        </div>
+        <div class="hero-note"><span class="pulse"></span><b>Image-only summary:</b> <span id="overallAssessment">Loading the latest comparison…</span></div>
+      </div>
+      <div class="hero-visual glass">
+        <img src="assets/liver-3d.webp" alt="Three-dimensional liver model with highlighted lesions">
+        <div class="floating-stat"><span>Latest tumor burden</span><strong id="latestBurden">—</strong></div>
+      </div>
+    </section>
+
+    <section id="timeline" class="section shell timeline-section">
+      <div class="section-heading">
+        <div><div class="eyebrow">Longitudinal imaging</div><h2>Choose any two CT dates</h2></div>
+        <p>The default comparison uses the first available CT and the latest available CT.</p>
+      </div>
+      <div class="timeline-picker panel">
+        <label><span>Earlier CT</span><select id="fromStudy" aria-label="Earlier CT date"></select></label>
+        <div class="timeline-arrow">→</div>
+        <label><span>Later CT</span><select id="toStudy" aria-label="Later CT date"></select></label>
+      </div>
+      <div class="timeline-track" id="timelineTrack" aria-label="CT study timeline"></div>
+    </section>
+
+    <section id="overview" class="section shell">
+      <div class="section-heading">
+        <div><div class="eyebrow">At a glance</div><h2>Disease burden dashboard</h2></div>
+        <p>Measurements are generated from automated 3D masks and should be treated as preliminary.</p>
+      </div>
+      <div class="stat-grid">
+        <article class="stat-card cyan"><span>Tumor volume</span><strong id="volumeDelta">—</strong><p id="volumeValues">Loading…</p></article>
+        <article class="stat-card teal"><span>Tumor burden</span><strong id="burdenDelta">—</strong><p id="burdenValues">Loading…</p></article>
+        <article class="stat-card amber"><span>Largest diameter</span><strong id="diameterDelta">—</strong><p id="diameterValues">Loading…</p></article>
+        <article class="stat-card purple"><span>Matched lesion groups</span><strong id="trackedCount">—</strong><p>Matched / present in either selected CT</p></article>
+      </div>
+
+      <div class="overview-grid">
+        <article class="panel burden-panel">
+          <div class="panel-title"><div><span class="kicker">Tumor burden</span><h3>Percentage of liver volume</h3></div></div>
+          <div class="donut-row">
+            <div class="donut-card"><div class="donut" id="fromDonut"><div><strong id="fromBurden">—</strong><span id="fromLabel">Earlier</span></div></div><p id="fromBurdenDetail">—</p></div>
+            <div class="donut-card"><div class="donut follow" id="toDonut"><div><strong id="toBurden">—</strong><span id="toLabel">Later</span></div></div><p id="toBurdenDetail">—</p></div>
+          </div>
+          <div class="delta-line" id="burdenChangeLine"><span>Change</span><b>—</b><b>—</b></div>
+        </article>
+        <article class="panel findings-panel">
+          <div class="panel-title"><div><span class="kicker">Interpretation</span><h3>Key observations</h3></div></div>
+          <ul class="findings" id="findingsList"><li><span>…</span><div><b>Loading analysis</b><p>Preparing the selected comparison.</p></div></li></ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="model" class="section model-section">
+      <div class="shell">
+        <div class="section-heading">
+          <div><div class="eyebrow">Latest CT · 23 Aug 2026</div><h2>Interactive 3D anatomy</h2></div>
+          <p>This 3D reconstruction comes from the latest CT. The translucent liver and each colored lesion are separate high-resolution objects.</p>
+        </div>
+        <div class="model-layout">
+          <div class="model-shell glass" id="modelShell">
+            <div id="threeViewer" class="three-viewer" role="img" aria-label="Interactive 3D liver, lesions, vessels and nearby organs">
+              <div class="model-loading" id="modelLoading"><img src="assets/liver-3d.webp" alt=""><span>Loading interactive anatomy…</span></div>
+            </div>
+            <div class="anatomy-toolbar" id="anatomyToolbar">
+              <button class="layer-panel-toggle" id="layerPanelToggle" type="button" aria-expanded="false" aria-controls="layerPanel">
+                <span>Layers</span><b id="visibleLayerCount">2 on</b>
+              </button>
+              <div class="layer-panel" id="layerPanel">
+                <div class="layer-panel-title"><strong>Anatomy overlays</strong><span>Tap to show or hide</span></div>
+                <div class="layer-controls" id="layerControls">
+                  <button class="layer-toggle active" data-layer="liver"><i style="--swatch:#b84e3a"></i>Liver</button>
+                  <button class="layer-toggle active" data-layer="lesions"><i style="--swatch:#8b5cf6"></i>Lesions</button>
+                  <button class="layer-toggle" data-layer="hepatic"><i style="--swatch:#22d3ee"></i>Hepatic vessels</button>
+                  <button class="layer-toggle" data-layer="portal"><i style="--swatch:#3b82f6"></i>Portal vein</button>
+                  <button class="layer-toggle" data-layer="ivc"><i style="--swatch:#2563eb"></i>IVC</button>
+                  <button class="layer-toggle" data-layer="aorta"><i style="--swatch:#ef4444"></i>Aorta</button>
+                  <button class="layer-toggle" data-layer="segments"><i style="--swatch:#84cc16"></i>Liver segments</button>
+                  <button class="layer-toggle" data-layer="gallbladder"><i style="--swatch:#22c55e"></i>Gallbladder</button>
+                  <button class="layer-toggle" data-layer="pancreas"><i style="--swatch:#fbbf24"></i>Pancreas</button>
+                  <button class="layer-toggle" data-layer="spleen"><i style="--swatch:#c084fc"></i>Spleen</button>
+                  <button class="layer-toggle" data-layer="kidneys"><i style="--swatch:#f4c9a0"></i>Kidneys</button>
+                  <button class="layer-toggle" data-layer="duodenum"><i style="--swatch:#fb923c"></i>Duodenum</button>
+                </div>
+                <div class="preset-controls"><button data-preset="tumor">Tumor only</button><button data-preset="vascular">Vessels</button><button data-preset="context">Organs</button></div>
+              </div>
+            </div>
+            <div class="model-controls">
+              <button id="rotateToggle" type="button">Auto-rotate</button>
+              <button id="resetCamera" type="button">Reset view</button>
+              <button id="fullscreenModel" type="button">Fullscreen</button>
+            </div>
+          </div>
+          <aside class="model-info">
+            <div class="model-number" id="modelLesionCount">9</div>
+            <h3>Latest residual lesion groups</h3>
+            <p>The 3D viewer remains a visualization aid. Timeline measurements and source-image comparisons below use the selected dates.</p>
+            <div class="mini-metrics"><div><span>Latest liver volume</span><b id="modelLiverVolume">1,467.57 mL</b></div><div><span>Latest tumor volume</span><b id="modelTumorVolume">46.56 mL</b></div><div><span>Latest scan</span><b>23 Aug 2026</b></div></div>
+            <div class="layer-heading">Interactive overlays</div>
+            <p class="layer-help">Use the <b>Layers</b> button inside the 3D viewer to add vessels, liver segments, and nearby organs.</p>
+            <a class="button ghost wide" href="assets/liver_anatomy_aug.glb" download>Download latest layered 3D model</a>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section shell">
+      <div class="section-heading"><div><div class="eyebrow">Volume distribution</div><h2>Which lesions drive total burden?</h2></div><p>The two largest lesions account for the great majority of segmented tumor volume.</p></div>
+      <div class="panel chart-panel"><div id="volumeChart" class="volume-chart" aria-label="Lesion volume comparison chart"></div></div>
+    </section>
+
+    <section id="lesions" class="section shell">
+      <div class="section-heading">
+        <div><div class="eyebrow">Lesion explorer</div><h2>Measurements and source-image comparisons</h2></div>
+        <p>Select any card for a full-resolution comparison and detailed metrics.</p>
+      </div>
+      <div class="filters">
+        <button class="filter active" data-filter="all">All</button>
+        <button class="filter" data-filter="major">Major lesions</button>
+        <button class="filter" data-filter="stable">Decreased / stable</button>
+        <button class="filter" data-filter="caution">Needs attention</button>
+        <label class="search"><span>Search</span><input id="lesionSearch" type="search" placeholder="ID or segment…"></label>
+      </div>
+      <div id="lesionGrid" class="lesion-grid" aria-live="polite"></div>
+    </section>
+
+    <section id="report" class="section report-section">
+      <div class="shell report-grid">
+        <div>
+          <div class="eyebrow">Designed clinical-style report</div>
+          <h2>Share the complete validated PDF</h2>
+          <p class="lede small-lede">Includes the four-date timeline, per-lesion trends, annotated comparisons, deterministic registration evidence, independent reconstruction-AI checks, attenuation proxies, vessel proximity, methodology, and safety limitations.</p>
+          <div class="hero-actions"><button class="button primary share-report" type="button">Share PDF report</button><a class="button ghost" href="assets/Liver_Lesion_CT_Comparison.pdf?v=6" target="_blank" rel="noopener">View PDF</a><a class="button ghost" href="assets/lesion_comparison.csv?v=5" download>Download CSV</a></div>
+          <p class="share-help">On iPhone, Share opens the native share sheet—send the report or choose <b>Save to Files</b>.</p>
+          <p class="share-status" id="shareStatus" aria-live="polite"></p>
+        </div>
+        <div class="report-preview"><img src="assets/timeline/L01_2026-01-19_2026-08-23.webp" alt="Annotated January and August CT comparison for lesion L01"></div>
+      </div>
+    </section>
+
+    <section class="section shell safety">
+      <div class="safety-icon">!</div>
+      <div><h2>Clinical safety notice</h2><p>This dashboard is a computer-assisted visualization, not a radiologist-signed diagnosis, formal RECIST assessment, or surgical-planning system. Do not use it alone to start, stop, or alter treatment. Small lesions, lesion matching, and low-attenuation estimates require specialist review.</p></div>
+    </section>
+  </main>
+
+  <footer class="site-footer shell"><span>Derived imaging dashboard · No original DICOM files published</span><span>CT timeline: 25 Dec 2025 · 19 Jan 2026 · 26 Apr 2026 · 23 Aug 2026</span></footer>
+
+  <dialog id="lesionDialog" class="lesion-dialog">
+    <button class="dialog-close" aria-label="Close">×</button>
+    <div id="dialogContent"></div>
+  </dialog>
+</body>
+</html>
