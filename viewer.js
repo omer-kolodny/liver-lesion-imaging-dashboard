@@ -17,7 +17,7 @@ if (container) {
   renderer.setPixelRatio(normalPixelRatio);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.33;
   container.appendChild(renderer.domElement);
 
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -31,8 +31,8 @@ if (container) {
   controls.minDistance = 120;
   controls.maxDistance = 900;
 
-  scene.add(new THREE.HemisphereLight(0xbfe8ff, 0x172033, 2.4));
-  const key = new THREE.DirectionalLight(0xffffff, 3.3); key.position.set(250, -350, 450); scene.add(key);
+  scene.add(new THREE.HemisphereLight(0xcceeff, 0x203149, 2.65));
+  const key = new THREE.DirectionalLight(0xffffff, 3.5); key.position.set(250, -350, 450); scene.add(key);
   const rim = new THREE.DirectionalLight(0x67e8f9, 2.0); rim.position.set(-300, 220, 180); scene.add(rim);
   const warm = new THREE.DirectionalLight(0xff9873, 1.2); warm.position.set(250, 280, -100); scene.add(warm);
 
