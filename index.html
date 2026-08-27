@@ -12,10 +12,10 @@
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=3">
   <link rel="manifest" href="site.webmanifest?v=4">
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=8">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
-  <script type="module" src="viewer.js?v=5"></script>
-  <script defer src="app.js?v=7"></script>
+  <script type="module" src="viewer.js?v=6"></script>
+  <script defer src="app.js?v=8"></script>
 </head>
 <body>
   <div class="privacy-strip">Derived and anonymized imaging data only · Automated analysis · Radiologist verification required</div>
@@ -52,7 +52,7 @@
     <section id="timeline" class="section shell timeline-section">
       <div class="section-heading">
         <div><div class="eyebrow">Longitudinal imaging</div><h2>Choose any two CT dates</h2></div>
-        <p>The default comparison uses the latest scan and the immediately preceding scan.</p>
+        <p>The default comparison uses the first available CT and the latest available CT.</p>
       </div>
       <div class="timeline-picker panel">
         <label><span>Earlier CT</span><select id="fromStudy" aria-label="Earlier CT date"></select></label>

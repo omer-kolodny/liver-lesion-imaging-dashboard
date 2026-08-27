@@ -256,7 +256,7 @@ fetch('assets/timeline.json?v=4').then(response => response.json()).then(data =>
   comparisons = data.comparisons || {};
   validation = data.validation || {};
   toDate = studies.at(-1).date;
-  fromDate = studies.at(-2).date;
+  fromDate = studies.at(0).date;
   renderSelectors();
   updateComparison();
 });

@@ -234,12 +234,21 @@ if (container) {
   document.querySelector('#resetCamera')?.addEventListener('click', () => {
     if (!homeCamera) return; camera.position.copy(homeCamera.position); controls.target.copy(homeCamera.target); controls.update();
   });
-  document.querySelector('#fullscreenModel')?.addEventListener('click', () => document.querySelector('#modelShell')?.requestFullscreen?.());
+  const modelShell = document.querySelector('#modelShell');
+  document.querySelector('#fullscreenModel')?.addEventListener('click', () => {
+    const request = modelShell?.requestFullscreen || modelShell?.webkitRequestFullscreen;
+    request?.call(modelShell);
+  });
 
   function resize() {
     const width = container.clientWidth, height = container.clientHeight;
     renderer.setSize(width,height,false); camera.aspect = width/height; camera.updateProjectionMatrix();
   }
+  function resizeAfterFullscreenChange() {
+    requestAnimationFrame(() => requestAnimationFrame(resize));
+  }
+  document.addEventListener('fullscreenchange', resizeAfterFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', resizeAfterFullscreenChange);
   new ResizeObserver(resize).observe(container); resize();
   renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene,camera); });
   window.anatomyViewer = { setLayer, applyPreset };
