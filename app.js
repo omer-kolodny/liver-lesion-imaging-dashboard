@@ -93,7 +93,7 @@ function renderOverview() {
   const auditSummary = validationSummary();
 
   document.querySelector('#comparisonLabel').textContent = `CT comparison · ${first.label} → ${second.label}`;
-  document.querySelector('#latestBurden').textContent = `${fmt(studies.at(-1).tumor_burden_pct,2)}%`;
+  document.querySelector('#latestBurden').textContent = `${fmt(studies.at(-1).tumor_burden_pct,2)}% auto`;
   document.querySelector('#volumeDelta').textContent = signed(volumeChange);
   document.querySelector('#volumeValues').textContent = `${fmt(first.tumor_volume_ml,2)} → ${fmt(second.tumor_volume_ml,2)} mL`;
   document.querySelector('#burdenDelta').textContent = signed(burdenChange, ' pp');
@@ -115,7 +115,7 @@ function renderOverview() {
   document.querySelector('#burdenChangeLine').innerHTML = `<span>Change</span><b>${signed(second.tumor_volume_ml-first.tumor_volume_ml,' mL')}</b><b>${signed(burdenChange,' percentage points')}</b>`;
 
   const assessment = volumeChange <= -30
-    ? 'substantially lower automated liver-lesion burden on the later scan; compatible with response, pending radiologist confirmation.'
+    ? 'substantially lower automatic segmented volume on the later scan. The current mask captured only part of the expert-contoured volume, so this is an exploratory software trend—not a clinical response percentage.'
     : volumeChange >= 20
       ? 'higher automated liver-lesion burden on the later scan; specialist review is recommended.'
       : 'no large automated change in liver-lesion burden.';
@@ -130,10 +130,10 @@ function renderOverview() {
     ? `${auditSummary.liver_registration_dice_pct}% liver-registration Dice · ${auditSummary.counts.supported} supported · ${auditSummary.counts.provisional} provisional · ${auditSummary.counts.review + auditSummary.counts['not-established']} review/not established.`
     : 'This selected non-consecutive pair has not undergone the independent registered-mask matching audit.';
   document.querySelector('#findingsList').innerHTML = `
-    <li><span>01</span><div><b>Corrected liver-only segmented burden</b><p>${signed(volumeChange)} volume change and ${signed(burdenChange,' percentage points')} burden change. The segment II/III mass formerly mislabeled as a node is now included.</p></div></li>
+    <li><span>01</span><div><b>Automatic segmented burden—not clinical ground truth</b><p>${signed(volumeChange)} automatic volume change and ${signed(burdenChange,' percentage points')} automatic burden change. The current automatic contour captured only ${fmt(dataOverall.automatic_vs_manual_capture_pct,1)}% of the expert screenshot total, so this must not be read as the true treatment-response percentage.</p></div></li>
     <li><span>02</span><div><b>Largest comparable liver target (${lead.lesion_id})</b><p>${signed(leadChange)} automated volume change over the selected interval.</p></div></li>
     <li><span>N</span><div><b>Separate portocaval node remains unsegmented</b><p>The previous automatic node trend was withdrawn because that contour was a liver mass. A reliable source contour for the true node is still required.</p></div></li>
-    <li><span>15</span><div><b>Expert workstation cross-check</b><p>${expertReference ? `${expertReference.target_count} manual targets totaling ${fmt(expertReference.total_volume_cc,2)} cc were visible in the supplied screenshots.` : 'Manual measurements are being reconciled.'}</p></div></li>
+    <li><span>15</span><div><b>Current expert workstation cross-check</b><p>${expertReference ? `${expertReference.target_count} manual targets total ${fmt(expertReference.total_volume_cc,2)} cc on the current CT. The automatic ${fmt(studies.at(-1).tumor_volume_ml,2)} mL is only ${fmt(dataOverall.automatic_vs_manual_capture_pct,1)}% of that total, but the scopes are not fully comparable until T1–T15 are anatomically mapped.` : 'Manual measurements are being reconciled.'}</p></div></li>
     <li><span>±</span><div><b>Volume uncertainty is now explicit</b><p>The primary August pipeline estimates ${fmt(studies.at(-1).tumor_volume_ml,2)} mL; an independent pipeline estimated ${fmt(dataOverall.independent_model_tumor_volume_ml,2)} mL. Neither is treated as clinical ground truth.</p></div></li>
     <li class="quality-${quality.level}"><span>03</span><div><b>${quality.label}${quality.score_pct == null ? '' : ` · ${fmt(quality.score_pct)}% internal-reference similarity`}</b><p>${quality.explanation}</p></div></li>
     <li class="validation-finding"><span>V</span><div><b>Dual-channel match validation</b><p>${auditLine}</p></div></li>
@@ -145,7 +145,7 @@ function renderExpertReference() {
   const section = document.querySelector('#expert-reference');
   if (!section || !expertReference) return;
   document.querySelector('#expertReferenceSummary').textContent = `${expertReference.target_count} manually segmented targets · ${fmt(expertReference.total_volume_cc, 2)} cc total`;
-  document.querySelector('#expertReferenceNote').textContent = `${expertReference.study_date_confidence}. ${expertReference.mapping_status}`;
+  document.querySelector('#expertReferenceNote').textContent = `Current CT (${expertReference.study_date}); ${expertReference.study_date_confidence}. If every listed target is hepatic, their conditional ratio is ${fmt(dataOverall.conditional_manual_target_to_liver_pct,2)}% of the automatic liver volume; this is not a final liver-only burden until T1–T15 are anatomically identified. ${expertReference.mapping_status}`;
   document.querySelector('#expertMeasurementGrid').innerHTML = expertReference.targets.map(item => `
     <div class="expert-measurement"><b>${item.label}</b><strong>${fmt(item.volume_cc, 2)} cc</strong><small>${item.workstation_hu_display}</small></div>`).join('');
   document.querySelector('#expertHuWarning').textContent = expertReference.hu_warning;
@@ -265,7 +265,7 @@ function updateComparison() {
   renderCards();
 }
 
-fetch('assets/timeline.json?v=8').then(response => response.json()).then(data => {
+fetch('assets/timeline.json?v=9').then(response => response.json()).then(data => {
   studies = data.studies;
   studyMap = Object.fromEntries(studies.map(study => [study.date, study]));
   lesions = data.lesions;

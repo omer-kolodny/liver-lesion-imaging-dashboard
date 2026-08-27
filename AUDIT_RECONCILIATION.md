@@ -6,7 +6,7 @@ Reviewed 27 Aug 2026. This is software quality assurance, not a radiologist-sign
 
 - The former `L01` extrahepatic-node label was incorrect. The tracked structure is a partly exophytic segment II/III hepatic mass and is included in liver-lesion burden.
 - The actual portocaval node is a separate target. It is not assigned an automatic volume or 3D contour because the liver-restricted model did not segment it reliably.
-- CT liver-lesion totals were restored to 166.82, 170.34, 97.64 and 46.56 mL. January-to-August automated volume change is -72.7%.
+- CT automatic liver-lesion totals were restored to 166.82, 170.34, 97.64 and 46.56 mL. The resulting January-to-August automatic change is -72.7%, but it is exploratory only and must not be interpreted as the true clinical response because the current automatic mask substantially under-segments the expert contours.
 - CT contrast delays were corrected to 174.4 s, 131.8 s and 131.9 s for January, April and August. January attenuation comparisons are therefore explicitly qualified.
 - The complete August MRI archive is used, including late T1, DWI b=800, ADC, T2 fat-sat and all dynamic phases.
 - The MRI 3D model now contains nine CT-anchored hepatic targets. Five have automatic support on at least one MRI sequence. Missing MRI contours are not interpreted as disappeared lesions.
@@ -41,14 +41,14 @@ The screenshots display 15 segmented objects totaling 105.77 cc:
 | T14 | 0.21 | 87.01 ± 87.01 HU |
 | T15 | 0.87 | 81.84 ± 81.84 HU |
 
-The scan date is not visible. April 2026 is the leading inference because T1 (37.17 cc) closely matches the April automatic segment VIII contour (37.621 mL), and the total is closest to the independent April estimate. This inference is not treated as confirmed.
+The user confirmed that these measurements are from the current 23 Aug 2026 CT. The earlier April inference based on numerical similarity was wrong and has been withdrawn. The primary automatic August pipeline measured 46.56 mL, only 44.0% of the 105.77 cc manual total. If all 15 targets are hepatic, 105.77 cc is conditionally 7.21% of the 1467.57 mL automatic liver volume. That is not a final liver-only burden because the screenshot does not identify which targets are hepatic and which may be extrahepatic.
 
 The repeated `mean ± SD` values are suspicious because every displayed standard deviation exactly equals its mean. They are retained as literal screenshot transcription and are not used for viability analysis.
 
 ## Still required for exact reconciliation
 
 1. The Philips DICOM SEG, RTSTRUCT, or labelled contour export corresponding to T1–T15.
-2. Confirmation of the acquisition date represented by the screenshots.
-3. A target-name/segment key for T1–T15.
-4. A validated contour for the true portocaval node.
+2. A target-name/segment key for T1–T15.
+3. Identification of whether any T-number is the extrahepatic portocaval node.
+4. A validated source contour for the true portocaval node.
 5. Complete re-downloads of the remaining truncated CT/MRI archives before claiming a final lesion count or definitive volumetric trend.

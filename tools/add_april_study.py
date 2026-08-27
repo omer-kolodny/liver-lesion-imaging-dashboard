@@ -341,11 +341,11 @@ def write_pdf(timeline: dict):
             f"Automated liver-only segmented lesion volume changed from {april['tumor_volume_ml']:.2f} mL to {august['tumor_volume_ml']:.2f} mL ({volume_change:+.1f}%). "
             f"Burden changed from {april['tumor_burden_pct']:.2f}% to {august['tumor_burden_pct']:.2f}%. April and August contrast timing is closely matched. "
             "The former L01 nodal classification was withdrawn: L01 is a segment II/III liver mass and is included here. The true portocaval node remains a separate unsegmented specialist-review target. "
-            "These outputs require radiologist confirmation and are not a diagnosis or treatment-planning measurement.", body),
+            "Because the current automatic mask captured only part of the expert-contoured volume, this percentage is an exploratory software trend, not the true clinical response percentage.", body),
         Spacer(1, 2*mm),
         Paragraph(
             f"Segmentation uncertainty: the primary August pipeline estimates {august['tumor_volume_ml']:.2f} mL, while the independent audit estimated {timeline.get('overall', {}).get('independent_model_tumor_volume_ml', 0):.2f} mL. "
-            "This spread is reported explicitly; neither estimate is treated as a clinical ground-truth volume.", body),
+            f"The radiologist-workstation screenshots total {timeline.get('expert_reference', {}).get('total_volume_cc', 0):.2f} cc on the same current CT. This spread is reported explicitly; none of the automatic estimates is treated as a clinical ground-truth volume.", body),
         Spacer(1, 4*mm),
         Paragraph("Tracking safeguards", h2),
         Paragraph(
@@ -366,8 +366,8 @@ def write_pdf(timeline: dict):
         story += [
             Paragraph("Radiologist-workstation screenshot cross-check", h2),
             Paragraph(
-                f"The supplied screenshots display {expert['target_count']} manually segmented targets totaling {expert['total_volume_cc']:.2f} cc. "
-                f"The study is probably 26 Apr 2026, but the date is not printed in the screenshot. {expert['mapping_status']}", body),
+                f"The supplied screenshots display {expert['target_count']} manually segmented targets totaling {expert['total_volume_cc']:.2f} cc on the current 23 Aug 2026 CT, as confirmed by the user. "
+                f"The primary automatic pipeline measured {august['tumor_volume_ml']:.2f} mL, only {timeline.get('overall', {}).get('automatic_vs_manual_capture_pct', 0):.1f}% of the manual total. If all listed targets are hepatic, their conditional ratio is {timeline.get('overall', {}).get('conditional_manual_target_to_liver_pct', 0):.2f}% of the automatic liver volume; it is not a final liver-only burden because the manual targets are not anatomically mapped. {expert['mapping_status']}", body),
             Spacer(1, 4*mm),
         ]
         manual_rows = [["Target", "Volume", "Workstation HU display"]] + [
@@ -503,7 +503,7 @@ def main():
     timeline["overall"].update({
         "april_to_aug_tumor_volume_change_pct": round(april_to_aug, 1),
         "april_to_aug_burden_change_points": round(august["tumor_burden_pct"] - april_study["tumor_burden_pct"], 2),
-        "bottom_line": "The automated models show lower segmented liver tumor volume in August than April, with the largest residual groups remaining L01 and L02. This is compatible with interval treatment response, but registration, segmentation, and protocol uncertainty require radiologist confirmation.",
+        "bottom_line": "The automatic models show lower segmented volume in August than April, but the current automatic mask captures substantially less volume than the current expert contours. The interval percentage is exploratory software output, not a clinical response measurement.",
     })
     timeline["generated"] = "2026-08-24"
     timeline["method"] = "Automated image-only segmentation with longitudinal registration. Matching uses spatial overlap/centroid, segment, morphology and vessel topology; split/merge and ambiguous tracks are flagged for review. Attenuation uses VNC correction and internal liver/blood-pool normalization."

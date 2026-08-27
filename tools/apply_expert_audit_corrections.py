@@ -88,24 +88,30 @@ def main() -> None:
         "jan_to_aug_burden_change_points": round(aug["tumor_burden_pct"] - jan["tumor_burden_pct"], 2),
         "april_to_aug_tumor_volume_change_pct": pct(april["tumor_volume_ml"], aug["tumor_volume_ml"]),
         "april_to_aug_burden_change_points": round(aug["tumor_burden_pct"] - april["tumor_burden_pct"], 2),
-        "best_working_inventory": "Nine automatic hepatic components on the latest CT. Expert workstation screenshots show 15 manually segmented targets on a likely April study; exact target mapping requires the original DICOM SEG/RTSTRUCT export.",
-        "bottom_line": "All automatic liver components, including the left-lobe segment II/III mass formerly mislabeled as a node, are included in liver burden. Automated volume is substantially lower in August, compatible with response, but exact lesion count and whole-tumor burden remain under expert reconciliation.",
+        "best_working_inventory": "Nine automatic hepatic components on the latest CT. Expert workstation screenshots from that same current CT show 15 manually segmented targets; exact target mapping requires the original DICOM SEG/RTSTRUCT export.",
+        "bottom_line": "The current expert contours total 105.77 cc, while the primary automatic pipeline captured 46.56 mL. The automatic longitudinal decrease therefore cannot be used as the true clinical response percentage until equivalent expert contours are mapped across dates.",
         "independent_model_tumor_volume_ml": 55.54,
         "volume_uncertainty_note": "Independent automatic pipelines differ materially. Reported volumes are model estimates, not a clinical ground-truth contour.",
         "portocaval_node_status": "A separate portocaval node is visible and described by the radiologist, but no reliable automated contour is included in the dashboard.",
+        "current_radiologist_segmented_target_volume_cc": 105.77,
+        "automatic_current_volume_ml": 46.56,
+        "automatic_vs_manual_capture_pct": 44.02,
+        "conditional_manual_target_to_liver_pct": 7.21,
+        "automatic_longitudinal_trend_status": "Exploratory only: the current automatic contour materially under-segments the expert target set, so automated interval percentages are not clinical response measurements.",
+        "manual_current_burden_status": "Not computable definitively from the screenshots alone because the 15 targets are not anatomically labelled and the node cannot be separated from hepatic targets. If all 105.77 cc are hepatic, the conditional ratio is 7.21% of the 1467.57 mL automatic liver volume.",
     })
     data["expert_reference"] = {
         "source": "Two radiologist-workstation screenshots supplied 27 Aug 2026; identifiers and screenshots are not published.",
-        "study_date": "2026-04-26",
-        "study_date_confidence": "probable, not printed in the screenshot",
-        "date_basis": "The 37.17 cc dominant contour closely matches the 37.621 mL April segment VIII automatic contour, and the 105.77 cc total is closest to the independent April estimate.",
+        "study_date": "2026-08-23",
+        "study_date_confidence": "confirmed by the user as the current CT",
+        "date_basis": "User confirmation received 27 Aug 2026. The earlier April inference based on numerical similarity was incorrect and has been withdrawn.",
         "target_count": 15,
         "total_volume_cc": 105.77,
         "targets": [
             {"label": label, "volume_cc": volume, "workstation_hu_display": hu}
             for label, volume, hu in WORKSTATION_ROWS
         ],
-        "mapping_status": "The screenshots do not contain target names, DICOM coordinates, or an exported segmentation object. Individual T1–T15 contours cannot be safely assigned to longitudinal lesion IDs from screenshots alone.",
+        "mapping_status": "The current CT screenshot does not contain target names, DICOM coordinates, or an exported segmentation object. Individual T1–T15 contours cannot be safely assigned to longitudinal lesion IDs from screenshots alone.",
         "hu_warning": "Every displayed SD exactly repeats the mean, which is unlikely to be a valid standard deviation. These HU entries are transcribed for audit only and are not used for viability calculations.",
     }
     data.setdefault("validation", {})["independent_audit_2026_08_27"] = {

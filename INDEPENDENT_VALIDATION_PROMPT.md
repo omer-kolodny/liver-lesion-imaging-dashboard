@@ -70,7 +70,7 @@ The revised analysis currently claims:
 - The real nodal target is not included in the automatic MRI volume or 3D model.
 - Calipers terminate on the contour and report the maximum axial diameter plus a perpendicular chord on each examination. A separate locked-axis analysis may be used for sensitivity testing but is not substituted for conventional per-scan measurement.
 - CT attenuation and MRI signal are treated as proxies rather than proof of viability or necrosis.
-- Two radiologist-workstation screenshots show 15 manually segmented objects totaling 105.77 cc, but do not expose DICOM coordinates or target-to-lesion labels.
+- Two radiologist-workstation screenshots from the current 23 Aug 2026 CT show 15 manually segmented objects totaling 105.77 cc, but do not expose DICOM coordinates or target-to-lesion labels.
 
 Reproduce or reject each claim independently.
 
